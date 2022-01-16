@@ -1,4 +1,6 @@
-6203 국어, 영어, 수학의 총점
+# 객체지향 문제
+
+## 6203 국어, 영어, 수학의 총점
 
 ```python
 class subject:   
@@ -18,7 +20,7 @@ print("국어, 영어, 수학의 총점: %d" %(student.total()))
 
 
 
-6223 원의 면적
+##  6223 원의 면적
 
 ```python
 class Circle:
@@ -33,7 +35,7 @@ print('원의 면적: %.2f'%(ar.area()))
 
 
 
-6225 사각형의 면적
+## 6225 사각형의 면적
 
 ```python
 class Rectangle:
