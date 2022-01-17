@@ -20,13 +20,10 @@
 
    How-to
 
-   컴퓨터에서는 이를 사용한다.
+   -> 컴퓨터에서는 이를 사용한다.
 
-* 파이썬의 특징
-
-  : Easy to learn, Expressive language, 크로스 플랫폼 언어, 인터프리터 언어, 객체지향 프로그래밍
-  
-  ​	객체지향 프로그래밍: 속성을 보거나 재사용 가능하게 여러가지를 할 수 있도록 	Person이라는 틀(class)을 짜고 속성과 행동(함수) 정의
+* 파이썬의 특징: Easy to learn, Expressive language, 크로스 플랫폼 언어, 인터프리터 언어, 객체지향 프로그래밍
+  * 객체지향 프로그래밍: 속성을 보거나 재사용 가능하게 여러가지를 할 수 있도록 Person이라는 틀(class)을 짜고 속성과 행동(함수) 정의
 
 
 
@@ -178,7 +175,7 @@ x, y = y, x		#값을 바꿔서 저장하는 코드
 print('Hello:' + name + '성적은' + score)
 print('Hello, %s: 성적은 %d' % (name, score))
 print('Hello, {}: 성적은 {}'.format(name, score))
-print(f'Hello, {name}: 성적은{score}}')
+print(f'Hello, {name}: 성적은{score}')
 ```
 
 
@@ -489,7 +486,7 @@ s[::-1]		#'ihgfedcba'
   * 읽혀지는 대로 쓰여있는 값 그 자체
 
 ```python
-name = '김싸피'	#name은 식별자, '김싸피'는 리터럴
+name = '김oo'	#name은 식별자, '김oo'은 리터럴
 ```
 
 * 표현식(Expression)
