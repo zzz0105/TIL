@@ -1,5 +1,99 @@
 # 0118 Code Review
 
+## 리스트 안 해당 요소의 개수
+
+```python
+words = ['a', 'b', 'a', 'c', 'b', 'c', 'a', 'a']
+print(students.count('a'))
+```
+
+
+
+## 최댓값 & 등장 횟수
+
+```python
+#최댓값을 판별할 때 변수에 가장 작은 값을 할당하고 비교를 시작할 때가 있다.
+#inf의 경우 어떤 숫자와 비교해도 무조건 크다고 판정되므로, -inf는 가장 작은 값이다.
+#최댓값과 등장 횟수를 각각 구하는 것보다 한 루프에서 돌면 복잡도가 줄어든다.
+nums =[7, 50, 22, 27, 50]
+big_num = nums[0]
+big_num_cnt = 0
+for num in nums:
+    if big_num < num:
+        big_num = num
+        big_num_cnt = 0	#큰 수가 바뀌면 지금까지 센 것 초기화
+    if big_num == num:
+        big_num_cnt += 1	#'+='은 붙여서 쓴다.
+print(big_num, big_num_cnt)
+```
+
+
+
+## 요소 찾기
+
+```python
+#리스트 컴프리헨션
+#변수명 지을 때 i, idx는 순서(인덱싱)를, 리스트 안 요소일 때는 다른 이름을 사용하면 좋다.
+nums= [2, 5, 6, 8, 5, 4, 3, 7, 2, 1]
+#nums 리스트의 요소 num. 만약 num이 2이면 num을 num_cnt에 넣는다. 그 후 길이를 잰다.
+num_cnt = [num for num in nums if i==2]	
+print(len(num_cnt))
+```
+
+
+
+## 요소 빼기
+
+```python
+#리스트 활용
+word = input()
+word = list(word)
+result = []
+for i in word:
+    if i != 'a':
+        result.append(i)
+print(''.join(result))	#리스트를 문자열로 출력할 때. 리스트 안의 요소들을 붙여서 출력
+print(*result, sep='')	#result 언패킹. 출력하면서 사이에 ''출력해라(=공백없이 출력)
+print(result, sep='')	#결과는 리스트인 result가 나온다.
+#continue 활용. a를 만나면 뒤에 있는 print문을 실행하지 말고 바로 다음 요소로 넘어가라
+for char in word:
+    if char == 'a':
+        continue
+    print(char, end='')
+#replace 메서드 사용. word의 a요소를 ''으로 대신 출력
+print(word.replace('a',''))
+#문자열
+new_word=''
+for char in word:
+    if char != 'a':
+        new_word += char
+print(new_word)
+#리스트 컨프리헨션
+new_word = [char for char in word if not char = 'a']
+print(''.join(new_word))
+```
+
+
+
+## 단어 뒤집기
+
+```python
+word = input()
+#리스트 슬라이싱 사용. 처음부터 끝까지 왼쪽으로 한칸씩 움직이며 출력해라
+print(word[::-1]) 
+#for문을 활용. print('a', end='b'): ab. a 출력하고 뒤에 b 붙인다(줄바꿈x)(초기값='\n').
+#print('a', 'b', sep='c'): acb. a와 b 사이에 c를 출력한다.(초기값=' ')
+for i in range(len(word)):
+    print(word[len(word)-i-1], end='')
+#문자열을 만들어나가는 코드
+rev_word = ''
+for alphabet in word:
+    rev_word = alphabet + rev_word
+print(rev_word)
+```
+
+
+
 ## Floating point rounding error(부동소수점 반올림 오차)
 
 * 파이썬은 부동소수점 방식으로 실수를 표현하는데, 부동소수점은 실수를 정확히 표현할 수 없는 문제가 있다.
