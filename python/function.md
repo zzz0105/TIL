@@ -180,7 +180,7 @@ print(a)		#NameError가 뜬다. a가 global variable이 아니기 때문인다.
         * Local scope: 함수
         * Enclosed scope: 특정 함수의 상위 함수. 함수 내부에 함수 정의 가능
         * Global scope: 함수 밖의 변수, Import 모듈
-        * Built-in scope: 파이썬 안에 내정되어 있는 함수 또는 속성
+        * Built-in scope: 파이썬 안에 내장되어 있는 함수 또는 속성
 
     ```python
     a = 0
