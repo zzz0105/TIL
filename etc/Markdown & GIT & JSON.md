@@ -80,6 +80,11 @@
 
 ### Git 기초 흐름
 
+![image-20220123002233148](Markdown & GIT & JSON.assets/image-20220123002233148.png)
+
+* head: 움직이며 내가 보는 곳 표시
+* Version들은 linked list로 연결되어 V2를 볼 때 V3만 볼 수 있다.
+
 #### Git 저장소 생성
 
 ```bash
