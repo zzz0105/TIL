@@ -52,22 +52,20 @@ def list_sum(lst):
 ## abs() 함수 구현
 
 ```python
-
-```
-
-
-
-## all() 함수 구현
-```python
-
-```
-
-
-
-
-## any() 함수 구현
-```python
-
+def my_abs(num):
+    if type(num) is complex:	#복소수일 때
+        return (num.imag**2 + num.real**2)**0.5
+    elif type(num) == int or type(num) == float:    #정수나 실수일 때
+        if n < 0:
+            return -n
+        elif n > 0:			
+            return n
+        else:			#-0 == 0이므로 num==0에 걸려서 처리됨. 따라서 제곱해서 반환.
+            return n**2    
+    
+#type(num) is float or type(num) is int == type(num)이 float이거나 int이거나
+#(type(num) is float) or (int) 이렇게 쓰는 것으로 인식.
+#type(num) is (float or int)   이것도 안됨
 ```
 
 
@@ -76,10 +74,21 @@ def list_sum(lst):
 ## 자릿수 더하기
 
 ```python
+#풀이1
+def sum_of_digit(number):
+    all_sum = 0
+    for num in str(number):	#입력을 문자열로 변환하고 for문 사용
+        all_sum += int(num)
+    return all_sum
 
+#풀이2. 정석풀이. 자릿수하면 몫과 나머지를 떠올리자!!
+	def sum_of_digit(num):
+	ans = 0
+	while(n/10):			#n/10이 0이 아닐 때
+    	#m = n % 10			#m은 나머지
+    	#n //= 10			#n은 몫
+    	n, m = divmod(n, 10)
+    	ans += m
+	return ans
 ```
-
-
-
-
 
