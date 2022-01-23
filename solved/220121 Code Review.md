@@ -22,11 +22,64 @@
 ## 딕셔너리
 
 ```python
-dic = {
+dic = {						#변수 이름 지을 때 유의하기
     ['A': '1', 'B':'2'],
     ['C': '3', 'D': '4']
 }
 dic[0]['A']		#'1'
 dic[0].keys()	#'A', 'B'
 ```
+
+
+
+## List 내 전체 합 구하기
+
+```python
+#재귀함수 사용
+def list_sum(lst):
+    result = 0
+    for i in lst:
+        if type(i) == list:
+            result += list_sum(i)
+        else:
+            result += i
+    return result
+#입력 예시: list_sum([[9],2,[1,3,2, [1, 5]],[6,8]])
+```
+
+
+
+## abs() 함수 구현
+
+```python
+
+```
+
+
+
+## all() 함수 구현
+```python
+
+```
+
+
+
+
+## any() 함수 구현
+```python
+
+```
+
+
+
+
+## 자릿수 더하기
+
+```python
+
+```
+
+
+
+
 
