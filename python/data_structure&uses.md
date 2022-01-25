@@ -4,7 +4,7 @@
   * 메소드로 호출하는 것은 원본 리스트를 정렬시키고 None을 return. ex.  a.sort()
   * 함수는 원본 리스트는 변경하지 않고 정렬된 리스트를 return. ex. sorted(a)
 * Iterable: 반복 가능한 객체. list, dict, set, str, bytes, tuple, range
-* mutable: 변경 가능한 객체. list, dict
+* mutable: 변경 가능한 객체. list, dict, set
 
 ## 순서가 있는 데이터 구조
 
@@ -39,7 +39,7 @@
 | 'separator'.join([iterable])  | 구분자로 iterable(반복가능한 요소. string의 메소드!!)을 합쳐 문자열 반환 |
 | s.capitalize()                | 가장 첫 번째 글자를 대문자로 변경                            |
 | s.title()                     | '나 공백 이후를 대문자로 변경                                |
-| s.upper                       | 모두 대문자로 변경                                           |
+| s.upper()                     | 모두 대문자로 변경                                           |
 | s.lower()                     | 모두 소문자로 변경                                           |
 | s.swapcase()                  | 대문자, 소문자 서로 변경                                     |
 
@@ -54,7 +54,7 @@
 | -------------------- | ------------------------------------------------------------ |
 | L.append(x)          | 리스트 마지막에 항목 x를 추가                                |
 | L.insert(i, x)       | 리스트 인덱스 i에 항목 x를 삽입. 리스트 길이보다 큰 경우 맨 뒤에 삽입 |
-| L.extend(iterable)   | 순회형 m의 모든 항목들의 리스트 끝에 추가(+=과 같은 기능) 입력할 때 주의. L.extend['lion']: 'lion'이 들어감. L.extend('lion'): 'l', 'i', 'o', 'n'이 들어감 |
+| L.extend(iterable)   | 리스트 마지막에 순회형으로 모든 항목들을 추가.(+=과 같은 기능) 입력주의! L.extend['lion']: 'lion'이 들어감. L.extend('lion'): 'l', 'i', 'o', 'n'이 들어감 |
 | L.remove(x)          | 리스트 가장 왼쪽에 있는 항목(첫번째) x를 제거. 항목이 존재하지 않을 경우 ValueError. |
 | L.pop()              | 리스트 가장 오른쪽에 있는 항목(마지막)을 반환 후 제거        |
 | L.pop(i)             | 리스트의 인덱스 i에 있는 항목을 반환 후 제거                 |
@@ -122,5 +122,143 @@
 | d.pop(k)          | 키 k의 값을 반환하고 키 k인 항목을 딕셔너리 d에서 삭제하는데, 키 k가 딕셔너리 d에 없을 경우 KeyError를 발생 |
 | d.pop(k, v)       | 키 k의 값을 반환하고 키 k인 항목을 딕셔너리 d에서 삭제하는데, 키 k가 딕셔너리 d에 없을 경우 v를 발생 |
 | d.update([other]) | 딕셔너리 d의 값을 매핑하여 업데이트. 값을 제공하는 key, value로 덮어쓴다. dict.update(tea='차') |
+
+## 얕은 복사와 깊은 복사
+
+### 할당
+
+* mutable한 객체의 변수 간 대입
+
+```python
+a = [1, 2, 3]
+b = a 			# shallow copy
+b[0]= 4
+print(a)		#[4, 2, 3]
+print(b)		#[4, 2, 3]
+#id(a)와 id(b)는 같다.
+```
+
+b에 a를 할당하면 값이 할당되지 않고 같은 메모리 주소를 바라본다.(객체 참조 복사) 따라서 b가 변경이 되면 a도 변경이된다.(참조하는 모든 변수에 영향) mutable한 객체에서 이와 같은 현상을 볼 수 있다.
+
+* immutable한 객체의 변수 간 대입
+
+```python
+a = "abc"
+b = a
+print(a)		#'abc'
+print(b)		#'abc'
+#id(a)와 id(b)는 같다.
+b = "abcd"
+print(a)		#'abc'
+print(b)		#'abcd'
+#id(a)와 id(b)는 다르다.
+```
+
+b에 a를 할당하면 같은 메모리 주소를 바라본다. 그러나 b에 다른 값을 할당하면 재할당이 이루어져 다른 메모리 주소를 바라본다. 따라서 a와 b는 다른 값을 가진다.
+
+### 얕은 복사
+
+```python
+a = [1,2,3]
+b = a[:]
+#id(a)와 id(b)는 다르다.
+#a와 b는 값은 같으나(==) 객체는 다르다.(a is not b)
+```
+
+* 슬라이싱([:])을 통해 값을 할당할 시 새로운 id가 부여되어 서로 영향을 받지 않는다.
+* copy 모듈의 copy 메소드도 얕은 복사에 해당한다.
+
+```python
+a = [1, 2, ['a', 'b']]
+b = a[:]
+b[2][0] = 'c'
+#a와 b는 모두 [1, 2, ['c', 'b']]
+```
+
+* 그러나 mutable 객체 안에 mutable 객체가 있을 시, 리스트 a와 b([1, 2], )는 다른 메모리 주소를 바라보지만 리스트 a와 b 속의 리스트(['a', 'b'])는 같은 주소를 바라본다. => 깊은 복사 사용!!
+  * 속에 있는 리스트 대신 'h'로 바꾸면 다른 애로 인식한다? => 리스트 안에 있는 값을 조정했을 때 참조가 같은거다. 속에 있는 리스트 대신 string으로 덮어쓰기를 하면 다른 애로 인식한다. 
+
+### 깊은 복사
+
+```python
+import copy
+a = [[1,2],[3,4]]
+b = copy.deepcopy(a)
+a[1].append(5)
+print(a)		#[[1, 2], [3, 4, 5]]
+print(b)		#[[1, 2], [3, 4]]
+```
+
+* 내부 객체들까지 모두 새롭게 copy되는 것. 같은 값이지만 다른 참조.
+* copy.deepcopy 메서드 사용
+
+
+
+## 에러/예외 처리
+
+### 디버깅
+
+#### 에러 메세지가 발생하는 경우
+
+* 먼저 syntax Error, Indentation Error 잡기
+
+* branches. 조건문
+  * 모든 조건이 원하는 대로 동작하는지
+* for loops
+  * 반복문이 원하는 횟수만큼 진행이 되는지
+  * 반복문 값 변경 잘 되는가. 진입 및 결과가 맞는가
+* while loops
+  * 반복문이 원하는 횟수만큼 진행이 되는지
+  * 반복문 값 변경 잘 되는가. 진입 및 결과가 맞는가
+  * 종료 조건 제대로 동작하는가
+* function
+  * 함수의 호출 잘 되었는가. 파라미터 잘 넣어줬는가. 결과 잘 나오는가
+  * type 확인
+
+### 에러와 예외
+
+#### 문법 에러(Syntax Error)
+
+* 파이썬 프로그램 실행되지 않는다.
+* 파일이름, 줄번호, 캐럿(^_에러 감지된 가장 앞의 위치) 문자를 통해 파이썬이 코드를 읽어나갈 때 문제가 발생한 위치 표현.
+
+#### Invalid Syntax
+
+- assign to literal. 해당할 수 없다.
+- EOL(End of Line) 따옴표나 괄호 끝에 안함
+- EOF(End of front)  따옴표나 괄호 앞에 안함
+
+#### 예외(Exception)
+
+* 실행 도중 예상치 못한 상황을 맞이하면, 프로그램 실행을 멈춤
+  * 문장이나 표현식이 문법적으로 올바르더라도 발생하는 에러
+* 실행 중에 감지되는 에러들을 예외(Exception)이라고 부름
+* 예외는 여러 타입으로 나타나고, 타입이 메세지의 일부로 출력됨
+  * ZeroDivisionError 0으로 나누고자 할 때
+  * NameError namespace 상에 이름이 없는 경우
+  * TypeError 타입 불일치, argument 누락, argument 개수 초과, argument type 불일치
+  * ValueError 타입은 올바르나 값이 적절하지 않거나 없는 경우
+  * IndexError 인덱스가 존재하지 않거나 범위를 벗어나는 경우
+  * KeyError 해당 키가 존재하지 않는 경우
+  * ModuleNotFoundError 존재하지 않는 모듈을 import하는 경우
+  * ImportError module은 있으나 존재하지 않는 클래스/함수를 가져오는 경우
+  * IndentationError Indentation(들여쓰기)이 적절하지 않는 경우
+* 
+* 모든 내장 예외는 Exception Class를 상속받아 이뤄짐
+* 사용자 정의 예외를 만들어 관리할 수 있음.
+
+### 예외처리
+
+### 예외 발생시키기
+
+###  raise & assert
+
+```python
+raise <표현식> (메세지)	#
+assert <표현식>, (메세지)	#
+```
+
+* 예외를 강제로 발생
+
 
 
