@@ -243,22 +243,78 @@ print(b)		#[[1, 2], [3, 4]]
   * ModuleNotFoundError 존재하지 않는 모듈을 import하는 경우
   * ImportError module은 있으나 존재하지 않는 클래스/함수를 가져오는 경우
   * IndentationError Indentation(들여쓰기)이 적절하지 않는 경우
-* 
 * 모든 내장 예외는 Exception Class를 상속받아 이뤄짐
 * 사용자 정의 예외를 만들어 관리할 수 있음.
 
 ### 예외처리
 
-### 예외 발생시키기
-
-###  raise & assert
+* 파이썬은 순차적으로 수행 => 가장 작은 범주부터 예외처리를 하자.
 
 ```python
-raise <표현식> (메세지)	#
-assert <표현식>, (메세지)	#
+try:
+    nums = [2, 5, 0]
+	for num in nums:
+        print(10/num)
+except ZeroDivisionError as zd:
+    print(f'{zd} 오류 발생')
+#5.0 2.0 division by zero 오류 발생
 ```
 
-* 예외를 강제로 발생
+#### try문
+
+* 오류가 발생할 가능성이 있는 코드를 실행
+* 예외가 발생되지 않으면, except 없이 실행 종료
+
+#### except 절
+
+* try문에서 예외가 발생하면, except 절이 실행
+* 예외 상황을 처리하는 코드를 받아서 적절한 조치를 취함
+
+#### as 키워드(예외 메세지 처리)
+
+* as 키워드를 활용해 원본 에러 메세지를 사용할 수 있다.
+
+#### else
+
+* try문에서 예외가 발생하지 않으면 실행
+
+#### finally
+
+* 예외 발생 여부와 관계없이 항상 실행
+* 클린업할 때 사용. ex. 성공하든 실패하든 마지막에 파일을 닫아야할 때.
+
+#### if/else와 try/except의 차이
+
+* if/else의 경우 오류가 발생하면 실행을 멈추지만, try/except의 경우 해당하는 예외에 대한 상황들을 처리할 수 있다.
+
+### 예외 강제로 발생시키기
+
+####  raise
+
+```python
+#raise <표현식> ('메세지')	
+raise						  #RuntimeError
+raise ValueError			  #ValueError
+raise Exception('에러다!')		#Exception: 에러다!
+try:
+    if ~:
+        raise
+except:
+    print('에러다')			#에러다
+```
+
+* 실제 프로덕션 코드에서 활용
+* 표현식에서 예외 타입을 지정. 주어지지 않을 경우 현재 스코프에서 활성화된 마지막 예외를 다시 일으킴.
+
+####  assert
+
+```python
+#assert <표현식>, ('메세지')	
+assert id[-1].isalpha(), 'id 맨 마지막 자리는 숫자!'	#AssertionError: id 맨 마지막 자리는 숫자!
+```
+
+* 상태 검증과 디버깅 용도로 사용. 
+* 표현식(특정 조건)이 False이면 AssertionError
 
 
 
