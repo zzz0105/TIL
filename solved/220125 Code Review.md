@@ -48,6 +48,15 @@ for blood_type in blood_types:
     result[blood_type] = result.get(blood_type, 0) + 1
 ```
 
+```python
+#get활용문제. dictionary 입력 받아 value와 key를 뒤집은 결과를 반환하는 함수
+def rev_dict(my_dict):
+    result_dict ={}
+    for my_key, my_value in my_dict.items():
+        result_dict[my_value] = result_dict.get(my_value, []) + [my_key]
+    return result_dict
+```
+
 
 
 ## 중복구하기
