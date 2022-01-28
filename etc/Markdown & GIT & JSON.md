@@ -230,3 +230,25 @@ open(file, mode='r', encoding=None)	#기본값 설정.파일명, 텍스트모드
 +) 알고리즘/문제풀이에서는 리스트, 조건문, 반복문을 많이 쓴다.
 
 ​	 실무에서는 딕셔너리와 리스트를 많이 사용한다.
+
+
+
+### 요청과 응답 그리고 API
+
+* 웹 스크래핑(=웹 크롤링)
+  * 웹 주소에서 query에 검색어를 넣으면 검색창에 검색어를 넣은 것과 같은 것을 볼 수 있다.
+  * 파이썬을 통해 주소로 요청을 보내고, 응답 결과를 파이썬으로 조작
+    * response (200) = 성공적으로 가져옴
+    * 404 / 500 = 오류
+
+```python
+import requests
+URL = 'https://~'    #URL
+response = requests.get(URL).json()	#요청. 딕셔너리 타입
+print(response.get('~'))
+```
+
+* API(Application Programming Interface)
+  * 컴퓨터나 컴퓨터 프로그램 사이의 연결
+  * 사용하는 방법은 API 사양/명세에 쓰여있다.(꼼꼼히 볼 것) 
+
