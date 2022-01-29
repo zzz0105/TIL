@@ -307,7 +307,76 @@ for i in range(T):	#테스트 케이스만큼 반복
 
 
 
+## 1204. [S/W 문제해결 기본] 1일차 - 최빈수 구하기
+
+* 첫째 줄 테스트 케이스의 수 T / 둘째 줄 테스트 케이스의 번호 / 셋째 줄~ 점수
+
+```python
+#enumerate 얘 쓰면 접근이 복잡함.#[(0, (41, 15)), (1, (85, 6)), (2, (72, 10)),...
+
+#zip
+T = int(input())	#테스트 케이스 수
+for i in range(T):	#테스트 케이스만큼 반복
+    n = int(input())	#테스트 케이스의 번호
+    scores_dic = {}
+    many = 0    #최빈값의 인덱스 할당
+    scores_lst = map(int, input().split())	#입력을 띄어쓰기로 분리하고 int형으로 형변환시켜 저장 
+    for score in scores_lst:
+        scores_dic[score] = scores_dic.get(score, 0) + 1    # 점수 : 횟수
+    score_item_lst = list(zip(scores_dic.keys(), scores_dic.values()))
+
+    for j in range(len(score_item_lst)):
+        if score_item_lst[many][1] < score_item_lst[j][1]:
+            many = j
+
+    print(f'#{n} {score_item_lst[many][0]}')
+```
 
 
 
+## 1284. 수도 요금 경쟁
+
+* 종민이의 집에서 한 달간 사용하는 수도의 양: W리터
+* A사 : 1리터당 P원의 돈을 내야 한다.
+* B사 : 기본 요금이 Q원이고, 월간 사용량이 R리터 이하인 경우 요금은 기본 요금만 청구된다. 하지만 R 리터보다 많은 양을 사용한 경우 초과량에 대해 1리터당 S원의 요금을 더 내야 한다.
+* 첫 번째 줄에 테스트 케이스의 수 T가 주어진다. 각 테스트 케이스마다 첫 번째 줄에 위 본문에서 설명한 대로 P, Q, R, S, W(1 ≤ P, Q, R, S, W ≤ 10000, 자연수)가 순서대로 공백 하나로 구분되어 주어진다.
+* 각 테스트 케이스마다 ‘#x’(x는 테스트케이스 번호를 의미하며 1부터 시작한다)를 출력하고, 종민이가 내야 하는 수도 요금을 출력한다.
+
+```python
+T = int(input())	#테스트 케이스 수
+for i in range(T):	#테스트 케이스 수만큼 반복
+    P, Q, R, S, W = map(int, input().split())
+    #A사
+    A = P * W
+    #B사
+    if W < R:
+        B = Q
+    else:
+        B = Q + S * (W - R)
+    money = A if A < B else B
+    print(f'#{i + 1} {money}')
+```
+
+
+
+## 1285. 아름이의 돌 던지기
+
+* 아름이 포함 N명. 가장 0에 가깝게 돌이 떨어진 위치와 0 사이의 거리 차이와 몇 명이 그렇게 돌을 던졌는지를 구하는 프로그램을 작성하라. ( 돌이 떨어지는 위치는 항상  -100,000에서 100,000사이 범위의 정수)
+* 입력: 테스트케이스 \n 명 수 \n 떨어진 위치(숫자 사이 공백)
+
+```python
+T = int(input())    #테스트 케이스
+for i in range(T):
+    people = int(input())   #사람 수 
+    pos = map(int, input().split()) #돌 떨어진 위치
+    cnt = 1
+    min = 100000    #0과 가까운 정도
+    for p in pos:
+        if abs(p) < abs(min):
+            min = p
+            cnt = 1
+        elif abs(p) == abs(min):
+            cnt += 1        
+    print(f'#{i+1} {abs(min)} {cnt}')   #거리 차이 및 그렇게 던진 사람의 수
+```
 
