@@ -1,4 +1,4 @@
-# SWEA D1 문제 풀이
+# [SWEA D1](https://swexpertacademy.com/main/code/problem/problemList.do?problemLevel=1&contestProbId=&categoryId=&categoryType=&problemTitle=&orderBy=FIRST_REG_DATETIME&selectCodeLang=ALL&select-1=&pageSize=10&pageIndex=1)
 
 ## 1545. 거꾸로 출력해 보아요
 
@@ -307,6 +307,8 @@ for i in range(T):	#테스트 케이스만큼 반복
 
 
 
+# [SWEA D2](https://swexpertacademy.com/main/code/problem/problemList.do?problemLevel=2&contestProbId=&categoryId=&categoryType=&problemTitle=&orderBy=FIRST_REG_DATETIME&selectCodeLang=ALL&select-1=1&pageSize=10&pageIndex=1)
+
 ## 1204. [S/W 문제해결 기본] 1일차 - 최빈수 구하기
 
 * 첫째 줄 테스트 케이스의 수 T / 둘째 줄 테스트 케이스의 번호 / 셋째 줄~ 점수
@@ -370,7 +372,7 @@ for i in range(T):
     people = int(input())   #사람 수 
     pos = map(int, input().split()) #돌 떨어진 위치
     cnt = 1
-    min = 100000    #0과 가까운 정도
+    min = 100000    #0과 가까운 정도를 비교할 변수. 최대값 부여
     for p in pos:
         if abs(p) < abs(min):
             min = p
@@ -379,4 +381,27 @@ for i in range(T):
             cnt += 1        
     print(f'#{i+1} {abs(min)} {cnt}')   #거리 차이 및 그렇게 던진 사람의 수
 ```
+
+
+
+## 1945. 간단한 소인수분해
+
+```python
+T = int(input())
+for i in range(T):
+    in_num = int(input())
+    nums_dic = {2:0, 3:0, 5:0, 7:0, 11:0}
+
+    for num in nums_dic.keys():
+        while(in_num/num).is_integer():	#정수형인지 판별(5.0도 정수로 판별)
+            in_num/=num
+            nums_dic[num] += 1
+
+    ans = ' '.join(map(str, list(nums_dic.values())))
+    print(f'#{i+1} {ans}')
+```
+
+
+
+
 
