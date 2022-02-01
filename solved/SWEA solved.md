@@ -402,3 +402,73 @@ for i in range(T):
 ```
 
 
+
+## 1946. 간단한 압축 풀기
+
+```python
+T= int(input())
+for i in range(T):
+    N = int(input())
+    sen = ''
+    sen_lst = []
+    for n in range(N):  #리스트에 추가
+        char, times = input().split()
+        sen += (char * int(times))		#char을 횟수만큼 반복해 문자열에 저장
+        while len(sen) >= 10:			#만약 문자열의 길이가 10 이상이라면
+            sen_lst.append(sen[0:10])	#문자열에 저장된 0~9 인덱스를 리스트에 저장
+            sen = sen[10:]				#저장안된건 다시 문자열 sen에 저장
+    print(f'#{i+1}')
+    for j in range(len(sen_lst)):		#리스트에 저장된 문자열부터 출력
+        print(sen_lst[j])
+    print(sen)							#나머지 문자열 출력
+```
+
+
+
+## 1948. 날짜 계산기
+
+```python
+T = int(input())
+date=[31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+for i in range(T):
+    m1, d1, m2, d2=map(int,input().split())
+    ans = 0
+    for j in range(m2-1):
+        ans += date[j]
+    for k in range(m1-1):
+        ans -= date[k]
+    print(f'#{i+1} {ans + d2 -d1 + 1}')
+
+```
+
+
+
+## 1959. 두 개의 숫자열
+
+```python
+T = int(input())
+for i in range(T):
+    n, m = map(int, input().split())
+    a = list(map(int, input().split()))
+    b = list(map(int, input().split()))
+    big_sum, sum = 0, 0
+    
+    if n <= m:  #b의 길이가 더 크다면
+        for j in range(m-n+1):
+            sum = 0
+            for k in range(n):
+                sum += a[k] * b[k+j]    
+            if sum > big_sum:
+                big_sum = sum
+    else:   #a의 길이가 더 크다면
+        for j in range(n-m+1):
+            sum = 0
+            for k in range(m):
+                sum += a[k+j] * b[k]     
+            if sum > big_sum:
+                big_sum = sum
+                
+    print(f'#{i+1} {big_sum}')
+
+```
+
