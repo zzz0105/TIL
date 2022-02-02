@@ -472,3 +472,57 @@ for i in range(T):
 
 ```
 
+
+
+## 1966. 숫자를 정렬하자
+
+```python
+T = int(input())
+for i in range(T) :
+    N = int(input())
+    num = list(map(int, input().split()))
+    num.sort()
+    print(f'#{i+1}', end=' ')
+    for j in num:
+        print(j, end=' ')
+    print()
+#str.join(iterable) 정수형으로 이루어진 리스트는 join 바로 쓰면 안됨. str로 바꿔서 쓰기.
+```
+
+
+
+## 1970. 쉬운 거스름돈
+
+* 손님에게 거슬러 주어야 할 금액 N을 최소 개수로 거슬러 주기 위한 각 종류의 돈 개수
+
+```python
+T = int(input())
+for i in range(T):
+    mon_dic = {50000 : 0, 10000 : 0, 5000 : 0, 1000 : 0, 
+                500 : 0, 100 : 0, 50 : 0, 10 : 0}
+    N = int(input())    #거슬러주어야할 금액
+    for j in mon_dic:
+        mon_dic[j] = N // j
+        N -= j * mon_dic[j]
+    ans = ' '.join(map(str, list(mon_dic.values())))
+    print(f'#{i+1}\n{ans}')
+```
+
+
+
+## 1976. 시각 덧셈
+
+```python
+T = int(input())
+for i in range(T):
+    h1, m1, h2, m2 = map(int, input().split())
+    hour = h1 + h2
+    if hour > 12:
+        hour -= 12
+    minute = m1 + m2
+    if minute > 59:
+        minute -= 60
+        hour += 1
+    print(f'#{i+1} {hour} {minute}')
+```
+
