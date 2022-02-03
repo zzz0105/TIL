@@ -125,3 +125,100 @@ print(string)					#abcd
 
 ## 4. 파이썬 문자열 031~040
 
+```python
+#31
+a = "3"
+b = "4"
+print(a + b)	#34
+
+#32
+print("Hi" * 3)	#HiHiHi
+
+#33 화면에 '-' 80개 출력
+print('-' * 80)
+
+#34
+t1 = 'python'
+t2 = 'java'
+print((t1 + ' ' + t2 + ' ')*4)
+
+#35
+name1 = "김민수" 
+age1 = 10
+name2 = "이철희"
+age2 = 13
+print('이름: %s 나이: %d' %(name1, age1))
+print('이름: %s 나이: %d' %(name2, age2))
+
+#36
+name1 = "김민수" 
+age1 = 10
+name2 = "이철희"
+age2 = 13
+print('이름: {} 나이: {}'.format(name1, age1))
+print('이름: {} 나이: {}'.format(name2, age2))
+
+#37
+name1 = "김민수" 
+age1 = 10
+name2 = "이철희"
+age2 = 13
+print(f'이름: {name1} 나이: {age1}' %(name1, age1))
+print(f'이름: {name2} 나이: {age2}' %(name2, age2))
+
+#38
+상장주식수 = "5,969,782,550"
+print(int(상장주식수.replace(',','')))
+
+#39
+분기 = "2020/03(E) (IFRS연결)"
+print(분기[:7])
+
+#40
+data = "   삼성전자    "
+print(data.strip())
+```
+## 4. 파이썬 문자열 041~050
+
+```python
+#41
+ticker = "btc_krw"
+ticker.upper()
+print(ticker)
+
+#42
+ticker = "BTC_KRW"
+ticker.lower()
+print(ticker)
+
+#43
+print('hello'.capitalize())
+
+#44
+file_name = "보고서.xlsx"
+file_name.endswith('xlsx')
+
+#45 문자열이 xlsx나 xls로 끝나는지 확인
+file_name = "보고서.xlsx"
+b = file_name.endswith(("xlsx", "xls"))
+
+#46
+file_name = "2020_보고서.xlsx"
+file_name.startswith('2020')
+
+#47 공백을 기준으로 나누기
+a = "hello world"
+a.split()
+
+#48
+ticker = "btc_krw"
+ticker.split('_')
+
+#49
+date = "2020-05-01"
+date.split('-') 
+
+#50
+data = "039490     "
+data.rstrip()
+```

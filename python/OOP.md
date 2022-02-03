@@ -366,11 +366,11 @@ class MyClass:
         return self
     
     @staticmethod
-    def static_method():		#클래스 메서드
+    def static_method():		#스태틱 메서드
         return ''
     
     @classmethod
-    def class_method(cls):		#스태틱 메서드
+    def class_method(cls):		#클래스 메서드
         print(cls.var)
         return cls
 ```
