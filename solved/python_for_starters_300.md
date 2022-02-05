@@ -223,7 +223,7 @@ data = "039490     "
 data.rstrip()
 ```
 
-## 5. 파이썬 문자열 051~060
+## 5. 파이썬 리스트 051~060
 
 ```python
 #51
@@ -263,5 +263,98 @@ print(len(cook))
 #60
 nums = [1, 2, 3, 4, 5]
 print(sum(nums)/len(nums))
+```
+
+## 6. 파이썬 리스트 061~070
+
+```python
+#61
+price = ['20180728', 100, 130, 140, 150, 160, 170]
+print(price[1:])
+
+#62 홀수만
+nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print(nums[::2])
+
+#63 짝수만
+nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print(nums[1::2])
+
+#64 역방향
+nums = [1, 2, 3, 4, 5]
+print(nums[::-1])
+
+#65
+interest = ['삼성전자', 'LG전자', 'Naver']
+print(interest[0], interest[2])
+
+#66
+interest = ['삼성전자', 'LG전자', 'Naver', 'SK하이닉스', '미래에셋대우']
+print(' '.join(interest))
+
+#67
+interest = ['삼성전자', 'LG전자', 'Naver', 'SK하이닉스', '미래에셋대우']
+print('/'.join(interest))
+
+#68
+interest = ['삼성전자', 'LG전자', 'Naver', 'SK하이닉스', '미래에셋대우']
+print('\n'.join(interest))
+
+#69
+string = "삼성전자/LG전자/Naver"
+print(string.split('/'))
+
+#70
+data = [2, 4, 3, 1, 5, 10, 9]
+data.sort()
+print(data)
+```
+
+## 7.  파이썬 튜플 071~080
+
+```python
+#71 
+my_variable = ()
+
+#72
+movie_rank = ('닥터 스트레인지', '스플릿', '럭키')
+
+#73 숫자 1이 저장된 튜플. (!)로 저장시키면 정수형으로 인식
+my_tuple = (1,)
+
+#74
+t = (1, 2, 3)
+t[0] = 'a'
+'''
+Traceback (most recent call last):
+  File "<pyshell#46>", line 1, in <module>
+    t[0] = 'a'
+TypeError: 'tuple' object does not support item assignment
+'''
+#튜플은 immutable하기 때문에 원소의 값을 변경할 수 없다.
+
+#75
+t = 1, 2, 3, 4
+#튜플. 원칙적으로 튜플은 괄호와 함께 데이터를 정의해야 하지만, 사용자 편의를 위해 괄호 없이도 동작함
+
+#76 t가 ('A', 'b', 'c') 튜플을 가리키도록 수정 하라.
+t = ('a', 'b', 'c')
+t = ('A', 'b', 'c')
+
+#77
+interest = ('삼성전자', 'LG전자', 'SK Hynix')
+interest_lst = list(interest)
+
+#78
+interest = ['삼성전자', 'LG전자', 'SK Hynix']
+interest_tuple = tuple(interest)
+
+#79
+temp = ('apple', 'banana', 'cake')
+a, b, c = temp
+print(a, b, c)	#apple, banana, cake
+
+#80
+my_tuple = tuple(range(2, 100, 2))
 ```
 
