@@ -210,8 +210,6 @@
 <input type="checkbox" name="agree"	id="agree">
 ```
 
-
-
 #### input 유형 -  일반
 
 * 일반적으로 입력을 받기 위하여 제공되며 타입별로 HTML 기본 검증 혹은 추가 속성을 활용할 수 있음
@@ -274,8 +272,11 @@ h1 {					//선택자
 ### CSS selectors
 
 * 기본 선택자
-  * 전체 선택자, 요소 선택자(HTML 태그를 직접 선택)
-  * 클래스 선택자(.으로 시작. 해당 클래스가 적용된 항목을 선택), 아이디 선택자(#으로 시작. 해당 아이디가 적용된 항목을 선택. 단일 id 사용 권장), 속성 선택자
+  * 전체 선택자(*)
+    요소 선택자(태그명. HTML 태그를 직접 선택)
+  * 클래스 선택자(.으로 시작. 해당 클래스가 적용된 항목을 선택)
+    아이디 선택자(#으로 시작. 해당 아이디가 적용된 항목을 선택. 단일 id 사용 권장)
+    속성 선택자
 * 결합자(Combinators)
   * 자손 결합자, 자식 결합자
   * 일반 형제 결합자, 인접 형제 결합자
@@ -287,13 +288,14 @@ h1 {					//선택자
 
 1. !important
 2. 우선 순위
-   1. inline>id>class, 속성, pseudo-class>요소, pseudo-element
-3. CSS 파일 로딩 순서
+
+   inline>#id>.class>태그명>*전체, 속성, pseudo-class>요소, pseudo-element
+3. CSS 파일 로딩 순서(나중에 선언된 것)
 
 #### 상속
 
 * CSS는 상속을 통해 부모 요소의 속성을 자식에게 상속한다.
-* 상속 되는 것: Text 관련 요소, opacity 등
+* 상속 되는 것: style(Text 관련 요소, opacity) 등
 * 상속 되지 않는 것: Box model 관련 요소, position 관련 요소 등
 
 
@@ -461,3 +463,151 @@ p + span{
 * 요소를 일반적인 문서 흐름에서 제거 후 레이아웃에 공간을 차지하지 않음(normal flow에서 벗어남)
 * 부모 요소와 관계없이 **viewport(브라우저) 기준**으로 이동.(스크롤 시에도 항상 같은 곳에 위치)
 
+
+
+### CSS Layout
+
+#### Float
+
+* 박스를 왼쪽 혹은 오른쪽으로 이동시켜 텍스트를 포함 인라인 요소들이 주변을 wrapping하도록 함. => Normal Flow 벗어남
+  * Flexbox, Grid 등장과 함께 사용도 낮아짐
+* 활용- Normal Flow에서 벗어난 레이아웃 구성
+  * 원하는 요소들을 Float로 지정하여 배치 => Normal Flow에서 벗어나 떠있는 상태
+  * 부모 요소에 반드시 Clearing Float를 하여 이후 요소부터 Normal Flow를 가지도록 지정
+* 속성
+  * 기본값: none 
+  * 요소를 왼쪽/오른쪽으로 띄움: Float Left/Right 
+
+```html
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .box{
+                width: 10rem;	//160px
+                height:10rem;
+                border: 1px solid black;
+                background color: crimson;
+            }
+            
+            .left{
+                float left;
+            }
+            
+            .clearfix:after{
+                content: ""	//뒤에 나올 글씨
+                display: block;
+                clear both;
+            }
+        </style>
+    </head>
+    <body>
+        <div class-"clearfix">	//float해도 float 안쓴것처럼.클리어링
+            <div class="box1 left">box1</div>
+        </div>
+        <div class="box2">box2</div>
+        <p>
+            Lorem Ipsum dolor ~//Lorem 300하면 가짜로 긴 글(dummy text) 생성
+        </p>
+    </body>
+</html>
+```
+
+* 이후 요소에 대하여 Float 속성이 적용되지 않도록 Clearing이 필수적
+  * ::after: 선택한 요소이 맨 마지막 자식으로 가상 요소를 하나 생성
+  * 부모요소에게 clear 속성 부여. 주로 clear: both;를 자주 쓴다.
+
+#### Flexbox
+
+* 행과 열 형태로 아이템들을 배치하는 1차원 레이아웃 모델
+
+  * 수동 값 부여 없이 아이템의 너비와 높이 혹은 간격을 동일하게 배치, 수직 정렬
+* 축: main axis(메인 축), cross axis(교차 축-메인 축과 수직)
+
+  * flex-direction: row
+    * main axis가 가로. 시작점이 왼쪽(시작점을 오른쪽으로 두려면 row-reverse)
+  * flex-direction: column
+    * main axis가 세로. 시작점이 위쪽(시작점을 아래쪽으로 두려면 column-reverse)
+
+##### 구성요소
+
+* Flex Container(부모 요소)
+  * flexbox 레이아웃을 형성하는 가장 기본적인 모델
+  * Flex Item들이 놓여있는 영역
+  * 속성을 display: flex; 혹은 inline-flex를 넣어주면 된다
+* Flex Item(자식요소)
+  * 컨테이너에 속해 있는 컨텐츠(박스)
+
+##### 속성
+
+* 배치 설정
+    * flex-direction
+        * Main axis의 방향을 설정. 시작점부터 1이다.
+      * row, row-reverse, column, column-reverse
+    * flex-wrap
+      * 아이템이 컨테이너 영역을 벗어나지 않도록 설정(wrap-넘치면 다음줄로/nowrap-기본값. 한줄 배치)
+    * flex-flow
+      * flex-direction과 flex-wrap에 대한 설정값을 차례로 작성.
+      * ex. flex-flow: row nowrap;
+* 공간 나누기
+  * justify-content
+    * Main axis를 기준으로 공간 배분
+    * flex-start/flex-end/center/space-between/space-around/space-evenly
+  * align-content
+    * Cross axis를 기준으로 공간 배분
+    * flex-start/flex-end/center/space-between/space-around, space-evenly
+* 정렬
+  * align-items: 모든 아이템을 Cross axis를 기준으로 정렬
+    * stretch/flex-start/flex-end/center/baseline
+  * align-self: **개별 아이템**을 Cross axis를 기준으로 정렬
+    * stretch/flex-start/flex-end/center
+* 기타 속성
+  * flex-grow: 남은 영역을 아이템에 분배
+  * order: 배치 순서
+
+##### grid
+
+
+
+#### Bootstrap
+
+> 세상에서 가장 유명한 프론트엔드 오픈소스
+
+##### CDN
+
+> Content Delivery(Distribution) Network
+
+* 컨텐츠를 더 효율적으로 전달하기 위해 여러 노드에 가진 네트워크에 데이터를 제공하는 시스템
+  * 개별 end-user의 가까운 서버를 통해 빠르게 전달 가능(지리적 이점)
+  * 외부 서버를 활용함으로써 본인 서버의 부하가 적어짐
+
+##### spacing
+
+* .mt-1: margin top 0.25rem(= 4px)
+
+* .mx-0: margin left right(x축) 0
+
+* .py-2: padding top bottom 0.5rem(=8px)
+  * (left=start, right=end)
+
+
+
+##### Responsive web
+
+> 별도의 기술 이름이 아닌 웹 디자인에 대한 접근 방식, 반응형 레이아웃 작성에 도움이 되는 사례들의 모음 등을 기술하는데 사용되는 용어
+
+
+
+#### Grid system(web design)
+
+>  요소들의 디자인과 배치에 도움을 주는 시스템
+
+* 기본 요소
+  * Column: 실제 컨텐츠를 포함하는 부분
+  * Gutter: 칼럼과 칼럼 사이의 공간(사이 간격)
+  * Container: Column들을 담고 있는 공간
+
+##### Bootsrap grid System
+
+* flexbox로 제작. container, rows, column으로 컨텐츠를 배치하고 정렬
+* ***12개의 column, 6개의 grid breakpoints**
