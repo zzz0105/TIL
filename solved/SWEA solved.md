@@ -526,3 +526,65 @@ for i in range(T):
     print(f'#{i+1} {hour} {minute}')
 ```
 
+
+
+## 4828. min max
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    N = int(input())    #양수의 개수
+    nums = list(map(int, input().split()))
+    minV = maxV = nums[0]
+    for i in range(N):
+        if minV > nums[i]:
+            minV = nums[i]
+        if maxV < nums[i]:
+            maxV = nums[i]
+    print(f'#{tc} {maxV-minV}')
+```
+
+
+
+## 4834. 숫자 카드
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    N = int(input())    #카드 장 수
+    cards = list(map(int, input()))
+    cnts = [0] * 10     #0부터 9까지
+    max = max_n = 0     #가장 많은 카드와 그 카드의 장 수
+    for i in range(N):  #개수 세기
+        cnts[cards[i]] += 1
+    for i in range(10):
+        if cnts[i] >= max:
+            max = cnts[i]
+            max_n = i
+    print(f'#{tc} {max_n} {max}')
+```
+
+
+
+##  4835. 구간합
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    N, M = tuple(map(int, input().split())) #정수개수N 구간개수M tuple로 형변환 안해줘도 잘 들어감
+    nums = list(map(int, input().split()))
+    sums = [10000 * M, 0, 0] #min(들어올 수 있는 최대 원소들의 합 표현 아니면 float('inf')=무한대. 1e10=백억), max, 현재 sum값 순
+    now_sum = 0
+    for i in range(N-M+1):
+        #현재 sum값 구하기
+        for j in range(M):
+            now_sum+=nums[i+j]
+        sums[2] = now_sum
+        if sums[0] > sums[2]:
+            sums[0] = sums[2]
+        if sums[1] < sums[2]:
+            sums[1] = sums[2]
+        now_sum = 0
+    print(f'#{tc} {sums[1]-sums[0]}')
+```
+
