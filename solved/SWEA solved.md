@@ -384,6 +384,24 @@ for i in range(T):
 
 
 
+## 1926. 간단한 369게임
+
+```python
+def is369(nums):
+    clap = 0
+    numlst = list(str(nums))
+    for n in numlst:
+        if int(n) == 3 or int(n) == 6 or int(n) == 9:
+            clap += 1
+    return clap
+
+num =  int(input())
+for n in range(1, num+1):
+    print('-'*is369(n), end=' ') if is369(n) else print(n, end=' ')
+```
+
+
+
 ## 1945. 간단한 소인수분해
 
 ```python
@@ -524,6 +542,24 @@ for i in range(T):
         minute -= 60
         hour += 1
     print(f'#{i+1} {hour} {minute}')
+```
+
+
+
+## 1989. 초심자의 회문 검사
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    word = input()
+    L = len(word)
+    for i in range(L):
+        if word[i] == word[L-i-1]:
+            ans = 1
+        else:
+            ans = 0
+            break
+    print(f'#{tc} {ans}')
 ```
 
 
