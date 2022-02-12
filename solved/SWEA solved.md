@@ -336,6 +336,45 @@ for i in range(T):	#테스트 케이스만큼 반복
 
 
 
+## 1206. View
+
+```python
+T = 10 #테스트 케이스 10개
+for tc in range(1, T+1):
+    buildings = int(input())    #빌딩 개수
+    heights = list(map(int, input().split()))   #빌딩들의 층 수 저장할 리스트
+    view = 0    #조망권 확보된 세대 수
+    for i in range(2, buildings-2):
+        compare_list = [heights[i-2],heights[i-1], heights[i], heights[i+1], heights[i+2]]
+ 
+        compare_list.sort()
+ 
+        if compare_list[4]==heights[i]:
+            view += compare_list[4]-compare_list[3]
+ 
+    print(f'#{tc} {view}')
+```
+
+
+
+## 1208. Flatten
+
+```python
+T = 10
+for tc in range(1, T+1):
+    dump_limit = int(input())
+    heights = list(map(int, input().split()))
+    for i in range(dump_limit):
+        heights.sort()
+        if heights[99] - heights[0] < 2:
+            break
+        heights[99] -= 1
+        heights[0] += 1
+    print(f'#{tc} {max(heights) - min(heights)}')
+```
+
+
+
 ## 1284. 수도 요금 경쟁
 
 * 종민이의 집에서 한 달간 사용하는 수도의 양: W리터
@@ -542,6 +581,23 @@ for i in range(T):
         minute -= 60
         hour += 1
     print(f'#{i+1} {hour} {minute}')
+```
+
+
+
+## 1986. 지그재그 숫자
+
+```python
+T = int(input())
+for tc in range(1, 1+T):
+    num =int(input())
+    ans= 0
+    for n in range(1,1+num):
+        if n % 2:   #홀수
+            ans += n
+        else:       #짝수
+            ans -= n
+    print(f'#{tc} {ans}')
 ```
 
 
