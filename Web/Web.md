@@ -163,7 +163,7 @@
 
 * table의 각 영역을 명시하기 위해 <thead><tbody><tfoot>요소를 활용
 * <tr>으로 가로 줄을 구성, 내부에는 <th>혹은<td>로 셀을 구성
-* colsan, rowspan 속성을 활용하여 셀 병합
+* colspan, rowspan 속성을 활용하여 셀 병합
 * <caption>을 통해 표 설명 또는 제목을 나타냄
 * table 태그 기본 구성
 
@@ -295,10 +295,12 @@ h1 {					//선택자
 #### 상속
 
 * CSS는 상속을 통해 부모 요소의 속성을 자식에게 상속한다.
-* 상속 되는 것: style(Text 관련 요소, opacity) 등
-* 상속 되지 않는 것: Box model 관련 요소, position 관련 요소 등
 
+* 상속 되는 것: Text 관련 요소(font, color,text-align), opacity, visibility 등
 
+* 상속 되지 않는 것: Box model 관련 요소(width, height, margin, padding, border, box-sizing, display), position 관련 요소(position, top/right/bottm/left, z-index) 등 되는 것: style(Text 관련 요소, opacity) 등
+
+  
 
 ### CSS 단위
 
