@@ -444,6 +444,7 @@ for n in range(1, num+1):
 ## 1945. 간단한 소인수분해
 
 ```python
+#딕셔너리 활용
 T = int(input())
 for i in range(T):
     in_num = int(input())
@@ -456,6 +457,21 @@ for i in range(T):
 
     ans = ' '.join(map(str, list(nums_dic.values())))
     print(f'#{i+1} {ans}')
+
+#리스트 활용
+T=int(input())
+nums = [2,3,5,7,11]
+for tc in range(1,T+1):
+    n = int(input())
+    times = [0, 0, 0, 0, 0]
+    for i in range(5):
+        while(n%nums[i]==0):
+            n//=nums[i]
+            times[i]+=1
+    print(f'#{tc}', end=' ')
+    for time in times:
+        print(time, end=' ')
+    print()
 ```
 
 
@@ -678,5 +694,66 @@ for tc in range(1, T+1):
             sums[1] = sums[2]
         now_sum = 0
     print(f'#{tc} {sums[1]-sums[0]}')
+```
+
+
+
+## 4836. 색칠하기
+
+```python
+#색칠하기 빨간색 인 곳 1로, 파란색인 곳 2로 채워서 합한다. 보라색 영역 =>합이 3인 곳 
+T = int(input())        #테스트케이스 개수
+for tc in range(1, T+1):
+    red_areas = [[0]*10 for _ in range(10)] #10*10격자
+    blue_areas = [[0] * 10 for _ in range(10)]  # 10*10격자
+    times = int(input())    #칠할 영역의 개수
+    purple = 0
+    colors = []
+    for i in range(times):
+        colors += [list(map(int, input().split()))]
+        for x in range(colors[i][0],colors[i][2]+1):
+            for y in range(colors[i][1],colors[i][3]+1):
+                if colors[i][4] == 1:
+                    red_areas[x][y] = 1
+                else:
+                    blue_areas[x][y] = 2
+                if red_areas[x][y] + blue_areas[x][y] == 3:
+                    purple += 1
+    print(f'#{tc} {purple}')
+
+```
+
+
+
+## 4839. 이진탐색
+
+```python
+T = int(input())
+for tc in range(1,  T+1):
+    page, page_a, page_b = map(int, input().split())    #책 페이지 수, a, b가 찾아야하는 쪽 수
+    a, b = 0, 0         #a와 b가 탐색해야하는 횟수
+    ia, ib, ra, rb, ca, cb =  1, 1, page, page, 0, 0     #a와 b의 시작, 끝, 중간
+    while(ca != page_a):
+        a += 1
+        ca = int((ia + ra) / 2)
+        if ca<page_a:
+            ia=ca
+        else:
+            ra=ca
+
+    while(cb != page_b):
+        b += 1
+        cb = int((ib + rb) / 2)
+        if cb<page_b:
+            ib=cb
+        elif cb>page_b:
+            rb=cb
+    if a<b:
+        win = 'A'
+    elif a>b:
+        win = 'B'
+    else:
+        win = '0'
+    print(f"#{tc} {win}")
 ```
 

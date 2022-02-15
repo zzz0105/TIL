@@ -343,8 +343,8 @@ N=3
 for i in range(N):
     for j in range(N):
         for di, dj in [(0,1), (1,0), (0,-1), (-1,0)]:
-            ni = i+di[k]
-            nj = j+dj[k]
+            ni = i+di
+            nj = j+dj
             if 0<=ni<N  and 0<=nj<M:	#유효 인덱스
                 print(i,j, arr[ni][nj])
         print()    
