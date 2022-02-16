@@ -601,6 +601,18 @@ for i in range(T):
 
 
 
+## 1984. 중간 평균값 구하기
+
+```python
+T = int(input())
+for tc in range(1, 1+T):
+    nums = list(map(int, input().split()))
+    midavg = sum(sorted(nums)[1:len(nums)-1])/(len(nums)-2)
+    print(f'#{tc} {round(midavg)}')
+```
+
+
+
 ## 1986. 지그재그 숫자
 
 ```python
@@ -755,5 +767,51 @@ for tc in range(1,  T+1):
     else:
         win = '0'
     print(f"#{tc} {win}")
+```
+
+
+
+## 9367. 점점 커지는 당근의 개수
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    N = int(input())    #당근의 개수
+    C = list(map(int, input().split()))
+    big_carrot = C[0]
+    cnt = 1
+    big_cnt = 1
+    for i in range(N):
+        if C[i] > big_carrot:
+            big_carrot = C[i]
+            cnt +=  1
+        else:
+            cnt = 1
+            big_carrot = C[i]
+        if big_cnt < cnt:
+            big_cnt = cnt
+
+    print(f'#{tc} {big_cnt}')
+```
+
+
+
+## 9386. 연속한 1의 개수
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    num_len = int(input())
+    nums = input()
+    one = 0
+    max_one = 0
+    for num in nums:
+        if num == '1':
+            one += 1
+        else:
+            one = 0
+        if max_one < one:
+            max_one = one
+    print(f'#{tc} {max_one}')
 ```
 
