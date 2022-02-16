@@ -547,6 +547,33 @@ for i in range(T):
 
 
 
+## 1961. 숫자 배열 회전
+
+```python
+def rot(in_lst,N):
+    out_lst=[[0]*N for _ in range(N)]
+    #out_lst = [[0] * N] * N	#이 방식으로 하면 얕은복사!!!
+    for x in range(N):
+        for y in range(N):
+            out_lst[y][N-1-x] = in_lst[x][y]
+    return out_lst
+
+T = int(input())
+for i in range(T):
+    N = int(input())
+    lst = []
+    for j in range(N):
+        lst.append(list(map(int, input().split())))
+    rot_90 = rot(lst,N)
+    rot_180 = rot(rot_90,N)
+    rot_270 = rot(rot_180,N)
+    print(f'#{i+1}')
+    for k in range(N):
+        print(''.join(map(str,rot_90[k])), ''.join(map(str,rot_180[k])), ''.join(map(str,rot_270[k])))
+```
+
+
+
 ## 1966. 숫자를 정렬하자
 
 ```python
@@ -583,6 +610,42 @@ for i in range(T):
 
 
 
+## 1974. 스도쿠 검증
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    arr = [list(input().split()) for _ in range(9)]
+    issudoku = 1
+    for x in range(9):
+        arr_h = []
+        new=[]
+        if len(set(arr[x])) != 9:
+            issudoku=0
+            break
+        for y in range(9):
+            arr_h +=  arr[y][x]
+            if x%3 ==0 and y%3==0:
+                for i in (list(arr_area[y:y+3] for arr_area in arr[x:x+3])):
+                    for j in i:
+                        new+=j
+                if len(set(new))!=9:
+                    issudoku = 0
+                    break
+
+        if len(set(arr_h)) != 9:
+            issudoku = 0
+            break
+    print(f'#{tc} {issudoku}')
+    
+#2차원 배열 슬라이싱
+# arr=[[1,2,9],[2,6,4],[4,6,3]]
+# print(arr[1:3])   			#[[2, 6, 4], [4, 6, 3]]
+# print(arr[1:3][0:1])			#[[2, 6, 4]
+```
+
+
+
 ## 1976. 시각 덧셈
 
 ```python
@@ -597,6 +660,25 @@ for i in range(T):
         minute -= 60
         hour += 1
     print(f'#{i+1} {hour} {minute}')
+```
+
+
+
+## 1983. 조교의 성적 매기기
+
+```python
+T = int(input())
+credit = {1:'A+', 2:'A0', 3:'A-', 4:'B+', 5:'B0',
+          6:'B-', 7:'C+', 8:'C0', 9:'C-', 10:'D0'}
+for tc in range(1,  T+1):
+    n, k = map(int,input().split()) #학생수, 학점을 알고 싶은 학생의 번호
+    tot = []
+    for i in range(n):
+        mid, final, hw = map(int,input().split())
+        tot += [round(mid*0.35 +final*0.45 + hw*0.2, 2)]
+    new_tot = sorted(tot)[::-1]
+    rank = new_tot.index(tot[k-1])
+    print(f'#{tc} {credit[(rank//(n/10))+1]}')
 ```
 
 
@@ -644,6 +726,21 @@ for tc in range(1, T+1):
             ans = 0
             break
     print(f'#{tc} {ans}')
+```
+
+
+
+## 2007. 패턴 마디의 길이
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    alphas = list(input())
+    alpha = []
+    for i in range(1, 11):
+        if alphas[0:i]==alphas[i:2*i]==alphas[2*i:3*i]:
+            alpha += [i]
+    print(f'#{tc} {min(alpha)}')
 ```
 
 
