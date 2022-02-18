@@ -307,6 +307,33 @@ for i in range(T):	#테스트 케이스만큼 반복
 
 
 
+## 4836. 색칠하기
+
+```python
+#색칠하기 빨간색 인 곳 1로, 파란색인 곳 2로 채워서 합한다. 보라색 영역 =>합이 3인 곳 
+T = int(input())        #테스트케이스 개수
+for tc in range(1, T+1):
+    red_areas = [[0]*10 for _ in range(10)] #10*10격자
+    blue_areas = [[0] * 10 for _ in range(10)]  # 10*10격자
+    times = int(input())    #칠할 영역의 개수
+    purple = 0
+    colors = []
+    for i in range(times):
+        colors += [list(map(int, input().split()))]
+        for x in range(colors[i][0],colors[i][2]+1):
+            for y in range(colors[i][1],colors[i][3]+1):
+                if colors[i][4] == 1:
+                    red_areas[x][y] = 1
+                else:
+                    blue_areas[x][y] = 2
+                if red_areas[x][y] + blue_areas[x][y] == 3:
+                    purple += 1
+    print(f'#{tc} {purple}')
+
+```
+
+
+
 # [SWEA D2](https://swexpertacademy.com/main/code/problem/problemList.do?problemLevel=2&contestProbId=&categoryId=&categoryType=&problemTitle=&orderBy=FIRST_REG_DATETIME&selectCodeLang=ALL&select-1=1&pageSize=10&pageIndex=1)
 
 ## 1204. [S/W 문제해결 기본] 1일차 - 최빈수 구하기
@@ -332,45 +359,6 @@ for i in range(T):	#테스트 케이스만큼 반복
             many = j
 
     print(f'#{n} {score_item_lst[many][0]}')
-```
-
-
-
-## 1206. View
-
-```python
-T = 10 #테스트 케이스 10개
-for tc in range(1, T+1):
-    buildings = int(input())    #빌딩 개수
-    heights = list(map(int, input().split()))   #빌딩들의 층 수 저장할 리스트
-    view = 0    #조망권 확보된 세대 수
-    for i in range(2, buildings-2):
-        compare_list = [heights[i-2],heights[i-1], heights[i], heights[i+1], heights[i+2]]
- 
-        compare_list.sort()
- 
-        if compare_list[4]==heights[i]:
-            view += compare_list[4]-compare_list[3]
- 
-    print(f'#{tc} {view}')
-```
-
-
-
-## 1208. Flatten
-
-```python
-T = 10
-for tc in range(1, T+1):
-    dump_limit = int(input())
-    heights = list(map(int, input().split()))
-    for i in range(dump_limit):
-        heights.sort()
-        if heights[99] - heights[0] < 2:
-            break
-        heights[99] -= 1
-        heights[0] += 1
-    print(f'#{tc} {max(heights) - min(heights)}')
 ```
 
 
@@ -730,6 +718,30 @@ for tc in range(1, T+1):
 
 
 
+## 2001. 파리 퇴치
+
+```python
+T = int(input())
+for tc in range(1,1+T):
+    n, m = map(int, input().split())    #N x N 배열, M x M 크기의 파리채
+    arr = [list(map(int, input().split())) for _ in range(n)]
+    sum_flies=[]
+    for x in range(n):
+        for y in range(n):
+            flies = 0
+            for i in [arr_f[y:y+m] for arr_f in arr[x:x+m]]:
+                for j in i:
+                    flies += j
+                sum_flies += [flies]
+    max_flies = 0
+    for j in sum_flies:
+        if max_flies < j:
+            max_flies = j
+    print(f'#{tc} {max_flies}')
+```
+
+
+
 ## 2007. 패턴 마디의 길이
 
 ```python
@@ -803,33 +815,6 @@ for tc in range(1, T+1):
             sums[1] = sums[2]
         now_sum = 0
     print(f'#{tc} {sums[1]-sums[0]}')
-```
-
-
-
-## 4836. 색칠하기
-
-```python
-#색칠하기 빨간색 인 곳 1로, 파란색인 곳 2로 채워서 합한다. 보라색 영역 =>합이 3인 곳 
-T = int(input())        #테스트케이스 개수
-for tc in range(1, T+1):
-    red_areas = [[0]*10 for _ in range(10)] #10*10격자
-    blue_areas = [[0] * 10 for _ in range(10)]  # 10*10격자
-    times = int(input())    #칠할 영역의 개수
-    purple = 0
-    colors = []
-    for i in range(times):
-        colors += [list(map(int, input().split()))]
-        for x in range(colors[i][0],colors[i][2]+1):
-            for y in range(colors[i][1],colors[i][3]+1):
-                if colors[i][4] == 1:
-                    red_areas[x][y] = 1
-                else:
-                    blue_areas[x][y] = 2
-                if red_areas[x][y] + blue_areas[x][y] == 3:
-                    purple += 1
-    print(f'#{tc} {purple}')
-
 ```
 
 
@@ -910,5 +895,67 @@ for tc in range(1, T+1):
         if max_one < one:
             max_one = one
     print(f'#{tc} {max_one}')
+```
+
+
+
+# [SWEA D3](https://swexpertacademy.com/main/code/problem/problemList.do?problemLevel=3&contestProbId=&categoryId=&categoryType=&problemTitle=&orderBy=FIRST_REG_DATETIME&selectCodeLang=ALL&select-1=&pageSize=10&pageIndex=1)
+
+## 1206. View
+
+```python
+T = 10 #테스트 케이스 10개
+for tc in range(1, T+1):
+    buildings = int(input())    #빌딩 개수
+    heights = list(map(int, input().split()))   #빌딩들의 층 수 저장할 리스트
+    view = 0    #조망권 확보된 세대 수
+    for i in range(2, buildings-2):
+        compare_list = [heights[i-2],heights[i-1], heights[i], heights[i+1], heights[i+2]]
+ 
+        compare_list.sort()
+ 
+        if compare_list[4]==heights[i]:
+            view += compare_list[4]-compare_list[3]
+ 
+    print(f'#{tc} {view}')
+```
+
+
+
+## 1208. Flatten
+
+```python
+T = 10
+for tc in range(1, T+1):
+    dump_limit = int(input())
+    heights = list(map(int, input().split()))
+    for i in range(dump_limit):
+        heights.sort()
+        if heights[99] - heights[0] < 2:
+            break
+        heights[99] -= 1
+        heights[0] += 1
+    print(f'#{tc} {max(heights) - min(heights)}')
+```
+
+
+
+## 5356. 의석이의 세로로 말해요
+
+```python
+T = int(input())
+for tc in range(1, 1+T):
+    words = []
+    max_words=0
+    for i in range(5):
+        words += [list(input())]
+    print(f'#{tc}', end=' ')
+    for x in range(15):
+        for y in range(5):
+            try:
+                print(words[y][x], end='')
+            except:
+                pass
+    print()
 ```
 
