@@ -853,6 +853,68 @@ for tc in range(1,  T+1):
 
 
 
+## 4866. 괄호검사
+
+```python
+t = int(input())
+for tc in range(1, 1+t):
+    code = input()
+    stack = []
+    for alpha in code:
+        if alpha == '(' or alpha == '{':
+            stack.append(alpha)
+        elif alpha ==  ')' or alpha == '}':
+            if len(stack)==0 or (alpha == '}' and stack[-1]!='{') or (alpha == ')' and stack[-1]!='('):
+                stack.append(alpha)
+                break
+            elif alpha == '}' and stack[-1]=='{':
+                stack.pop()
+            elif alpha == ')' and stack[-1]=='(':
+                stack.pop()
+
+    ans = 1 if len(stack)==0 else 0
+    print(f'#{tc} {ans}')
+```
+
+
+
+## 4869. 종이붙이기
+
+```python
+t=int(input())
+for tc in range(1, t+1):
+    n = int(input())
+    n//=10
+    paper = [0] * (n+1)
+    paper[1] = 1
+    paper[2] = 3
+    for i in range(3, n+1):
+        paper[i]=paper[i-1]+paper[i-2]*2
+    print(f'#{tc} {paper[n]}')
+```
+
+
+
+## 4873. 반복문자 지우기
+
+```python
+t = int(input())
+for tc in range(1, 1+t):
+    word = input()
+    stack = []
+    for alpha in word:
+        if len(stack) == 0:   #스택에 아무것도 없다면 append
+            stack.append(alpha)
+        else:
+            if stack[-1] == alpha:    #stack의 top에 지금 alpha와 같은 문자가 있다면 pop
+                stack.pop()
+            else:
+                stack.append(alpha)   #아니라면 append
+    print(f'#{tc} {len(stack)}')
+```
+
+
+
 ## 9367. 점점 커지는 당근의 개수
 
 ```python
