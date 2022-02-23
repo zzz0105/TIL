@@ -319,7 +319,7 @@ my_variable = ()
 #72
 movie_rank = ('닥터 스트레인지', '스플릿', '럭키')
 
-#73 숫자 1이 저장된 튜플. (!)로 저장시키면 정수형으로 인식
+#73 숫자 1이 저장된 튜플. (1)로 저장시키면 정수형으로 인식
 my_tuple = (1,)
 
 #74
@@ -358,7 +358,7 @@ print(a, b, c)	#apple, banana, cake
 my_tuple = tuple(range(2, 100, 2))
 ```
 
-## 8. 파이썬 딕셔너리
+## 8. 파이썬 딕셔너리 081~090
 
 ```python
 #81 *좌측 8개의 값 변수에 바인딩
@@ -405,5 +405,227 @@ Traceback (most recent call last):
     icecream['누가바']
 KeyError: '누가바'
 #icecream 딕셔너리의 키에는 누가바가 존재하지 않아서 KeyError 발생
+```
+
+## 9. 파이썬 딕셔너리 091~100
+
+```python
+#91
+inventory = {'메로나': [300, 20], '비비빅': [400, 3], '죠스바': [250, 100]}
+
+#92
+print(inventory['메로나'][0], '원')
+
+#93
+print(inventory['메로나'][1], '개')
+
+#94
+inventory['월드콘'] = [500, 7]
+
+#95 key값으로만 구성된 리스트
+icecream_lst = list(icecream.keys())
+
+#96
+price_lst = list(icecream.values())
+
+#97
+print(sum(icecream.values()))
+
+#98 딕셔너리에 추가하기
+icecream.update(new_product)
+
+#99 두 튜플을 하나의 딕셔너리로 변환. keys를 키로 vals를 값으로 저장
+result = dict(zip(keys, vals))
+
+#100
+close_table = dict(zip(date, close_price))
+```
+
+
+
+## 10. 파이썬 분기문 101~110
+
+```python
+#101 True False 데이터 타입
+Bool 타입
+
+#102 print(3==5)
+False
+
+#103 print(3<5)
+True
+
+#104 print(1 < x < 5)
+True
+
+#105 print ((3 == 3) and (4 != 3))
+True
+
+#106 print(3 => 4)
+지원하지 않는 연산자
+
+#107 if 4 < 3: print("Hello World")
+조건 만족하지 않아 아무 결과도 출력되지 않는다
+
+#108 
+if 4 < 3: 
+    print("Hello World.")	
+else: 
+    print("Hi, there.")
+Hi, there
+
+#109
+if True :
+    print ("1")
+    print ("2")
+else :
+    print("3")
+print("4")
+1
+2
+4
+
+#110
+if True :
+    if False:
+        print("1")
+        print("2")
+    else:
+        print("3")
+else :
+    print("4")
+print("5")
+3
+5
+```
+
+
+
+## 11. 파이썬 분기문 111~120
+
+```python
+#111 입력받은 문자열 두 번 출력하기
+print(input()*2)
+
+#112
+print(int(input('숫자를 입력하세요: ')) + 10)
+
+#113
+a = '홀수' if int(input())%2 else '짝수'
+print(a)
+
+#114
+a = int(input('입력값: '))
+a += 20
+if a > 255:
+    print(255)
+else: 
+    print(a)
+    
+#115
+a = int(input('입력값: '))
+a -= 20
+if a > 255:
+    print(255)
+elif a < 0:
+    print(0)
+else: 
+    print(a)
+
+#116
+h, m = input('현재시간:').split()
+if m == '00':
+    print('정각 입니다.')
+else:
+    print('정각이 아닙니다.')
+
+#117
+fruit = ["사과", "포도", "홍시"]
+f = input('좋아하는 과일은?')
+if f in fruit:
+    print('정답입니다.')
+else:
+    print('오답입니다')
+    
+#118
+warn_investment_list = ["Microsoft", "Google", "Naver", "Kakao", "SAMSUNG", "LG"]
+invest = input('종목: ')
+if invest in warn_investment_list:
+    print('투자 경고 종목입니다.')
+else:
+    print('투자 경고 종목이 아닙니다.')
+    
+#119 사용자가 입력한 값이 딕셔너리 키 (key) 값에 포함되었다면 "정답입니다" 아닐 경우 "오답입니다"
+fruit = {"봄" : "딸기", "여름" : "토마토", "가을" : "사과"}
+s = input('제가좋아하는계절은: ')
+if s in fruit:
+    print('정답입니다.')
+else:
+    print('오답입니다.')
+    
+#120
+fruit = {"봄" : "딸기", "여름" : "토마토", "가을" : "사과"}
+s = input('제가좋아하는계절은: ')
+if s in fruit.values():
+    print('정답입니다.')
+else:
+    print('오답입니다.')
+```
+
+
+
+## 12. 파이썬 분기문 121~130
+
+```python
+#121 대문자 > 소문자	소문자 > 대문자
+alpha = input('')
+if alpha.islower():
+    print(alpha.upper())
+else:
+    print(alpha.lower())
+
+#122
+s = int(input('score: '))
+if 81 <= score <= 100:
+    print("grade is A")
+elif 61 <= score <= 80:
+    print("grade is B")
+elif 41 <= score <= 60:
+    print("grade is C")
+elif 21 <= score <= 40:
+    print("grade is D")
+else:
+    print("grade is E")
+    
+#123
+m, n = input('입력: ').split
+if n =='달러':
+    m *= 1167
+elif n == '엔':
+    m *= 1.096
+elif n == '유로':
+    m *= 1268
+elif n == '위안':
+    m *= 171
+print(m, '원')
+'''
+딕셔너리를 활용한 방법
+환율 = {"달러": 1167, 
+        "엔": 1.096, 
+        "유로": 1268, 
+        "위안": 171}
+user = input("입력: ")
+num, currency = user.split()
+print(float(num) * 환율[currency], "원")
+'''
+
+#124
+num1 = int(input("input number1: "))
+num2 = int(input("input number2: "))
+num3 = int(input("input number3: "))
+num = max(num1, num2, num3)
+print(num)
+
+
 ```
 
