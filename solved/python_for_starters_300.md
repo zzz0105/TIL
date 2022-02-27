@@ -626,6 +626,61 @@ num3 = int(input("input number3: "))
 num = max(num1, num2, num3)
 print(num)
 
-
+#125
+phone = input('휴대전화 번호 입력: ')
+if phone[:3] == '011':
+    print('당신은 SKT 사용자입니다.')
+if phone[:3] == '016':
+    print('당신은 KT 사용자입니다.')
+if phone[:3] == '019':
+    print('당신은 LGU 사용자입니다.')
+if phone[:3] == '010':
+    print('당신은 알수없음 사용자입니다.')
+    
+#126
+po = input('우편번호: ')
+if po[:3] == '010' or po[:3] == '011' or po[:3] == '012':
+    print('강북구')
+elif po[:3] in ['013','014', '015']:
+    print('도봉구')
+else:
+    print('노원구')
+    
+#127
+m, n = input('주민등록번호: ').split('-')
+if n[0] == '1' or n[0] == '3':
+    print('남자')
+else:
+    print('여자')
+    
+#128
+m, n = input('주민등록번호: ').split('-')
+if 0 <= int(n[1:3]) <= 8:
+    print("서울입니다.")
+else:
+    print('서울이 아닙니다.')
+    
+#129
+nums = list(input('주민등록번호: '))
+nums.remove('-')
+n = [2,3,4,5,6,7,8,9,2,3,4,5]
+tot = 0
+for i in range(12):
+    tot += int(nums[i]) * n[i]
+if int(nums[-1]) == 11 - (tot % 11):
+    print('유효한 주민등록번호입니다.')
+else:
+    print('유효하지 않은 주민등록번호입니다.')
+    
+#130
+import requests
+btc = requests.get("https://api.bithumb.com/public/ticker/").json()['data']
+gap = float(btc['max_price']) - float(btc['min_price'])
+marketp = float(btc['opening_price'])
+maxp = float(btc['max_price'])
+if (marketp+gap) > maxp:
+    print("상승장")
+else:
+    print("하락장")
 ```
 

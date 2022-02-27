@@ -1002,6 +1002,81 @@ for tc in range(1, T+1):
 
 
 
+## 1209. Sum
+
+```python
+t = 10
+for tc in range(1,t+1):
+    test = int(input())
+    arr = [list(map(int, input().split())) for _ in range(100)]
+    tot_g = 0   #가로 합
+    tot_d1 = 0  #오른쪽 아래 대각선(\) 합
+    tot_d2 = 0  #오른쪽 위 대각선(/) 함
+    tots = []   #합들의 집합
+
+    for i in range(100):
+        tots += [sum(arr[i])]
+        tot_s = 0  # 세로 합
+        tot_d1 += arr[i][i]
+        tot_d2 += arr[99-i][i]
+        for j in range(100):
+            tot_s += arr[j][i]
+        tots += [tot_s]
+    tots += [tot_d1] + [tot_d2]
+    print(f'#{tc} {max(tots)}')
+```
+
+
+
+## 1860. 진기의 최고급 붕어빵
+
+```python
+t = int(input())
+for tc in range(1, 1+t):
+    n, m, k = map(int, input().split()) #손님 n명온다. m초에 k개 붕어빵 만든다
+    guests = list(map(int, input().split())) #손님이 언제 오는지
+    bb = 0  #만든 붕어빵 개수
+    ans = 'Possible'
+    for s in range(max(guests)+1):
+        if s != 0 and s % m == 0:
+            bb += k
+        for j in guests:
+            if s == j:
+                bb -= 1
+            if bb < 0:
+                ans = 'Impossible'
+                break
+    print(f'#{tc} {ans}')
+```
+
+
+
+## 3499. 퍼펙트 셔플
+
+```python
+t = int(input())
+for tc in range(1, t+1):
+    n = int(input())    #카드의 개수
+    cards = list(input().split())
+    lc = len(cards)
+    if lc%2:    #홀수
+        card1 = cards[:lc // 2 + 1]
+        card2 = cards[lc // 2 + 1:]
+    else:
+        card1 = cards[:lc // 2]
+        card2 = cards[lc // 2:]
+    print(f'#{tc}', end=' ')
+    for i in range(lc//2 +1):
+        try:
+            print(card1[i], end=' ')
+            print(card2[i], end=' ')
+        except:
+            pass
+    print()
+```
+
+
+
 ## 5356. 의석이의 세로로 말해요
 
 ```python
@@ -1019,5 +1094,31 @@ for tc in range(1, 1+T):
             except:
                 pass
     print()
+```
+
+
+
+## 11315. 오목 판정
+
+```python
+t = int(input())
+for tc in range(1, t+1):
+    n = int(input())
+    arr = [list(input()) for _ in range(n)] # ‘o’는 돌이 있는 칸을 의미하고, ‘.’는 돌이 없는 칸을 의미
+    ans = 'NO'
+    for i in range(n):
+        for j in range(n):
+            if arr[i][j] == 'o':
+                for di, dj in [(0,1), (1,1), (1,0), (1, -1)]:
+                    cnt = 0
+                    for k in range(5):
+                        ni = i + di * k
+                        nj = j + dj * k
+                        if 0<=ni<n and 0<=nj<n and arr[ni][nj] == 'o':
+                            cnt += 1
+                        if cnt >= 5:
+                            ans = 'YES'
+                            break
+    print(f'#{tc} {ans}')
 ```
 
