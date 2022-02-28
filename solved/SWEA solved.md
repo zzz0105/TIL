@@ -1051,6 +1051,24 @@ for tc in range(1, 1+t):
 
 
 
+## 3456. 직사각형 길이 찾기
+
+```python
+t = int(input())	#테스트케이스
+for tc in range(1, t+1):
+    lst = []
+    nums = list(map(int,input().split()))	#직사각형의 세 변의 길이를 받는다
+    for num in nums:
+        if num not in lst:	#리스트에 num이 없을 때 lst에 추가
+            lst.append(num)
+        elif num in lst:
+            lst.remove(num)	#있으면 제거
+
+    print(f'#{tc} {lst.pop()}')
+```
+
+
+
 ## 3499. 퍼펙트 셔플
 
 ```python
@@ -1094,6 +1112,25 @@ for tc in range(1, 1+T):
             except:
                 pass
     print()
+```
+
+
+
+## 5948. 새샘이의 7-3-5 게임
+
+```python
+t = int(input())
+for tc in range(1, t+1):
+    tots = []
+    nums = list(map(int, input().split()))
+    for a in nums:
+        for b in nums:
+            for c in nums:
+                if a != b and b != c and c != a:	#a, b, c가 서로 같지 않을 때 합을 리스트에 추가
+                    tots += [a+b+c]
+    tots = list(set(tots))		#중복제거
+    tots.sort()					#정렬
+    print(f'#{tc} {tots[-5]}')	#5번째로 큰 수 출력
 ```
 
 
