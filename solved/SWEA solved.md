@@ -1114,6 +1114,31 @@ for tc in range(1, 1+T):
     print()
 ```
 
+## 5431. 민석이의 과제 체크하기
+
+```python
+t = int(input())
+for tc in range(1,t+1):
+    n, k = map(int, input().split())    #n: 수강생 수 k: 과제 제출한 사람 수
+    hw = list(map(int,input().split())) #과제한 사람 번호
+    p = list(range(1, n+1)) #모든 수강생의 번호
+    for h in hw:
+        p.remove(h)
+    print(f'#{tc}', end=' ')
+    print(*p)
+```
+
+
+
+## 5549. 홀수일까 짝수일까
+
+```python
+t = int(input())
+for tc in range(1,t+1):
+    ans = 'Odd' if int(input())%2 else 'Even'
+    print(f'#{tc} {ans}')
+```
+
 
 
 ## 5948. 새샘이의 7-3-5 게임
