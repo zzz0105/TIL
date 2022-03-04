@@ -1093,6 +1093,27 @@ for tc in range(1, t+1):
     print()
 ```
 
+## 3750. Digit sum
+
+```python
+t = int(input())
+ans = []
+for tc in range(1,t+1):
+    nums = input()
+    while len(str(nums)) != 1:	#숫자의 길이가 1이 아니면
+        n=[]
+        for num in nums:
+            n.append(int(num))	#정수형으로 형변환 시켜 n에 집어넣는다
+        nums = str(sum(n))		#문자열로 형변환
+    ans.append(nums)			#숫자의 길이가 1일 때 ans에 저장
+
+#저장하고 한번에 출력하기. 하나씩 출력하는 것보다 빠르다.    
+tc=1
+for a in ans:
+    print(f'#{tc} {a}')
+    tc+=1
+```
+
 
 
 ## 5356. 의석이의 세로로 말해요
