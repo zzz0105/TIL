@@ -1179,6 +1179,21 @@ for tc in range(1, t+1):
     print(f'#{tc} {tots[-5]}')	#5번째로 큰 수 출력
 ```
 
+## 10804. 문자열의 거울상
+
+```python
+t = int(input())
+mirror = {'b':'d', 'd':'b', 'p':'q', 'q':'p'}
+for tc in range(1,t+1):
+    ans = []
+    alphas = input()
+    for alpha in alphas:
+        ans += mirror[alpha]
+
+    ans=''.join(ans[::-1])
+    print(f'#{tc} {ans}')
+```
+
 
 
 ## 11315. 오목 판정
