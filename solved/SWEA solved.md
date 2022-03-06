@@ -1051,6 +1051,23 @@ for tc in range(1, 1+t):
 
 
 
+## 3314. 보충학습과 평균
+
+```python
+t = int(input())
+for tc in range(1, t+1):
+    scores = list(map(int, input().split()))
+    new = []
+    for score in scores:
+        if score<40:	#점수가 40점 미만이면 40점으로 추가
+            new.append(40)
+        else:			#이외에는 그냥 추가
+            new.append(score)
+    print(f'#{tc} {round(sum(new)/len(new))}')	#정수로 평균 출력
+```
+
+
+
 ## 3456. 직사각형 길이 찾기
 
 ```python
