@@ -478,3 +478,104 @@ def catch(request):
 
   - 주어진 URL 패턴 이름 및 선택적 매개 변수와 일치하는 절대 경로 주소를 반환
   - 템플릿에 URL을 하드 코딩하지 않고도 DRY 원칙을 위반하지 않으면서 링크를 출력하는 방법
+
+
+
+## Namespace
+
+- 객체를 구분할 수 있는 범위를 나타내는 말. 일반적으로 하나의 이름 공간에서는 하나의 이름이 단 하나의 객체만을 가리키게 된다.
+
+- 모든 변수명과 함수명 등이 모두 겹치지 않게 정의하는 것은 어렵다.
+
+- 문제점
+
+  1. articles 앱의 index 페이지에서 두번째 앱 pages의 index로 이동하는 하이퍼링크를 클릭 시 현재 페이지로 이동 => url namespace
+  2. pages 앱 index url로 이동해도 articles 앱의 index 페이지가 출력됨 => Template namespace
+
+  => 약속된 경로 앞에는 쓰지 않기 때문에 발생. 서버가 켜지면 템플릿들을 모아서 보게 되는데, 앱을 <u>등록한 순서대로</u> 선택하게 된다.
+
+- 해결책
+
+  1. 서로 다른 앱의 같은 이름을 가진 url name은 **이름공간**을 설정해서 구분
+
+     - urls.py에 "app_name" attribute 값 작성 후 참조.
+
+  2. templates, static 등 django는 정해진 경로 <u>하나로</u> 모아서 보기 때문에 중간에 **폴더를 임의로 만들어주어** 이름 공간을 물리적으로 설정
+
+     - 관행적으로 앱 이름과 같은 폴더를 templates 안에 만들어주고 기존의 템플릿들을 모두 넣어준다.
+
+     - 경로의 변화: articles/templates/index.html -> articles/templates/**articles**/index.html
+
+       - 장고와 약속된 경로는 articles/templates까지. 그 뒤부터 읽음.
+
+         => **articles**가 templates의 이름공간 역할을 한다.
+
+       ```python
+       #urls.py
+       #전
+       def index(request):
+           return render(request, 'index.html')
+       #물리적으로 이름공간 설정 후
+       def index(request):
+           return render(request, 'articles/index.html')
+       ```
+
+```django
+{# settings.py #}
+...
+TEMPLATES = [
+	{
+		...
+		'DIRS': [BASE_DIR/'templates',]
+		...
+	}
+]
+
+{# pjt/urls.py #}
+urlpatterns=[
+	path('pages/', include('pages.urls'))
+]
+
+{# articles/urls.py #}
+from . import views
+app_name='articles'
+urlpatterns=[
+	path('/index', views.index, name='index')
+]
+
+{# pages/urls.py #}
+from django.urls import path
+from . import views	{# 명시적인 상대경로 #}
+app_name='pages'
+urlpatterns=[
+	path('index/', views.index, name='index')
+]
+
+{# pages/views.py #}
+def index(request):
+	return render(request, 'index.html')
+
+{# pages/templates/index.html #}
+{# 참조 : 어떤 앱의 url인지 붙여준다 #}
+{% extends 'base.html' %}
+{% block content %}
+	<a href="{% url 'pages:index' %}"></a>
+	<h1>두번째 앱의 index</h1>
+{% endblock %}
+```
+
+
+
+## Static files
+
+- 웹 서버와 정적 파일
+
+  - 웹서버: 특정 위치(URL)에 있는 자원(resource - data -)을 요청(HTTP request)을 받아서 제공(serving)하는 응답(HTTP response)을 처리하는 것을 기본 동작으로 한다.
+
+    => 자원과 접근 가능한 주소가 정적으로 연결된 관계.
+
+    => 웹 서버는 요청 받은 URL로 서버에 존재하는 **정적 자원**(statuc resource)을 제공
+
+- Static file
+  - 응답할 때 별도의 처리 없이, 사용자의 요청에 따라 내용이 바뀌는 것이 아니라 파일 내용을 **그대로** 보여주면 되는 파일.
+  - 파일 자체가 고정되어있고, 서비스 중에도 추가되거나 변경되지 않고 고정되어 있음.
