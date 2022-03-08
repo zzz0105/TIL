@@ -64,7 +64,7 @@
 - 가상환경 생성(python -m venv 가상환경이름) 및  활성화(source 가상환경이름/Scripts/activate) --> django 설치(pip install django==3.2.12) 
   -> 프로젝트 생성(django-admin startproject 프로젝트명 .) 
   -> 서버 켜서(python manage.py runsever) 로켓 확인하기  
-  -> (ctrl+c로 서버 끄고) 앱 생성(python manage.py startapp articles) 
+  -> (ctrl+c로 서버 끄고) 앱 생성(python manage.py startapp 앱이름) 
   -> 앱등록(settings.py의 INSTALLED_APPS 리스트에 추가)
   
   - 가상환경을 쓰는 이유: 프로젝트 별로 pip로 설치되는 패키지를 독립적으로 관리하기 위함
@@ -280,7 +280,7 @@
 
   - 코드의 재사용성에 초점을 맞춤
   - 템플릿 상속을 사용하면 사이트의 모든 공통 요소를 포함하고, 하위 템플릿이 재정의(**override**)할 수 있는 블록을 정의하는 기본 '**skeleton**' 템플릿을 만들 수 있음
-    - 장고 프로젝트를 가진 최상단 폴더(BASE_DIRS)에 templates 폴더를 만들고 그 안에 skeleton 템플릿을 위한 base.html을 만든다. 그 후 꼭!! settings.py의 templates의 DIRS 리스트에 경로 추가해주기. BASE_DIRS/'templates'
+    - 장고 프로젝트를 가진 최상단 폴더(BASE_DIRS)에 templates 폴더를 만들고 그 안에 skeleton 템플릿을 위한 base.html을 만든다. 그 후 꼭!! settings.py의 templates의 DIRS 리스트에 경로 추가해주기. BASE_DIR/'templates'
       - 객체지향적으로 주소가 썼기 때문에 구동되는 운영체제에 맞춰 번역이 된다.
   - tags
     - {% extends '부모템플릿의 이름' %}: 자식(하위) 템플릿이 부모 템플릿을 확장한다는 것을 알림. 반드시 템플릿 최상단에 작성되어야 함
@@ -433,7 +433,7 @@ def catch(request):
   	return render(request,'hello.html', context)
   
   {# hello.html #}
-  {% extends 'base.html' %}
+  {% extends 'base.html' %}	{# 항상 최상단에 와야한다 #}
   {% block content %}
   	<h1>안녕, {{name}}{#2#}</h1>
   {% endblock %}
@@ -579,3 +579,88 @@ def index(request):
 - Static file
   - 응답할 때 별도의 처리 없이, 사용자의 요청에 따라 내용이 바뀌는 것이 아니라 파일 내용을 **그대로** 보여주면 되는 파일.
   - 파일 자체가 고정되어있고, 서비스 중에도 추가되거나 변경되지 않고 고정되어 있음.
+
+### Static file의 구성
+
+1. django.contrib.staticfiles가 INSTALLED_APPS에 포함되어 있는지 확인
+2. settings.py에서 STATIC_URL을 정의
+3. 템플릿에서 static 템플릿 태그를 사용하여 지정된 상대경로에 대한 URL을 빌드
+4. 앱의 static 디렉토리에 정적 파일을 저장.
+
+```django
+{% load static %}
+<img src="{% static 'my_app/example.jpg' %}" alt="img">
+{# app/static 폴더에 이미지 넣기 #}
+{# app/static 안에 app 폴더를 만들어 물리적으로 공간 설정해주어 문제가 생기지 않도록 한다. #}
+```
+
+* The staticfiles app
+  * STATICFILES_DIRS
+    - 'app/static/' 디렉토리 경로(기본 경로)를 사용하는 것 외에 추가적인 정적 파일 경로 목록을 정의하는 리스트
+    - 추가 파일 디렉토리에 대한 전체 경로를 포함하는 문자열 목록으로 작성되어야 함
+    
+  * STATIC_URL
+
+    * STATIC_ROOT에 있는 정적 파일을 **참조**할 때 사용할 **URL**
+      - <u>개발 단계</u>에서는 실제 정적 파일들이 저장되어 있는 'app/static' 경로(**기본 경로**) 및 STATICFILES_DIRS에 정의된 **추가 경로**들을 탐색함
+    - 실제 파일이나 디렉토리가 아니며, **URL로만 존재**
+    * <u>비어 있지 않은 값</u>으로 설정 한다면 **반드시 슬래시(/)로** 끝나야 함
+      - 장고는 trailing comma와 end slash를 지킨다
+
+  * STATIC_ROOT
+
+    * collectstatic이 배포를 위해 정적 파일을 수집하는 디렉토리의 절대 경로
+
+      * collectstatic: STATIC_ROOT에 정적 파일을 수집
+
+    * django 프로젝트에서 사용하는 **모든 정적 파일을 한 곳에 모아 넣는 경로**
+
+    * 개발 과정에서 settings.py의 DEBUG 값이 True로 설정되어 있으면 해당 값은 작용되지 않음
+
+      * 직접 작성하지 않으면 django 프로젝트에서는 settings.py에 작성되어 있지 않음
+
+        +. 장고의 상태는 개발 단계와 배포 단계로 나누어져 있다.
+
+      ​	- 배포: 외부로 서비스 하기 위해 이 장고 프로젝트를 서버로 올리는 과정. DEBUG 값을 False로 바꾼다(에러 화면이 불친절해진다)
+
+    * 실 서비스 환경(배포 환경)에서 django의 모든 정적 파일을 다른 웹 서버가 직접 제공하기 위함
+
+    ```python
+    {# settings.py #}
+    STATICFILES_DIRS=[
+    	BASE_DIR/'static',
+    ]
+    STATIC_URL = '/static/'
+    ```
+
+### Django template tag
+
+- load
+  - 사용자 정의 템플릿 태그 세트를 로드(static은 빌트인 태그가 아니기 때문. static 쓸 때 로드해주어야 한다)
+  - 로드하는 라이브러리, 패키지에 등록된 모든 태그와 필터를 불러옴
+- static
+  - STATIC_ROOT에 저장된 정적 파일에 연결
+
+```django
+{# articles/static/에 이미지 저장 #}
+{# 기본 #}
+{% load static %}
+<img src="{% static 'ex.jpg' %}" alt='img'>
+
+{# 이름 공간 설정 위해 추가 파일 생성. articles/static/articles/에 이미지 저장 #}
+{% load static %}
+<img src="{% static 'articles/ex.jpg' %}" alt='img'>
+
+{# 다른 공간의 정적 파일을 가져와야 한다면? 경로를 추가하기 위해 설정하기 #}
+{# settings.py #}
+STATICFILES_DIRS = [BASE_DIR / 'static']
+{# 최상단에 static 폴더 만든다 #}
+{# base.html #}
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}"
+```
+
+
+
+
+
