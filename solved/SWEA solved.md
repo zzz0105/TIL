@@ -1196,6 +1196,23 @@ for tc in range(1, t+1):
     print(f'#{tc} {tots[-5]}')	#5번째로 큰 수 출력
 ```
 
+
+
+## 6692. 다솔이의 월급 상자
+
+```python
+t = int(input())    #테스트케이스
+for tc in range(1, t+1):
+    n = int(input())
+    money = 0
+    for _ in range(n):
+        p, x = map(float, input().split())    #p 확률로 x원 받는다
+        money += p * x
+    print(f'#{tc} {money}')
+```
+
+
+
 ## 10804. 문자열의 거울상
 
 ```python
