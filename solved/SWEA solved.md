@@ -1110,6 +1110,8 @@ for tc in range(1, t+1):
     print()
 ```
 
+
+
 ## 3750. Digit sum
 
 ```python
@@ -1129,6 +1131,23 @@ tc=1
 for a in ans:
     print(f'#{tc} {a}')
     tc+=1
+```
+
+
+
+## 4406. 모음이 보이지 않는 사람
+
+```python
+t = int(input())    #테스트케이스
+for tc in range(1, t+1):
+    words = list(input())
+    vowels = ['a', 'i', 'e', 'o', 'u']
+    ans = []
+    for w in words:
+        if not w in vowels:
+            ans.append(w)
+    ans=''.join(ans)
+    print(f'#{tc} {ans}')
 ```
 
 

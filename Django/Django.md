@@ -660,7 +660,3 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 <link rel="stylesheet" href="{% static 'style.css' %}"
 ```
 
-
-
-
-
