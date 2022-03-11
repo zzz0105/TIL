@@ -66,8 +66,16 @@
   -> 서버 켜서(python manage.py runsever) 로켓 확인하기  
   -> (ctrl+c로 서버 끄고) 앱 생성(python manage.py startapp 앱이름) 
   -> 앱등록(settings.py의 INSTALLED_APPS 리스트에 추가)
-  
+
   - 가상환경을 쓰는 이유: 프로젝트 별로 pip로 설치되는 패키지를 독립적으로 관리하기 위함
+
+  - requirements.txt에 쓰여있는 모든 패키지 설치하는 방법:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+    
 - Project
   - Appliction(앱)의 집합
   - 프로젝트에는 여러 앱이 포함될 수 있다. (앱은 여러 프로젝트에 있을 수 있다.)

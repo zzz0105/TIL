@@ -197,6 +197,71 @@ Untracked files:
 
 
 
+### Git branch
+
+* <u>나뭇가지 형태</u>로 여러 갈래로 작업공간을 나누어 git이 관리하는 파일 트리에 한해서 원래 코드와 상관없이 **독립적으로 작업**할 수 있도록 돕는다.
+* (master): branch 중 가장 중심이 되는 것. 원본에 대한 것을 진행한다. 상용(실제 서비스로 사용됨. 세상에 공개가 되어있다.)
+* 장점
+  * 독립공간 형성=> 원본에 대해 안전한 상태로 진행
+    * 별도의 브랜치에서 에러를 수정/삭제한다. 마스터에 영향을 끼치지 않는다. 작업이 끝난 후에 다시 master로 반영
+  * 하나의 작업은 하나의 브랜치에서 진행 => 관리 측면에서 체계적인 개발 가능
+  * 다른 버전관리시스템보다 매우 빠르고 가볍다.
+
+```bash
+$ git init					#local 저장소로 형성. master branch 만들어짐
+$ git branch				#branch 목록 확인 
+$ git branch 브랜치이름		 #새로운 branch 생성
+$ git branch -d 브랜치이름	 #특정 브랜치 삭제. master 브랜치에 병합된 브랜치만 삭제 가능
+$ git branch -D 브랜치이름	 #병합에 상관없이 강제 삭제
+$ git log --oneline			#간단하게 한 줄로 커밋들을 확인할 수 있다
+$ git switch 브랜치이름		 #다른 브랜치로 이동. 버전관리가 되고 있는지 확인 필요
+$ git log --oneline --all --graph	#가지가 어떻게 뻗어나가는지 확인
+$ git switch -c 브랜치이름	 #branch를 새로 생성과 동시에 이동
+```
+
++. checkout: branch를 switch하거나 restore한다. 각각 명확하게 구분하기 위해 switch와 restore(: restore working tree files)로 분리하여 사용한다.
+
+
+
+#### merge(병합)
+
+* branch에서 개발이 끝난 후 다른 branch나 master에 반영
+
+  ```bash
+  $ git merge 병합할_브랜치이름
+  ```
+
+* merge가 되면 그 branch의 역할은 끝난 것. => <u>branch 삭제</u>해준다
+
+* 주의사항
+
+  * merge하기 전 합쳐지는 쪽인 메인 브랜치로 switch해야한다
+
+* 종류
+
+  1. fast-forward: HEAD가 앞으로 나간다. merge된 새로운 버전이 만들어지지 않는다.
+
+     - 조건: branch에서 작업하는 동안 과거에 있던 master는 변화 없음
+
+     - master, branch를 fast-forward하면 HEAD -> master, branch
+
+  2. 3-way merge(merge commit)
+
+     - 조건: branch에서 작업하는 동안 과거에 있던 master 변화 있음.
+
+     - 세 개의 commit(공통된 조상, master와 branch의 각각의 최신 commit)을 별도로 merge시키고 새로운 버전 만들어진다
+
+  3. merge conflict
+     - merge하는 두 브랜치에서 같은 파일의 같은 부분을 동시에 수정하고 merge하면, git은 해당 부분을 자동으로 merge해주지 못함.
+       - git status를 해보면 both modified 상태인 것을 볼 수 있다
+       - 반면, 동일 파일이더라도 서로 다른 부분을 수정했다면, conflict 없이 자동으로 merge commit된다.
+     - modified 이후 commit할 때에는 commit 메세지를 쓰지 않는다.(git commit)
+       - vim editor가 켜지고, 맨 위에 커밋 이름이 나온다.(알아서 지정해줌. 커밋에 대한 정보도 써준다.)
+       - 저장하고 나가야한다.(명령모드로 가야함.) 
+         - esc 누르고 :wq 쓴 후 엔터
+
+  
+
 ## JSON(JavaScript Object Notation)
 
 * 자바스크립트 객체 표기법. 웹 어플리케이션에서 데이터를 전송할 때 사용
@@ -225,8 +290,6 @@ open(file, mode='r', encoding=None)	#기본값 설정.파일명, 텍스트모드
 									#인코딩 방식은 일반적으로 utf-8 사용한다.
 ```
 
-
-
 +) 알고리즘/문제풀이에서는 리스트, 조건문, 반복문을 많이 쓴다.
 
 ​	 실무에서는 딕셔너리와 리스트를 많이 사용한다.
@@ -251,4 +314,3 @@ print(response.get('~'))
 * API(Application Programming Interface)
   * 컴퓨터나 컴퓨터 프로그램 사이의 연결
   * 사용하는 방법은 API 사양/명세에 쓰여있다.(꼼꼼히 볼 것) 
-
