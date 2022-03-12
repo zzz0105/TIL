@@ -1028,6 +1028,87 @@ for tc in range(1,t+1):
 
 
 
+## 1228. 암호문1
+
+```python
+t = 10
+for tc in range(1,1+t):
+    n = int(input())    #원본 암호문의 길이 n
+    pw = list(map(int,input().split())) #원본 암호문
+    m = int(input())    #명령어의 개수
+    cmd = list(input().split()) #명령어
+    for i in range(len(cmd)):
+        if cmd[i]=='I':
+            x = int(cmd[i+1])
+            y = int(cmd[i+2])
+            #x의 위치 다음에 y개의 숫자 삽입
+            pw = pw[:x]+cmd[i+3:i+3+y]+pw[x:]
+    ans = list(map(int,pw[:10]))
+    print(f'#{tc}', end=' ')
+    print(*ans)
+```
+
+
+
+## 1229. 암호문2
+
+```python
+t = 10
+for tc in range(1,1+t):
+    n = int(input())    #원본 암호문의 길이 n
+    pw = list(map(int,input().split())) #원본 암호문
+    m = int(input())    #명령어의 개수
+    cmd = list(input().split()) #명령어
+    for i in range(len(cmd)):
+        if cmd[i]=='I':
+            x = int(cmd[i+1])
+            y = int(cmd[i+2])
+            #x의 위치 다음에 y개의 숫자 삽입
+            pw = pw[:x]+cmd[i+3:i+3+y]+pw[x:]
+        elif cmd[i]=='D':
+            x = int(cmd[i + 1])
+            y = int(cmd[i + 2])
+            # x의 위치 다음에 y개의 숫자 삭제
+            pw = pw[:x]+pw[x+y:]
+    ans = list(map(int,pw[:10]))
+    print(f'#{tc}', end=' ')
+    print(*ans)
+```
+
+
+
+## 1230. 암호문3
+
+```python
+t = 10
+for tc in range(1,1+t):
+    n = int(input())    #원본 암호문의 길이 n
+    pw = list(map(int,input().split())) #원본 암호문
+    m = int(input())    #명령어의 개수
+    cmd = list(input().split()) #명령어
+    for i in range(len(cmd)):
+        if cmd[i]=='I':
+            x = int(cmd[i+1])
+            y = int(cmd[i+2])
+            #x의 위치 다음에 y개의 숫자 삽입
+            pw = pw[:x]+cmd[i+3:i+3+y]+pw[x:]
+        elif cmd[i]=='D':
+            x = int(cmd[i + 1])
+            y = int(cmd[i + 2])
+            # x의 위치 다음에 y개의 숫자 삭제
+            pw = pw[:x]+pw[x+y:]
+        elif cmd[i]=='A':
+            y = int(cmd[i + 1])
+            s = cmd[i+2:i+2+y]
+            # 암호문의 맨 뒤에 y개의 숫자를 덧붙인다. s는 덧붙일 숫자들.
+            pw += s
+    ans = list(map(int,pw[:10]))
+    print(f'#{tc}', end=' ')
+    print(*ans)
+```
+
+
+
 ## 1860. 진기의 최고급 붕어빵
 
 ```python
