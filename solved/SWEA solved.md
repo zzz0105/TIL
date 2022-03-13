@@ -1149,6 +1149,38 @@ for tc in range(1, t+1):
 
 
 
+## 3408. 세가지 합 구하기
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    n = int(input())
+    s1 = ((n+1)*n) // 2	#시간을 줄이기 위해 공식을 쓰자
+    s2 = 2 * s1 - n
+    s3 = 2 * s1
+    print(f'#{tc} {s1} {s2} {s3}')
+```
+
+
+
+## 3431. 준환이의 운동관리
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    l, u, x = map(int,input().split())
+    #1주일에 L분 이상 U분 이하의 운동해야함. x분 운동함.
+    if x > u:
+        ans = -1
+    elif x < l:
+        ans = l-x
+    else:
+        ans = 0
+    print(f'#{tc} {ans}')
+```
+
+
+
 ## 3456. 직사각형 길이 찾기
 
 ```python
@@ -1352,5 +1384,16 @@ for tc in range(1, t+1):
                             ans = 'YES'
                             break
     print(f'#{tc} {ans}')
+```
+
+
+
+## 13218. 조별과제
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    n = int(input())    #학생수
+    print(f'#{tc} {n//3}')  #3명 이상의 학생으로 구성된 조의 수 최댓값
 ```
 
