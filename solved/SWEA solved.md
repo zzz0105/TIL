@@ -1132,6 +1132,17 @@ for tc in range(1, 1+t):
 
 
 
+## 3260. 두 수의 덧셈
+
+```python
+t = int(input())
+for tc in range(1,t+1):
+    n, m = map(int,input().split())
+    print(f'#{tc} {n+m}')
+```
+
+
+
 ## 3314. 보충학습과 평균
 
 ```python
@@ -1307,6 +1318,21 @@ t = int(input())
 for tc in range(1,t+1):
     ans = 'Odd' if int(input())%2 else 'Even'
     print(f'#{tc} {ans}')
+```
+
+
+
+## 5601. 쥬스 나누기
+
+```python
+#공평하게 쥬스 나누기. n명이니 1/n씩 나누기
+t = int(input())
+for tc in range(1,t+1):
+    n = int(input())
+    print(f'#{tc}', end=' ')
+    for _ in range(n):
+        print(f'1/{n}', end=' ')
+    print()
 ```
 
 
