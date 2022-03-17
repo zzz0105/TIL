@@ -1259,6 +1259,40 @@ for a in ans:
 
 
 
+## 3975. 승률 비교하기
+
+```python
+t = int(input())
+win=[]
+for tc in range(1,t+1):
+    a,b,c,d = map(int,input().split())
+    #앨리스 B전 A승. 밥은 D전 C승
+    alice = a/b
+    bob = c/d
+    if alice>bob: win.append('ALICE')
+    elif alice==bob: win.append('DRAW')
+    else: win.append('BOB')
+for a in range(1, 1+t):
+    print(f'#{a} {win[a-1]}')
+```
+
+
+
+## 4299. 태혁이의 사랑은 타이밍
+
+```python
+t = int(input())
+for tc in range(1,t+1):
+    d,h,m = map(int,input().split()) #일,시,분
+    minute = (d-11) * 24 * 60 + (h - 11) * 60 + m - 11
+    if minute <0:
+        print(f'#{tc} -1')
+    else:
+        print(f'#{tc} {minute}')
+```
+
+
+
 ## 4406. 모음이 보이지 않는 사람
 
 ```python
@@ -1272,6 +1306,19 @@ for tc in range(1, t+1):
             ans.append(w)
     ans=''.join(ans)
     print(f'#{tc} {ans}')
+```
+
+
+
+## 4466. 최대 성적표 만들기
+
+```python
+t = int(input())
+for tc in range(1,t+1):
+    n, k = map(int,input().split()) #n과목 중 k과목 선택
+    scores = list(map(int, input().split()))
+    scores.sort(reverse=True)
+    print(f'#{tc} {sum(scores[:k])}')
 ```
 
 
