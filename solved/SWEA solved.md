@@ -1470,3 +1470,36 @@ for tc in range(1,1+t):
     print(f'#{tc} {n//3}')  #3명 이상의 학생으로 구성된 조의 수 최댓값
 ```
 
+
+
+# SWEA D4
+
+## 1861. 정사각형 방
+
+```python
+t = int(input())
+for tc in range(1, t + 1):
+    n = int(input())  # 방의 한 변 길이
+    arr = [list(map(int, input().split())) for _ in range(n)]
+    v = [0] * (n * n + 1)
+    delta = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    for i in range(n):
+        for j in range(n):
+            for di, dj in delta:
+                ni = i + di
+                nj = j + dj
+                if 0 <= ni < n and 0 <= nj < n and arr[i][j]+1 == arr[ni][nj]:
+                    v[arr[i][j]] = 1
+
+    cnt, mini,max_cnt = 0,0,0
+    for k in range(n * n -1,-1,-1):
+        if v[k]:
+            cnt += 1
+        elif cnt:
+            if max_cnt <= cnt:
+                max_cnt = cnt
+                mini = k + 1
+            cnt = 0
+    print(f'#{tc} {mini} {max_cnt + 1}')
+```
+
