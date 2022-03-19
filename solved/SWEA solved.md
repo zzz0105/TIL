@@ -1323,6 +1323,28 @@ for tc in range(1,t+1):
 
 
 
+## 4751. 다솔이의 다이아몬드 장식
+
+```python
+t = int(input())
+for tc in range(1,t+1):
+    alp = list(input())
+    l = len(alp)
+    print(('..#.')*l, end='')
+    print('.')
+    print(('.#.#') * l, end='')
+    print('.')
+    for a in alp:
+        print(f'#.{a}.',end='')
+    print('#')
+    print(('.#.#') * l,end='')
+    print('.')
+    print(('..#.') * l, end='')
+    print('.')
+```
+
+
+
 ## 5356. 의석이의 세로로 말해요
 
 ```python
@@ -1418,6 +1440,23 @@ for tc in range(1, t+1):
 
 
 
+## 10505. 소득 불균형
+
+```python
+t = int(input())
+for tc in range(1,t+1):
+    n = int(input())    #사람 수
+    money = list(map(int,input().split()))
+    cnt = 0 #평균 이하 소득 가진 사람 수 세기 위함
+    avg = sum(money)/n
+    for m in money:
+        if m<=avg:
+            cnt+=1
+    print(f'#{tc} {cnt}')
+```
+
+
+
 ## 10804. 문자열의 거울상
 
 ```python
@@ -1456,6 +1495,21 @@ for tc in range(1, t+1):
                         if cnt >= 5:
                             ans = 'YES'
                             break
+    print(f'#{tc} {ans}')
+```
+
+
+
+## 12368. 24시간
+
+```python
+#a시에서 b시간이 지나면 몇시?
+t = int(input())
+for tc in range(1,t+1):
+    a, b = map(int, input().split())	
+    ans = a+b
+    if ans>=24:
+        ans-=24
     print(f'#{tc} {ans}')
 ```
 
