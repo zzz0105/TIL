@@ -1,4 +1,4 @@
-# Django:Template, View, Routing
+# Django
 
 > [Django](https://docs.djangoproject.com/ko/4.0/intro/): Python Web framework
 
@@ -75,7 +75,6 @@
     pip install -r requirements.txt
     ```
 
-    
 - Project
   - Appliction(앱)의 집합
   - 프로젝트에는 여러 앱이 포함될 수 있다. (앱은 여러 프로젝트에 있을 수 있다.)
@@ -343,7 +342,7 @@
   - 주어진 리소스가 수행할 작업을 나타내는 request methods를 정의
   - HTTP request method 종류: GET, POST, PUT, DELETE 등
   - HTTP request method - "GET"
-    - 서버로부터 정보를 조회하는데 사용. 데이터를 가져올 때만 사용해야 함
+    - 서버로부터 정보를 조회하는데 사용. 데이터를 가져올 때만 사용해야 함. 
     - 데이터를 서버로 전송할 때 body가 아닌 Query String Parameters를 통해 전송
     - 우리는 서버에 요청을 하면 HTML 문서 파일 한 장을 받는데, 이 때 사용하는 요청의 방식이 GET
 
@@ -668,3 +667,384 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 <link rel="stylesheet" href="{% static 'style.css' %}"
 ```
 
+
+
+## Model
+
+- 웹 애플리케이션의 데이터를 **구조화**하고 **조작**하기 위한 도구
+
+- 단일한 데이터에 대한 정보를 가짐.
+  - 사용자가 저장하는 데이터들의 필수적인 필드들과 동작들을 포함
+
+- 저장된 데이터베이스의 **레이아웃**
+- <u>Django</u>는 model을 통해 **데이터에 접속하고 관리**.
+- 일반적으로 **각각의 model**은 **하나의 데이터베이스 테이블에 매핑됨.**
+
+### Database
+
+- 데이터베이스(DB): 체계화된 데이터의 모임
+- 쿼리(Query)
+  - 데이터를 **조회**하기 위한 명령어/조건에 맞는 데이터를 **추출하거나 조작**하는 명령어
+  - Query를 날린다 = DB를 조작한다.
+
+#### Database의 기본 구조
+
+- 스키마(Schema): 데이터베이스에서 제약조건(자료의 구조, 표현방법, 관계 등)에 관련한 전반적인 명세를 기술한 것
+- 테이블: 열과 행의 모델을 사용해 조직된 데이터 요소들의 집합. SQL 데이터베이스에서는 테이블을 관계라고도 한다.
+  - 열(column): 필드, 속성
+    - 각 열에는 고유한 데이터 형식이 지정
+  - 행(row): 레코드, 튜플
+    - 테이블의 데이터 저장됨
+    - 기본키: 각 행의 고유값으로, PK(Primary Key)라고 한다. <u>반드시 설정</u>하여야하며, 데이터베이스 관리 및 관계 설정 시 주요하게 활용된다.
+
+
+
+## ORM
+
+> Object-Relational-Mapping
+
+- 객체 지향 프로그래밍 언어를 사용하여 **호환되지 않는 유형의 시스템 간**(<u>Django-SQL</u>)에 **데이터를 변환**하는 프로그래밍 기술
+- OOP 프로그래밍에서 RDBMS를 연동할 때, 데이터베이스와 객체 지향 프로그래밍 언어 간의 **호환되지 않는 데이터를 변환**하는 프로그래밍 기법
+- Django에서는 내장 Django ORM을 사용
+- 장점
+  - SQL을 잘 알지 못해도 DB 조작 가능
+  - SQL의 정차적 접근이 아닌 **객체 지향적 접근**으로 인한 높은 **생산성**(웹 개발의 속도를 높이는 것 - 현대 웹 프레임워크의 요점)
+- 단점
+  - ORM 만으로 완전한 서비스를 구현하기 어려운 경우가 있음.
+
+### models.py 작성
+
+```python
+class Article(models.Model):
+    title = models.CharField(max_length=10)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+```
+
+- 각 모델은 django.models.Model 클래스의 서브 클래스로 표현됨
+
+  - django.db.models 모듈의 Model 클래스를 상속받음
+
+- models 모듈을 통해 어떠한 타입의 DB 컬럼을 정의할 것인지 정의
+
+  - title, content는 모델의 필드를 나타냄
+  - 각 **필드**는 **클래스 속성**으로 지정됨.
+  - 각 **속성**은 각 데이터베이스의 **열**에 매핑.
+
+- 사용 모델 필드
+
+  - CharField(max_length=None, **options)
+
+    - 길이의 제한이 있는 문자열을 넣을 때. max_length는 필수 인자
+    - **필드의 최대 길이(문자)**, 데이터베이스 레벨과 Django의 유효성검사(값 검증)에서 활용
+
+  - TextField(**options)
+
+    - 글자의 수가 많을 때 사용
+    - max_length 적용 시 자동 양식 필드인 textarea <u>위젯에 반영</u>은 되지만 <u>모델과 데이터베이스 수준에는 **적용되지 않음**</u>
+
+  - DateTimeField options(DateField options와 동일한 추가 인자 사용_ DateTimeField는 DateField의 서브 클래스이기 때문)
+
+    - auto_now_add
+      - **최초 생성** 일자
+      - Django ORM이 **최초 insert**(테이블에 데이터 입력)시에만 현재 날짜와 시간으로 갱신.
+    - auto_now
+      - **최종 수정** 일자
+      - Django ORM이 save할 때마다 현재 날짜와 시간으로 갱신
+
+    
+
+## Migrations
+
+- Django가 model에 생긴 변화를 반영하는 방법
+
+- 명령어
+
+  - makemigrations	$ python manage.py makemigrations
+
+    - model을 **변경**한 것에 기반한 **새로운 migration**(설계도 개념)을 **만들 때** 사용. 추가로 모델 필드 작성할 때 makemigrations 진행해야함!
+    - migrations/0001_initial.py 생성 확인
+
+  - migrate                   $ python manage.py migrate
+
+    - migration을 **DB에 반영**하기 위해 사용
+    - 모델에서의 <u>변경 사항들과 DB의 스키마</u>가 **동기화**를 이룸
+    - 0001_initial.py 설계도를 실제 DB에 반영
+
+  - sqlmigrate              $ python manage.py sqlmigrate app_name 0001
+
+    - migration에 대한 **SQL 구문**을 보기 위해 사용
+    - migration이 SQL 문으로 <u>어떻게 해석되어서 동작할지</u> 미리 확인할 수 있음
+
+  - showmigrations    $ python manage.py showmigrations
+
+    - 프로젝트 <u>전체</u>의 **migration 상태를 확인**하기 위해 사용
+    - migration 파일들의 migrate 여부를 확인할 수 있음
+
+    
+
+## Database API
+
+- DB를 조작하기 위한 도구
+- Django가 기본적으로 ORM을 제공함에 따른 것으로 **DB를 편하게 조작**할 수 있도록 돕는다.
+- Model을 만들면 Django는 <u>객체들을 만들고 읽고 수정하고 지울 수 있는</u> **database-abstract API(=database-access API)**를 **자동으로 만듬**
+
+### DB API 구문 - Making Queries
+
+- Article.objects.all()	=> Class Name.Manager.QuerySet API
+  - Manager
+    - Django 모델에 **데이터베이스 query 작업이 제공**되는 <u>인터페이스</u>
+    - 기본적으로 모든 Django 모델 클래스에 **objects**라는 <u>Manager 추가</u>
+  - QuerySet
+    - 데이터베이스로부터 전달받은 객체 목록
+    - queryset 안의 객체는 0개, 1개, 혹은 여러개일 수 있다
+    - 데이터베이스로부터 <u>조회, 필터, 정렬 등을 수행</u>할 수 있다
+
+### Django shell
+
+- 일반 Python shell을 통해서는 장고 프로젝트 환경에 접근할 수 없음
+
+- 따라서 장고 프로젝트 설정이 load된 Python shell을 활용해 DB API 구문 테스트 진행
+
+  - Django-extensions 라이브러리의 기능 중 하나인 shell_plus 사용해서 진행
+  - ipython, django-extensions 설치 후 settings.py에서 앱 등록 후 shell_plus 진행
+
+  
+
+## CRUD
+
+- 대부분의 컴퓨터 소프트웨어가 가지는 기본적인 데이터 처리기능인 Create, Read, Update, Delete를 묶어서 일컫는 말
+
+### Create
+
+- 방법1) 인스턴스 생성 후 인스턴스 변수 설정
+
+```shell
+article = Article()			#Article(class)로부터 Article(instance)
+article.title = 'first'		#인스턴스 변수에 값을 할당
+article.content = 'django'
+article.save()				
+```
+
+- 방법2) 초기 값과 함께 인스턴스 생성
+
+```shell
+article = Article(title='second', content='django')
+article.save()
+```
+
+- 방법3) QuerySet API - create() 사용
+
+```shell
+Article.objects.create(title='third', content='django')
+#바로 쿼리 표현식 리턴
+```
+
+- save 메서드
+
+  - 객체를 데이터베이스에 저장
+  - 데이터 생성 시 save()를 호출하기 전에는 객체의 ID 값이 무엇인지 알 수 없음(ID 값은 Django가 아니라 **DB에서 계산되기 때문**)
+  - 단순히 모델을 인스턴스화 하는 것은 DB에 영향을 미치지 않는다. => **반드시 save()**해야함!
+
+- str 메서드
+
+  ```python
+  class Article(models.Model):
+      title = models.CharField(max_length=10)
+      content = models.TextField()
+      created_at = models.DateTimeField(auto_now_add=True)
+      updated_at = models.DateTimeField(auto_now=True)
+      
+      def __str__(self):
+          return self.title
+  ```
+
+  - 표준 파이썬 클래스의 메소드인 str()을 정의하여 각각의 object가 사람이 읽을 수 있는 **문자열을 반환(return)하도록** 할 수 있음
+  - **작성 후 반드시 shell_plus 재시작해야 반영됨**
+
+### Read
+
+- DB에 앤스턴스 객체를 얻기 위한 쿼리문 날리기
+
+```shell
+>>> Article.objects.all()	#전체 article 객체 조회
+<QuerySet []>	#레코드가 하나만 있으면 인스턴스 객체로, 두 개 이상이면 쿼리셋으로 리턴
+```
+
+- QuerySet API method의 종류
+
+  - Methods that **return new querysets**
+  - Methods that **do not return querysets**
+
+- QuerySet API method
+
+  - all(): 현재 QuerySet의 **복사본을 반환**
+
+  - get()
+
+    - 주어진 lookup 매개변수와 **일치**하는 객체를 반환
+    - <u>객체를 찾을 수 없으면</u> **DoesNotExist 예외**를 발생. <u>둘 이상의 객체</u>를 찾으면 **MultipleObjectsReturned 예외**를 발생 시킴
+      - 위와 같은 특징으로 인해 PK와 같이 고유성을 보장하는 조회에서 사용해야 함
+
+  - filter()
+
+    ```shell
+    >>> Ariticle.objects.filter(content='django')
+    <QuerySet [<Article:first>,<Article:second>,<Article:third>]>
+    ```
+
+    - 주어진 lookup 매개변수와 일치하는 객체를 포함하는 **새 QuerySet을 반환**
+
+- Field lookups
+
+  ```shell
+  Article.objects.filter(pk__gt=2)
+  Article.objects.filter(content__contains='an')
+  ```
+
+  - 조회 시 특정 검색 조건을 지정
+  - QuerySet 메서드 filter(), exclude() 및 get()에 대한 키워드 인수로 지정됨
+
++. 게시글 정렬 순서 변경
+
+```python
+def index(request):
+    #1 DB로 부터 받은 쿼리셋을 파이썬이 변경
+    articles=Article.objects.all()[::-1]
+    #2 처음부터 내림차순으로 쿼리셋을 받는다(DB가 조작)
+    articles=Article.objects.order_by('-pk')
+```
+
+### Update
+
+```shell
+article.title='bye'	#값 변경 후 저장
+article.save()
+```
+
+- article 인스턴스 객체의 인스턴스 변수의 값을 변경 후 저장
+
+### Delete
+
+```shell
+>>> article = Article.objects.get(pk=1)
+>>> article.delete()
+(1, {'articles.Article':1})
+```
+
+- QuerySet의 **모든 행에 대해** SQL 삭제 쿼리를 수행하고, <u>삭제된 객체 수와 객체 유형 당 삭제 수가 포함</u>된 **딕셔너리를 반환**
+
+
+
+## Admin Site
+
+### Automatic admin interface
+
+- 사용자가 아닌 서버의 관리자가 활용하기 위한 페이지
+- Model class를 admin.py에 등록하고 관리
+- django.contrib.auth 모듈에서 제공됨
+- record 생성 여부 확인에 매우 유용하며, 직접 record를 삽입할 수도 있음
+
+### admin 생성
+
+```bash
+$ python manage.py createsuperuser
+```
+
+- 관리자 계정 생성 후 서버를 실행한 다음 '/admin'으로 가서 관리자 페이지 로그인
+  - 계정만 만든 경우 Django 관리자 화면에서 아무것도 보이지 않음
+- 내가 만든 Model을 보기 위해서는 admin.py에 작성하여 Django 서버에 등록
+- [주의] auth에 관련된 기본 테이블이 생성되지 않으면 관리자 계정을 생성할 수 없음
+
+### admin 등록
+
+```python
+#articles/admin.py
+from django.contrib import admin
+from .models import Article
+
+#admin site에 register하겠다
+admin.site.register(Article)
+```
+
+- admin.py는 관리자 사이트에 Article 객체가 관리자 인터페이스를 가지고 있다는 것을 알려주는 것
+- models.py에 정의한 __ str __의 형태로 객체가 표현됨
+
+### ModelAdmin options
+
+```python
+#articles/admin.py
+from django.contrib import admin
+from .models import Article
+
+class ArticleAdmin(admin.ModelAdmin):
+    list_display=('pk','title','content',)
+
+admin.site.register(Article, ArticleAdmin)
+```
+
+- list_display: models.py 정의한 각각의 속성(칼럼)들의 값(레코드)을 admin 페이지에 출력하도록 설정
+
+
+
+## CRUD with views
+
+### HTTP method
+
+- HTTP request method - "GET"
+  - 특정 리소스를 가져오도록 요청할 때 사용
+  - 반드시 데이터를 가져올 때만 사용해야 함.
+  - DB에 변화를 주지 않음
+  - CRUD에서 R 역할
+
+* HTTP request method - "POST"
+  * 서버로 데이터를 전송할 때 사용
+  * 리소스를 생성/변경하기 위해 데이터를 HTTP body에 담아 전송.
+  * 서버에 변경사항을 만듦
+  * CRUD에서 C, U, D 역할 담당
+
+### 사이트 간 요청 위조(CSRF)
+
+> Cross-site request forgery
+
+- 웹 애플리케이션 취약점 중 하나로 사용자가 자신의 의지와 무관하게 **공격자가 의도한 행동**을 하여 특정 웹페이지를 보안에 취약하게 하거나 수정, 삭제 등의 작업을 하게 만드는 **공격 방법**
+- Django는 CSRF에 대항하여 middleware와 template tag를 제공
+  - middleware: 공통 서비스 및 기능을 애플리케이션에 제공하는 소프트웨어. 데이터 관리, 인증 및 API 관리 등을 처리
+  - 공격방어를 위한 middleware는 settings.py의 MIDDLEWARE에 작성되어 있다.
+
+#### CSRF 공격 방어
+
+- Security Token 사용 방식(CSRF Token)
+  - 사용자의 데이터에 임의의 난수 값을 부여해, 매 요청마다 해당 난수 값을 포함시켜 전송시키도록 함
+  - 이후 서버에서 요청을 받을 때마다 전달된 token의 값이 유효한지 검증
+  - 데이터 변경이 가능한 POST, PATCH, DELETE Method 등에 적용(GET 제외)
+
+#### csrf_token template tag
+
+{% csrf_token %}
+
+* CSRF 보호에 사용됨
+* input type이 hidden으로 작성됨. value는 Django에서 생성한 hash값으로 설정됨
+* 해당 태그 <u>없이</u> 요청을 보낸다면 Django 서버는 <u>403 forbidden</u>을 응답
+
+### redirect
+
+- 새 URL로 요청을 보냄.
+- 브라우저는 현재 경로에 따라 전체 URL 자체를 재구성
+  - return redirect('articles:index')
+
+### Variable Routing
+
+- 글의 번호를 활용해 각각의 페이지를 따로 구현해야하는 경우 사용
+
+  ```python
+  #articles/urls.py
+  path('< int:pk >/', views.detail, name='detail')
+  
+  #articles/views.py
+  def detail(request,pk):
+      article=Article.objects.get(pk=pk)
+      #왼쪽pk는 DB에 저장된 레코드의 pk(id), 오른쪽pk는 variable routing을 통해 받은 pk
+      return render(request,'articles/detail.html','article':article)
+  ```
