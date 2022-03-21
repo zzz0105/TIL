@@ -61,20 +61,21 @@
 
 ## Django Intro
 
-- 가상환경 생성(python -m venv 가상환경이름) 및  활성화(source 가상환경이름/Scripts/activate) --> django 설치(pip install django==3.2.12) 
+- 가상환경 생성(python -m venv 가상환경이름) 및  활성화(source 가상환경이름/Scripts/activate) 
+  -> django 설치(pip install django==3.2.12) 
   -> 프로젝트 생성(django-admin startproject 프로젝트명 .) 
   -> 서버 켜서(python manage.py runsever) 로켓 확인하기  
   -> (ctrl+c로 서버 끄고) 앱 생성(python manage.py startapp 앱이름) 
-  -> 앱등록(settings.py의 INSTALLED_APPS 리스트에 추가)
-
-  - 가상환경을 쓰는 이유: 프로젝트 별로 pip로 설치되는 패키지를 독립적으로 관리하기 위함
-
-  - requirements.txt에 쓰여있는 모든 패키지 설치하는 방법:
-
+-> 앱등록(settings.py의 INSTALLED_APPS 리스트에 추가)
+  
+- 가상환경을 쓰는 이유: 프로젝트 별로 pip로 설치되는 패키지를 독립적으로 관리하기 위함
+  
+- requirements.txt에 쓰여있는 모든 패키지 설치하는 방법:
+  
     ```bash
     pip install -r requirements.txt
-    ```
-
+  ```
+  
 - Project
   - Appliction(앱)의 집합
   - 프로젝트에는 여러 앱이 포함될 수 있다. (앱은 여러 프로젝트에 있을 수 있다.)
@@ -168,7 +169,7 @@
     - Variable
 
       - <u>render()</u>를 사용하여 views.py에서 정의한 <u>변수</u>를 **template 파일로 넘겨 사용**
-      - 변수명은 영어, 숫자, _ 조합으로 구성될 수 있으 밑줄로는 시작할 수 없다. 공백이나 구두점 또한 사용 불가
+      - 변수명은 영어, 숫자, _ 조합으로 구성될 수 있으나 밑줄로는 시작할 수 없다. 공백이나 구두점 또한 사용 불가
       - .을 사용하여 변수 속성에 접근
       - render의 세번째 인자로 {'key' : value}와 같이 **딕셔너리 형태**로 넘겨주며, 여기서 정의한 **key**에 해당하는 문자열이 template에서 사용 가능한 **변수명**
 
@@ -342,7 +343,7 @@
   - 주어진 리소스가 수행할 작업을 나타내는 request methods를 정의
   - HTTP request method 종류: GET, POST, PUT, DELETE 등
   - HTTP request method - "GET"
-    - 서버로부터 정보를 조회하는데 사용. 데이터를 가져올 때만 사용해야 함. 
+    - 서버로부터 정보를 조회하는데 사용.
     - 데이터를 서버로 전송할 때 body가 아닌 Query String Parameters를 통해 전송
     - 우리는 서버에 요청을 하면 HTML 문서 파일 한 장을 받는데, 이 때 사용하는 요청의 방식이 GET
 
@@ -1046,5 +1047,5 @@ admin.site.register(Article, ArticleAdmin)
   def detail(request,pk):
       article=Article.objects.get(pk=pk)
       #왼쪽pk는 DB에 저장된 레코드의 pk(id), 오른쪽pk는 variable routing을 통해 받은 pk
-      return render(request,'articles/detail.html','article':article)
+      return render(request,'articles/detail.html',{'article':article})
   ```
