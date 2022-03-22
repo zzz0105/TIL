@@ -334,6 +334,20 @@ for tc in range(1, T+1):
 
 
 
+## 5097. 회전
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    n, m = map(int,input().split())
+    nums=list(map(int,input().split()))
+    #n개의 숫자로 이루어진 수열
+    #맨 앞의 숫자를 맨 뒤로 보내는 작업 M번한 후 맨 앞 숫자 출력
+    print(f'#{tc} {nums[m % n]}')
+```
+
+
+
 # [SWEA D2](https://swexpertacademy.com/main/code/problem/problemList.do?problemLevel=2&contestProbId=&categoryId=&categoryType=&problemTitle=&orderBy=FIRST_REG_DATETIME&selectCodeLang=ALL&select-1=1&pageSize=10&pageIndex=1)
 
 ## 1204. [S/W 문제해결 기본] 1일차 - 최빈수 구하기
@@ -915,6 +929,31 @@ for tc in range(1, 1+t):
 
 
 
+## 5099. 피자굽기
+
+```python
+from collections import deque
+t = int(input())
+for tc in range(1,1+t):
+    n, m = map(int,input().split()) #화덕크기/피자개수
+    chz = list(map(int,input().split()))
+    chz = deque(enumerate(chz))
+    fire = deque()
+    for _ in range(n):
+        fire.append(chz.popleft())
+    while len(fire)>1:
+        if len(fire) < n and chz:	#화덕 안에 있는 피자의 길이가 n보다 작고 피자가 있다면
+            fire.append(chz.popleft())
+        i, c = fire.popleft()
+        if c//2==0:
+            continue
+        else:
+            fire.append((i,c//2))
+    print(f'#{tc} {fire.popleft()[0]+1}')
+```
+
+
+
 ## 9367. 점점 커지는 당근의 개수
 
 ```python
@@ -1453,6 +1492,23 @@ for tc in range(1,t+1):
         if m<=avg:
             cnt+=1
     print(f'#{tc} {cnt}')
+```
+
+
+
+## 10726. 이진수 표현
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    n, m = map(int,input().split()) #m의 이진수 표현의 마지막 N비트가 모두 1로 켜져있는가
+    ans='ON'
+    for _ in range(n):
+        if not m%2: #0이라면
+            ans = 'OFF'
+            break
+        m//=2
+    print(f'#{tc} {ans}')
 ```
 
 
