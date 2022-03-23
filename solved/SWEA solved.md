@@ -1148,6 +1148,34 @@ for tc in range(1,1+t):
 
 
 
+## 1493. 수의 새로운 연산
+
+```python
+#x축 근처에 있는 숫자들 리스트
+arr = [1]
+for a in range(1,300):
+    arr += [arr[a-1]+a+1]
+
+t = int(input())
+for tc in range(1,t+1):
+    p, q = map(int,input().split())
+    #p, q가 할당된 좌표 찾기
+    for i in range(300):
+        if arr[i]>=p:   #배열 안 숫자보다 작아질 때
+            x = i+1 + (p - arr[i])
+            y = 1 - (p - arr[i])
+            break
+    for j in range(300):
+        if arr[j]>=q:
+            m = j+1 + (q - arr[j])
+            n = 1 - (q - arr[j])
+            break
+    #(x+m,y+n)의 값을 찾아라
+    print(f'#{tc} {arr[x+m+y+n-1-1]-(y+n-1)}')
+```
+
+
+
 ## 1860. 진기의 최고급 붕어빵
 
 ```python
