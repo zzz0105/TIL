@@ -1199,6 +1199,19 @@ for tc in range(1, 1+t):
 
 
 
+## 3142. 영준이와 신비한 뿔의 숲
+
+```python
+t = int(input())	#연립방정식으로 유니콘과 트윈혼의 수 구함
+for tc in range(1, t + 1):
+    n, m = map(int,input().split())
+    uni = n - m
+    twin = 2*m - n
+    print(f'#{tc} {twin} {uni}')
+```
+
+
+
 ## 3260. 두 수의 덧셈
 
 ```python
@@ -1507,6 +1520,17 @@ for tc in range(1, t+1):
 
 
 
+## 10200. 구독자 전쟁
+
+```python
+t = int(input())
+for tc in range(1, t + 1):
+    n, a, b = map(int,input().split())  #전체, P채널 구독자, T채널 구독자
+    print(f'#{tc} {min(a,b)} {0 if a+b<n else a+b-n}')
+```
+
+
+
 ## 10505. 소득 불균형
 
 ```python
@@ -1606,6 +1630,19 @@ t = int(input())
 for tc in range(1,1+t):
     n = int(input())    #학생수
     print(f'#{tc} {n//3}')  #3명 이상의 학생으로 구성된 조의 수 최댓값
+```
+
+
+
+## 13229. 일요일
+
+```python
+#다음 일요일까지 얼마나 남았나
+t = int(input())
+d = {'MON': 6, 'TUE':5, 'WED':4, 'THU':3,
+     'FRI':2, 'SAT':1, 'SUN':7}
+for tc in range(1, t + 1):
+    print(f'#{tc} {d[input()]}')
 ```
 
 
