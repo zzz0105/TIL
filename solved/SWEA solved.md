@@ -1403,6 +1403,54 @@ for tc in range(1,t+1):
 
 
 
+## 4615. 재미있는 오셀로 게임
+
+```python
+t = int(input())
+move = [(1,0),(1,1),(0,1),(-1,1),(-1,0),(-1,-1),(0,-1),(1,-1)]
+for tc in range(1,1+t):
+    n, m = map(int, input().split())    #보드 한 변 길이, 돌 놓는 횟수
+    arr = [[0]*n for _ in range(n)]
+
+    u = n//2
+    arr[u][u], arr[u-1][u-1] = 2,2      #초기 돌 세팅
+    arr[u-1][u], arr[u][u-1] = 1,1      #흑돌 = 1, 백돌 = 2
+
+    for _ in range(m):
+        x, y, c = map(int,input().split())  #행, 열, 색
+        x-=1    #문제표기와 헷갈리지 않도록 뺴준다
+        y-=1
+
+        arr[x][y] = c   #해당 위치에 돌을 놓는다
+        toggle = []     #색을 바꿔야할 돌들의 리스트
+
+        for di, dj in move: #방향 탐색
+            ni = x+di
+            nj = y+dj
+            while(True):
+                if (ni not in range(n)) or (nj not in range(n)) or (arr[ni][nj]==0):
+                    #돌이 없거나 범위 안에 없을 때
+                    toggle=[]
+                    break
+                if arr[ni][nj]==c:  #같은 색 만남
+                    break
+                else:
+                    toggle.append((ni,nj))
+                ni += di
+                nj += dj
+            for ti,tj in toggle:    #뒤집어준다
+                arr[ti][tj] = 1 if c==1 else 2
+
+    #돌 세기
+    white, black = 0, 0
+    for f in range(n):
+        black += arr[f].count(1)
+        white += arr[f].count(2)
+    print(f'#{tc} {black} {white}')
+```
+
+
+
 ## 4751. 다솔이의 다이아몬드 장식
 
 ```python
@@ -1676,5 +1724,27 @@ for tc in range(1, t + 1):
                 mini = k + 1
             cnt = 0
     print(f'#{tc} {mini} {max_cnt + 1}')
+```
+
+
+
+## 7701. 염라대왕의 이름 정렬
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    n = int(input())    #이름 개수
+    ans = []
+    names = [input() for _ in range(n)] #n줄에 걸쳐 들어오는 입력 받기
+    names = list(set(names))    #중복 제거
+    for i in range(1,51):
+        smlen = []  #같은 길이의 이름 모아둘 리스트
+        for name in names:
+            if len(name)==i:
+                smlen.append(name)
+        ans += sorted(smlen)
+    print(f'#{tc}')
+    for a in ans:
+        print(a)
 ```
 
