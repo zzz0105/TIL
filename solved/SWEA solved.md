@@ -1630,6 +1630,28 @@ for tc in range(1,t+1):
 
 
 
+## 10912. 외로운 문자
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    st = input()
+    a = []
+    for s in st:
+        if s in a:
+            a.remove(s)
+        else:
+            a.append(s)
+    a.sort()
+    if a==[]:
+        ans = 'Good'
+    else:
+        ans = ''.join(a)
+    print(f'#{tc} {ans}')
+```
+
+
+
 ## 11315. 오목 판정
 
 ```python
@@ -1652,6 +1674,35 @@ for tc in range(1, t+1):
                             ans = 'YES'
                             break
     print(f'#{tc} {ans}')
+```
+
+
+
+## 11856. 반반
+
+```python
+t = int(input())
+for tc in range(1,t+1):
+    s = input()
+    sets = list(set(s))
+    if len(sets)!=2 or s.count(sets[0]) != 2 or s.count(sets[1]) != 2:
+        print(f'#{tc} No')
+    else:
+        print(f'#{tc} Yes')
+```
+
+
+
+## 12221. 구구단2
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    a, b = map(int,input().split())
+    if a>=10 or b>=10:
+        print(f'#{tc} -1')
+    else:
+        print(f'#{tc} {a*b}')
 ```
 
 
@@ -1695,7 +1746,7 @@ for tc in range(1, t + 1):
 
 
 
-# SWEA D4
+# [SWEA D4](https://swexpertacademy.com/main/code/problem/problemList.do?problemLevel=4&contestProbId=&categoryId=&categoryType=&problemTitle=&orderBy=FIRST_REG_DATETIME&selectCodeLang=PYTHON&select-1=&pageSize=10&pageIndex=1)
 
 ## 1861. 정사각형 방
 
