@@ -1148,6 +1148,27 @@ for tc in range(1,1+t):
 
 
 
+## 1289. 원재의 메모리 복구하기
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    cnt=0
+    bits_ori = list(map(int,input()))    #원래 메모리 값
+    bits_len = len(bits_ori)
+    bits = [0]*bits_len   				 #초기화 상태
+    for i in range(bits_len):
+        if bits[i] != bits_ori[i]:
+            for j in range(i, len(bits)):#bit값 결정하면 메모리 끝까지 덮어씌움
+                bits[j]=bits_ori[i]
+            cnt+=1
+        if bits == bits_ori:
+            break
+    print(f'#{tc} {cnt}')
+```
+
+
+
 ## 1493. 수의 새로운 연산
 
 ```python
