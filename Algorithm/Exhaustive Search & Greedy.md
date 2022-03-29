@@ -72,6 +72,7 @@
 * 재귀 호출을 통한 순열 생성
 
   ```python
+  #재귀
   def perm(n, k,m):
       if n==k:
           print(arr)	#원하는 작업 수행
@@ -86,6 +87,20 @@
   p = [0]*3	#고를 숫자만큼 만들어주면 된다
   used = [0]*len(arr)
   f(0,3, len(arr))		#전체에 대한 순열이 아니라면 몇개 고를지에 대한 정보도 넘겨야한다.
+  
+  #반복문 활용
+  arr = [1,3,5,7,10]
+  n = len(arr)
+  for i in range(n):
+      for j in range(n):
+          for k in range(n):
+              if i != j and j != k and k != i:
+                  print(i,j,k)
+  
+  #itertools의 permutations를 활용해 구할 수도 있다.
+  from itertools import permutations
+  arr = [1,3,5,7,10]
+  nums = list(permutations(arr,3))
   ```
 
 ### 부분집합
@@ -94,9 +109,77 @@
   - 자기 자신과 공집합을 포함한 모든 부분집합(powerset)의 개수는 2^n개
   - 원소의 수가 증가하면 부분집합의 개수는 지수적으로 증가
 
+```python
+arr = [1,4,6,8,16,29]
+n = len(arr)
+#반복문 활용
+subsets=[[]]
+for a in arr:
+    for y in range(len(subsets)):
+        subsets.append(subsets[y]+[a])
+
+#바이너리 카운팅 활용
+for i in range(0,1<<n):
+    for j in range(n):
+        if i&(1<<j):	#i의 j번째 비트가 1일 때
+            print(arr[j], end=' ')
+    print()
+```
+
 ### 조합
 
 > 서로 다른 n개의 원소 중 r개를 순서 없이 골라낸 것
 
 - nCr = n!/((n-r)!*r!) = **n-1 C r-1 + n-1C r**(재귀적)
 - nC0 = 1
+
+```python
+#재귀 호출 활용
+#an:n개의 원소를 가지고 있는 배열
+#tr: r개의 크기의 배열, 조합이 임시 저장될 배열
+def com(n,r):
+    if r==0:
+        print(arr)
+    elif n<r:
+        return
+    else:
+        tr[r-1] = an[n-1]
+        com[n-1,r-1]
+        com[n-1,r]
+        
+#반복문 활용
+arr = [3,6,1,7,8]
+n = len(arr)
+for i in range(n):
+    for j in range(i+1,n):
+        for k in range(j+1,n):
+            print(i,j,k)
+            
+#itertools의 combinations를 활용할 수도 있다
+from itertools import combinations
+arr = [3,6,1,7,8]
+nums = list(combinations(menu,2))
+```
+
+
+
+## 탐욕 알고리즘
+
+- 최적해를 구하는데 사용되는 근시안적인 방법. 머리속에 떠오르는 생각을 검증없이 바로 구현하면 Greedy 접근이다. 하지만 **최적이라는 보장은 없다.**
+- 한번 선택된 것은 번복하지 않는다. -> 단순하며 제한적인 문제들에 적용됨
+- 최적화 문제: 가능한 해들 중에서 가장 좋은 해를 찾는 문제
+- 동작 과정
+  1. 해 선택: 부분 문제의 최적 해를 구한 뒤 이를 부분해집합에 추가
+  2. 실행 가능성 검사: 새로운 부분 해 집합이 실행가능한지(제약 조건을 위반하지 않는지)를 확인.
+  3. 해 검사: 새로운 부분 해 집합이 문제의 해가 되는지를 확인
+
+- 탐욕 기법과 동적 계획법의 비교
+
+  | 탐욕 기법                                                    | 동적 계획법                                          |
+  | ------------------------------------------------------------ | ---------------------------------------------------- |
+  | 매 단계에서 가장 좋게 보이는 것을 빠르게 선택. <br />-> 지역 최적 선택 | 매 단계의 선택은 해결한 하위 문제의 해를 기반으로 함 |
+  | 하위 문제를 풀기 전, 탐욕적 선택이 먼저 이루어짐             | 하위 문제가 우선 해결된다                            |
+  | Top-down 방식                                                | Bottom-up 방식                                       |
+  | 일반적으로, 빠르고 간결하다.                                 | 좀 더 느리고 복잡하다                                |
+
+  
