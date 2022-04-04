@@ -954,6 +954,25 @@ for tc in range(1,1+t):
 
 
 
+## 5202. 화물 도크
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    n = int(input())
+    arr = [list(map(int,input().split())) for _ in range(n)]
+    arr.sort(key=lambda x:x[1])     #*끝나는 것 기준으로 정렬*
+    cnt = 1
+    j = 0
+    for i in range(1,n):
+        if arr[i][0]>=arr[j][1]:
+            cnt+=1
+            j=i
+    print(f'#{tc} {cnt}')
+```
+
+
+
 ## 9367. 점점 커지는 당근의 개수
 
 ```python
