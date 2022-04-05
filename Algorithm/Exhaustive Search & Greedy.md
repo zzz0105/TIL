@@ -22,7 +22,7 @@
 - 함수 내부에서 직접 혹은 간접적으로 자기 자신을 호출하는 함수
 - 함수 호출은 프로그램 메모리 구조에서 스택을 사용한다. 따라서 재귀 호출은 반복적인 스택의 사용을 의미하여 메모리 및 속도에서 성능 저하가 발생한다.
 - 두 부분으로 나뉜다
-  - 기본 부분(basis part): 집합에 포함되어 있는 원소. induction을 생성하기 위한 시드 역할.
+  - 기본 부분(basis part): 집합에 포함되어 있는 원소. 유도 부분을 생성하기 위한 시드 역할.
   - 유도 부분(inductive part): 새로운 집합의 원소를 생성하기 위해 결합되어지는 방법
 
 ### 반복과 재귀의 비교
@@ -69,39 +69,32 @@
   - nPr = n * (n-1) * (n-2) * (n-2) * ... * (n-r+1)
   - nPn = n!(팩토리얼) = n * (n-1) * (n-2) * (n-2) * ... * 2 *1
 
-* 재귀 호출을 통한 순열 생성
+```python
+#재귀
+def perm(arr, n):
+	result = []
+	if n == 0:
+		return [[]]
+	for i in range(len(arr)):
+		elem = arr[i]
+		for rest in perm(arr[:i] + arr[i+1:], n - 1):
+			result.append([elem] + rest)
+	return result
 
-  ```python
-  #재귀
-  def perm(n, k,m):
-      if n==k:
-          print(arr)	#원하는 작업 수행
-      else:
-          for i in range(m):
-              if used=[i]==0:
-                  used[i]=1
-                  p[n]=arr[i]
-                  perm(n+1,k,m)
-                  used[i]=0
-  arr=[1,2,3,4]
-  p = [0]*3	#고를 숫자만큼 만들어주면 된다
-  used = [0]*len(arr)
-  f(0,3, len(arr))		#전체에 대한 순열이 아니라면 몇개 고를지에 대한 정보도 넘겨야한다.
-  
-  #반복문 활용
-  arr = [1,3,5,7,10]
-  n = len(arr)
-  for i in range(n):
-      for j in range(n):
-          for k in range(n):
-              if i != j and j != k and k != i:
-                  print(i,j,k)
-  
-  #itertools의 permutations를 활용해 구할 수도 있다.
-  from itertools import permutations
-  arr = [1,3,5,7,10]
-  nums = list(permutations(arr,3))
-  ```
+#반복문 활용
+arr = [1,3,5,7,10]
+n = len(arr)
+for i in range(n):
+    for j in range(n):
+        for k in range(n):
+            if i != j and j != k and k != i:
+                print(i,j,k)
+
+#itertools의 permutations를 활용해 구할 수도 있다.
+from itertools import permutations
+arr = [1,3,5,7,10]
+nums = list(permutations(arr,3))
+```
 
 ### 부분집합
 
@@ -135,17 +128,15 @@ for i in range(0,1<<n):
 
 ```python
 #재귀 호출 활용
-#an:n개의 원소를 가지고 있는 배열
-#tr: r개의 크기의 배열, 조합이 임시 저장될 배열
-def com(n,r):
-    if r==0:
-        print(arr)
-    elif n<r:
-        return
-    else:
-        tr[r-1] = an[n-1]
-        com[n-1,r-1]
-        com[n-1,r]
+def com(arr, n):
+    result = []
+    if n==0:
+        return [[]]
+    for i in range(len(arr)):
+        elem = arr[i]
+        for C in com(arr[i+1:],n-1):
+            result.append([elem]+C)
+    return result
         
 #반복문 활용
 arr = [3,6,1,7,8]
@@ -181,5 +172,3 @@ nums = list(combinations(menu,2))
   | 하위 문제를 풀기 전, 탐욕적 선택이 먼저 이루어짐             | 하위 문제가 우선 해결된다                            |
   | Top-down 방식                                                | Bottom-up 방식                                       |
   | 일반적으로, 빠르고 간결하다.                                 | 좀 더 느리고 복잡하다                                |
-
-  
