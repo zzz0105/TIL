@@ -280,3 +280,200 @@ def create(request):
   - Django가 해당 model에서 양식에 필요한 대부분의 정보를 이미 정의
   - 어떤 레코드를 만들어야 할지 알고 있으므로 바로 .save() 호출 가능
 
+#### Widgets 활용하기
+
+- Django의 HTML <u>input element 표현</u>(유효성 검사x)
+
+- HTML 렌더링을 처리
+
+- 2가지 작성 방식을 가짐
+
+  - 첫번째 방식_Django에서 권장하지 않는다
+
+    ```python
+    #articles/forms.py
+    class ArticleForm(forms.ModelForm):
+        class Meta:
+            model = Article
+            fields = '__all__'
+            widgets = {
+                'title': forms.TextInput(attrs={
+                    'class':'my-title',
+                    'placeholder': 'Enter the title',
+                    'maxlength': 10,
+                    }
+                )
+            }
+    ```
+
+  - 두번째 방식_권장
+
+    ```python
+    class ArticleForm(forms.ModelForm):
+        title = forms.CharField(
+            widget=forms.TextInput(
+            	attrs={		#속성값을 넣기 위함
+                    'class':'my-title', 'second-class',	#부트스트랩 클래스 여기에 써야함
+                    'placeholder': 'Enter the title',
+                }
+            )
+        )
+        content = forms.CharField(
+            widget=forms.Textarea(
+            	attrs={		
+                    'class':'my-title', 
+            }
+            )     
+        )
+        class Meta:
+        model = Article
+            fields = '__all__'
+  ```
+
+- 에러메세지 바꾸는 방법
+
+```python
+content = forms.CharField(
+    widget=forms.Textarea(
+    	attrs={
+            'class' : 'my-content',            
+        }
+    ),
+    error_messages={
+        'required' : 'Please enter your content!!'
+    }
+)
+```
+
+
+
+## Rendering fields manually
+
+### 수동으로 Form 작성하는 2가지 방법
+
+1. Rendering fields manually
+
+   ```django
+   <!--articles/create.html -->
+   <h1>Create</h1>
+   <hr>
+   
+   <form action="" method="POST">
+       {% csrf_token %}
+       <div>
+           {{ form.title.errors }}
+           {{ form.title.label_tag }}
+           {{ form.title }}
+       </div>
+       <div>
+           {{ form.content.errors }}
+           {{ form.content.label_tag }}
+           {{ form.content }}
+       </div>
+       <input type="submit">
+   </form>
+   ```
+
+2. Looping over the form's fields({% for %})
+
+   ```django
+   <!--articles/create.html -->
+   <form action="{% url 'articles:create' %}" method="POST">
+       {% csrf_token %}
+       {% for field in form %}
+           {{ field.errors }}
+           {{ field.label_tag }}
+           {{ field }}
+       {% endfor %}
+       <input type="submit">
+   </form>
+   ```
+
+### Bootstrap과 함께 사용하기
+
+1. Bootstrap class with widgets
+
+   - Bootstrap Form을 사용해 적용한다
+   - 핵심 클래스: form-control
+
+   ```python
+   #articles/forms.py
+   class ArticleForm(forms.ModelForm):
+       title = forms.CharField(
+           widget=forms.TextInput(
+           	attrs={		
+                   'class':'my-title form-control',	
+                   'placeholder': 'Enter the title',
+               }
+           )
+       )
+       content = forms.CharField(
+           widget=forms.Textarea(
+           	attrs={		
+                   'class':'my-title form-control', 
+               }
+           ),
+           error_messages={
+           'required' : 'Please enter your content!!'
+       	}        
+       )
+       class Meta:
+           model = Article
+           fields = '__all__'
+   ```
+
+   ```django
+   <!-- 에러메세지 색상 바꾸기 -->
+   <!--articles/create.html -->
+   <form action="{% url 'articles:create' %}" method="POST">
+       {% csrf_token %}
+       {% for field in form %}
+       	{% if field.errors %}	
+       		{% for error in field.errors %}
+       			<div class="alert alert-danger">{{ error }}</div>
+       		{% endfor %}
+       	{% endif %}
+           {{ field.label_tag }}
+           {{ field }}
+       {% endfor %}
+       <input type="submit">
+   </form>
+   ```
+
+2. Django Bootstrap 5 Library
+
+   - django-bootstrap v5
+
+     - form class에 bootstrap을 적용시켜주는 라이브러리
+     - 한번에 끝낼 수 있지만 커스텀이 어려워짐(자율성 떨어짐)
+
+     ```bash
+     $ pip install django-bootstrap-v5
+     ```
+
+     ```python
+     #settings.py
+     INSTALLED_APPS=[
+         ...
+         'bootstrap5',
+         ...
+     ]
+     ```
+
+   ```django
+   <!-- update.html -->
+   {% extends 'base.html' %}	<!-- base.html에 bootstrap cdn 추가해야됨 -->
+   {% load bootstrap5 %}
+   
+   {% block content %}
+   	<h1>UPDATE</h1>
+   	<hr>
+   	<form action="{% url 'articles:update' article.pk %}" method="POST">
+           {% csrf_token %}
+           {% bootstrap_form form %}
+           <input type="submit">
+   	</form>
+   	<hr>
+   	<a href="{% url 'articles:detail' article.pk %}">[back]</a>
+   {% endblock %}
+   ```
