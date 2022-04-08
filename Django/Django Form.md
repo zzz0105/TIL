@@ -125,7 +125,7 @@ def new(request):
 
 ## ModelForm
 
-- Django Form을 사용하다 보면 Model에 정의한 필드를 유저로부터 입력 받기 위해 Form에서 <u>Model 필드를 재정의하는 행위가 중복</u>될 수 있음 => Model을 통해 Form Class를 만들 수 있는 ModelForm이라는 Helper 제공
+- Django Form을 사용하다 보면 Model에 정의한 <u>필드</u>를 유저로부터 <u>입력</u> 받기 위해 Form에서 <u>Model 필드를 재정의하는 행위가 **중복**</u>될 수 있음 => Model을 통해 Form Class를 만들 수 있는 ModelForm이라는 Helper 제공
 - 모델 필드 속성에 맞는 html element를 만들어주고 이를 통해 받은 데이터를 view 함수에서 유효성 검사를 할 수 있도록 함
 
 ### Model Form Class
@@ -196,7 +196,7 @@ def create(request):
 - The save() method
 
   - Form에 바인딩 된 데이터에서 데이터 베이스 **객체를 만들고 저장**
-  - ModelForm의 하위(sub) 클래스(ArticleForm)는 기존 모델 인스턴스를 키워드 인자 instance로 받아 들일 수 있음
+  - ModelForm의 하위(sub) 클래스(ArticleForm)는 <u>기존 모델 인스턴스</u>를 키워드 인자`instance`로 <u>받아 들일 수 있음</u>
     - 이것이 제공되면 save()는 해당 인스턴스를 수정(UPDATE)
     - 제공되지 않은 경우 save()는 지정된 모델의 새 인스턴스를 만듦(CREATE)
   - Form의 유효성이 확인되지 않은 경우(hasn't been validated) save()를 호출하면 form.errors를 확인하여 에러 확인 가능
@@ -494,11 +494,30 @@ content = forms.CharField(
 
      - render(request, template_name, context=None, content_type=None, status=None, using=None)
 
+       ```python
+       #views.py
+       from django.shortcuts import render
+       def foo(request):
+           context={
+               'articles':articles
+           }
+           return render(request, 'foo.html', context)
+       ```
+
        - templates에 data(dictionary `'템플릿에서 사용할 변수이름': 파이썬 변수` 형태의 context)를 넣어서 보내고 싶을 때 이용
+       - 주어진 context와 template 바탕으로 HTML 문서를 만들어서 HTTP 응답.
+         - template_name을 받아 내부적으로 reverse 함수를 사용하여 URL으로 변환, (패턴이 일치하지 않는다면 NoReverseMatch 오류)
 
      - redirect(to, permanent=False, *args, **kwargs)
 
-       - templates나 url(to)로 이동하고 싶을 때 사용. data는 넘길 수 없다.
+       ```python
+       #views.py
+       from django.shortcuts import redirect
+       def foo(request):
+           return redirect('appname:foo')	#urls.py에 등록한 app_name : urls.py의 urlpatterns에서 설정한 name
+       ```
+
+       - HTTP 응답을 적절한 URL(redirect의 2번째 인자`templates나 url`)로 이돌하기 위함. data는 넘길 수 없다.
 
      - get_object_or_404()
 
@@ -623,7 +642,16 @@ content = forms.CharField(
       - 문자열 기반 필드에 True로 설정 시 '데이터 없음(no data)'에 "빈 문자열(1)"과 "NULL(2)"의 2가지 가능한 값이 있음을 의미하게 됨.
       - 대부분의 경우 "데이터 없음"에 대해 두 개의 가능한 값을 갖는 것은 중복되는 것이며, Django는 NULL이 아닌 빈 문자열을 사용하는 것이 규칙
 
-#### ImageField(or FileField)를 사용하기 위한 몇 가지 단계
+```python
+#models.py
+class student(models.Model):
+    name = models.CharField(max_length=10)
+    photo = models.TextField(blank=TRUE)
+#data의 무결성(=항상 정확한 데이터를 유지하고 있다)을 해치지 않기 위해 blank나 null의 default는 False. 그래서 다른 설정을 해주지 않아도 필드에 입력하지 않으면 '필수항목입니다.'를 보여줌.
+#null보다는 주로 blank를 많이 사용함
+```
+
+#### ImageField(or FileField)를 사용하기 위한 과정
 
 1. settings.py에 **MEDIA_ROOT, MEDIA_URL** 설정
 2. **upload_to** 속성을 정의하여  업로드된 파일에 사용할 **MEDIA_ROOT**의 하위 경로를 지정
@@ -671,17 +699,163 @@ urlpatterns=[
     path('admin/', admin.site.urls),
     path('appname/', include('appname.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-'''
-사용자가 업로드 한 파일이 프로젝트에 업로드 되더라도, 실제로 사용자에게 제공하기 위해서는 업로드 된 파일의 URL이 필요
-'''
+#사용자가 업로드 한 파일이 프로젝트에 업로드 되더라도, 실제로 사용자에게 제공하기 위해서는 업로드 된 파일의 URL이 필요
 ```
 
 - settings.MEDIA_URL: 업로드된 파일의 URL
 - settings.MEDIA_ROOT: MEDIA_URL을 통해 참조하는 파일의 실제 위치
 
 ```bash
-$ pip install Pillow
-$ python manage.py makemigrations
+$ pip install Pillow #ImageField 사용하기 위해 라이브러리 설치
+$ python manage.py makemigrations	#Migration 진행
 $ python manage.py migrate
-$ pip freeze > requirements.txt
 ```
+
+### Image Upload
+
+#### READ
+
+- 이미지 경로 불러오기
+
+  ```django
+  <!-- detail.html -->
+  {% extends 'base.html' %}
+  
+  {% block content %}
+  <img src="{{ article.image.url }}" alt="{{  article.image }}">
+  {% endblock %}
+  ```
+
+  - article.image.url: 업로드 파일의 경로
+  - article.image: 업로드 파일의 파일 이름
+
+- STATIC_URL과 MEDIA_URL
+
+  - static, media 파일 모두 서버에 요청해서 조회하는 것
+    - <u>서버에 요청</u>하기 위해서는 **url**이 필요
+
+#### UPDATE
+
+- 이미지 수정하기
+
+  - 이미지는 바이너리 데이터(=하나의 덩어리)이기 때문에 텍스트처럼 <u>일부만 수정하는 것은 불가능</u> => 새로운 사진으로 덮어 씌우는 방식을 사용
+  - update.html의 `enctype="multipart/form-data"` 
+    views.py의 `request.FILES`
+
+  ```django
+  <!-- update.html -->
+  {% extends 'base.html' %}
+  {% block content %}
+  	<form action="{% url 'articles:update' article.pk  %}" method="POST" enctype="multipart/form-data">
+  		{% csrf_token %}
+          {{  form.as_p }}
+      </form>
+  {% endblock %}
+  ```
+
+  ```python
+  #views.py
+  def update(request, pk):
+      article = Article.objects.get(pk=pk)
+      if request.method="POST":
+          form = ArticleForm(request.POST, request.FILES, instance=article)
+          if form.is_valid():
+              article = form.save()
+              return redirect('articles:detail', article.pk)
+      else:
+          form = ArticleForm(instance=article)
+      context={
+          'article':article
+          'form':form
+      }
+      return render(request, 'articles/update.html', context)
+  ```
+
+  - 이미지가 없이 작성된 게시글은 detail 페이지가 출력되지 않음 -> image가 없는 게시글의 경우 출력할 이미지 경로가 없기 때문 
+    => 조건문을 통해 경로 확보
+
+    ```django
+    <!-- detail.html -->
+    {% extends 'base.html' %}
+    {% block content %}
+    	{% if article.image %}
+    		<img src="{{ article.image.url }}" alt="{{ article.image }}"
+    	{% endif %}
+    {% endblock %}
+    ```
+
+### Image Resizing
+
+- 실제 원본 이미지를 서버에 그대로 업로드하는 것은 서버의 부담이 큰 작업 => Image resizing
+
+- 방법
+
+  - < img > 태그에서 직접 사이즈를 width와 height 속성을 사용하여 조정
+
+  - **업로드될 때 이미지 자체를 resizing**
+
+    1. django-imagekit 설치
+
+       ```bash
+       $ pip install django-imagekit
+       ```
+
+    2. INSTALLED_APPS에 추가
+
+       ```python
+       #settings,py
+       INSTALLED_APPS = [
+           'imagekit',
+       ]
+       ```
+
+    - 원본 이미지를 재가공하여 저장(원본X, 썸네일O)
+
+      ```python
+      #models.py
+      from imagekit.processors import Thumbnail
+      from imagekit.models import ProocessedImageField
+      from django.db import models
+      
+      class Article(models.Model):
+          image = ProcessedImageField(
+          	blank=True,
+              upload_to = 'thumbnails/',
+              processors=[Thumbnail(200,300)],
+              format='JPEG',
+              options={'quality:90'}         
+          )
+      ```
+
+      - ProcessedImageField()의 parameter로 작성된 값들은 변경하더라도 다시 makemigrations를 해줄 필요없이 즉시 반영 됨
+
+    - 원본 이미지를 재가공하여 저장(원본O, 썸네일O)
+
+      ```python
+      #models.py
+      from imagekit.processors import Thumbnail
+      from imagekit.models import ProocessedImageField, ImageSpecField
+      from django.db import models
+      
+      class Article(models.Model):
+          image = models.ImageField(upload_to='images/', blank=True)
+          image_thumbnail = ProcessedImageField(
+          	source='image',	#원본 ImageField
+              processors=[Thumbnail(200,300)],
+              format='JPEG',
+              options=['quality':90]
+          )
+      ```
+
+      ```django
+      <!-- detail.html -->
+      {% extends 'base.html' %}
+      {% block content %}
+      	{% if article.image %}
+      		<img src="{{ article.image.url }}" alt="{{ article.image }}">
+      		<img src="{{ article.image_thumbnail.url }}" alt="{{ article.image_thumbnail }}">
+      	{% endif %}
+      {% endblock %}
+      ```
+
+      - ProcessedImageField()와 달리 업로드 후 이미지를 출력해야 썸네일용 이미지가 생성
