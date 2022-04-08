@@ -14,7 +14,7 @@
 
 ### Form Class
 
-- Django Form 관리 시스템의 핵심. 장고의 빌트인 클래스.
+- Django Form 관리 시스템의 핵심. Django의 빌트인 클래스.
 - Form 내 field, field 배치, 디스플레이 widget, label, 초기값, 유효하지 않는 field에 관련된 에러메세지 결정.
 - Django는 사용자의 데이터를 받을 때 해야 할 과중한 작업(데이터 유효성 검증, 필요 시 입력된 데이터 검증 결과 재출력, 유효한 데이터에 대해 요구되는 동작 수행 등)과 반복 코드를 줄여줌
 
@@ -248,7 +248,7 @@ def create(request):
             form = ArticleForm(request.POST, instance=article)	
         	if form.is_valid():	#유효성검사
             	article = form.save()
-            return redirect('articles:detail', article.pk)
+            	return redirect('articles:detail', article.pk)
         else:	#기존 edit
             form = ArticleForm(instance=article)
         context = {
@@ -328,7 +328,7 @@ def create(request):
         class Meta:
         model = Article
             fields = '__all__'
-  ```
+    ```
 
 - 에러메세지 바꾸는 방법
 
@@ -477,3 +477,211 @@ content = forms.CharField(
    	<a href="{% url 'articles:detail' article.pk %}">[back]</a>
    {% endblock %}
    ```
+
+
+
+## Handling HTTP requests
+
+> HTTP 요청에 따라 적절한 예외처리 혹은 데코레이터를 사용해 서버를 보호하고 클라이언트에게 정확한 상황을 제공하는 것은 중요함
+
+### Django에서 HTTP 요청을 처리하는 방법
+
+1. Django shortcut functions
+
+   - django.shortcuts 패키지는 개발에 도움이 될 수 있는 여러 함수와 클래스를 제공
+
+   - shortcuts function 종류
+
+     - render(request, template_name, context=None, content_type=None, status=None, using=None)
+
+       - templates에 data(dictionary `'템플릿에서 사용할 변수이름': 파이썬 변수` 형태의 context)를 넣어서 보내고 싶을 때 이용
+
+     - redirect(to, permanent=False, *args, **kwargs)
+
+       - templates나 url(to)로 이동하고 싶을 때 사용. data는 넘길 수 없다.
+
+     - get_object_or_404()
+
+       ```python
+       from django.shortcuts import get_object_or_404
+       
+       def update(request, pk):
+           article = Article.objects.get_object_or_404(pk=pk)
+       ```
+
+       - objects에서 get()을 호출했으나 해당 객체가 없을 경우 DoesNotExist 예외 대신 Http 404를 raise.
+         - get(): 조건에 맞는 데이터가 없을 경우 예외 발생.
+           - 코드 실행 단계에서 발생한 예외 및 에러에 대해서 브라우저는 http status code 500으로 인식
+       - **상황에 따라 적절한 예외처리**를 하고 **클라이언트에게 올바른 에러 상황을 전달하는 것**은 개발의 중요한 요소 중 하나이다.
+
+     - get_list_or_404()
+
+2. View decorators
+
+   ```python
+   from django.views.decorators.http import require_http_methods, require_POST, require_safe
+   
+   @require_http_methods('GET', 'POST')
+   def create(request):
+       pass
+   
+   @require_POST
+   def delete(request, pk):	#URL로 delete 요청 시 405 http status code
+       pass
+   
+   @require_safe
+   def index(request):
+       pass
+   ```
+
+   - django는 다양한 HTTP 기능을 지원하기 위해 view 함수에 적용할 수 있는 여러 데코레이터를 제공
+     - Decorator: 원본 함수를 수정하지 않으면서 추가 기능만을 구현할 때 사용
+   - Allowed HTTP methods
+     - 요청 메서드에 따라 view 함수에 대한 엑세스를 제한
+     - 요청이 조건을 충족시키지 못하면 HttpResponseNotAllowed을 return(405 Method Not Allowed)
+     - 종류
+       - @require_http_methods('GET', 'POST'): view 함수가 특정한 method 요청에 대해서만 허용하도록 하는 데코레이터
+       - @require_POST: view 함수가 POST method 요청만 승인하도록 하는 데코레이터
+       - @require_safe: view 함수가 GET 및 HEAD method만 허용하도록  요구하는 데코레이터. (django는 @require_GET 대신 @require_safe를 사용하는 것을 권장)
+
+
+
+## Media files
+
+> 미디어 파일. 사용자가 웹에서 업로드하는 정적 파일(user-upload). 유저가 업로드한 모든 정적 파일
+
+### Model field
+
+#### ImageField()
+
+- 이미지 업로드에 사용하는 모델 필드
+- FileField를 상속받는 서브 클래스이기 때문에 FileField의 모든 속성 및 메서드를 사용 가능하며, 더해서 사용자에 의해 업로드 된 객체가 유효한 이미지인지 검사
+-  ImageField 인스턴스는 최대 길이가 100자인 문자열로 DB에 생성되며, max_length 인자를 사용하여 최대 길이를 변경 할 수 있음
+
+**[주의]** 사용하려면 반드시 Pillow 라이브러리 필요함
+
+##### Arguments
+
+- upload_to='images/': 실제 이미지가 저장되는 경로를 지정
+
+  - 업로드 디렉토리와 파일 이름을 설정하는 2가지 방법
+
+    - 문자열 값이나 경로 지정
+
+      ```python
+      #models.py
+      class MyModel(models.Model):
+          upload = models.FileField(upload_to='uploads/')
+          upload = models.FileField(upload_to='uploads/%Y/%m/%d/')
+      ```
+
+      - 파이썬의 strftime() 형식이 포함될 수 있으며, 이는 파일 업로드 날짜/시간으로 대체 됨
+        time.strftime(format[ , t]):날짜 및 시간 객체를 문자열 표현으로 변환하는 데 사용. 하나 이상의 형식화된 코드 입력을 받아 문자열 표현을 반환
+
+    - 함수 호출
+
+      ```python
+      #models.py
+      def articles_image_path(instance, filename):
+          return f'image_{instance.pk}/{filename}'
+      class Article(models.Model):
+          image = models.ImageField(upload_to=articles_image_path)
+      ```
+
+      - 필수 인자
+        - instance: FileField가 정의된 모델의 인스턴스. 대부분 이 객체는 아직 데이터베이스에 저장되지 않았으므로 PK 값이 아직 없을 수 있음
+        - filename: 기존 파일에 제공된 파일  이름
+
+- blank=True: 이미지 필드에 빈 값(빈  문자열)이 허용되도록 설정(이미지를 선택적으로 업로드할 수 있도록)
+
+#### FileField()
+
+- 파일 업로드에 사용하는 모델 필드
+- 선택인자
+  - upload_to
+  - ~~storage~~
+
+#### Model field option
+
+- blank
+
+  - 기본 값: False
+  - True인 경우 필드를 비워둘 수 있음. **DB에 빈 문자열로 저장**
+  - **Validation-related**
+  - 유효성 검사에서 사용됨(is_valid)
+    - 모델 필드에 blank=True를 작성하면 <u>form 유효성 검사에서 빈 값</u>을 입력할 수 있음
+
+- null
+
+  - 기본 값: False
+
+  - True인 경우 django는 빈 값에 대해 **DB에 NULL로 저장**
+  - **Database-related**
+    - 문자열 기반 및 비문자열 기반 필드 모두에 대해  **null은 DB에만 영향**을 미침
+  - 주의 사항
+    - CharField, TextField와 같은 <u>문자열 기반 필드에는 사용하는 것을 피해야 함</u>
+      - 문자열 기반 필드에 True로 설정 시 '데이터 없음(no data)'에 "빈 문자열(1)"과 "NULL(2)"의 2가지 가능한 값이 있음을 의미하게 됨.
+      - 대부분의 경우 "데이터 없음"에 대해 두 개의 가능한 값을 갖는 것은 중복되는 것이며, Django는 NULL이 아닌 빈 문자열을 사용하는 것이 규칙
+
+#### ImageField(or FileField)를 사용하기 위한 몇 가지 단계
+
+1. settings.py에 **MEDIA_ROOT, MEDIA_URL** 설정
+2. **upload_to** 속성을 정의하여  업로드된 파일에 사용할 **MEDIA_ROOT**의 하위 경로를 지정
+3. 업로드된 파일의 경로는 django가 제공하는 **'url' 속성**을 통해 얻을 수 있음
+
+```django
+<img src="{{ article.image.url }}" alt='{{ article.image }}'
+```
+
+- MEDIA_ROOT
+
+  ```python
+  #settings.py
+  MEDIA_ROOT = BASE_DIR / 'media'
+  ```
+
+  - 사용자가 업로드한 파일(미디어 파일)들을 보관할 디렉토리의 절대 경로
+  - django는 서능을 위해 업로드 파일은 데이터베이스에 저장하지 않음
+    - 실제 데이터베이스에 저장되는 것은 **파일의 경로**
+
+  **[주의]** MEDIA_ROOT는 STATIC_ROOT와 반드시 다른 경로로 지정해야 함
+
+- MEDIA_URL
+
+  ```python
+  #settings.py
+  MEDIA_URL = '/media/'
+  ```
+
+  - MEDIA_ROOT에서 제공되는 미디어를 처리하는 URL
+  - 업로드된 파일의 주소(URL)를 만들어주는 역할
+    - 웹 서버 사용자가 사용하는 public URL
+  - <u>비어있지 않은 값</u>으로 설정한다면 반드시 **slash(/)**로 끝나야함
+
+  **[주의]** MEDIA_URL은 STATIC_URL과 반드시 다른 경로로 지정해야 함
+
+#### 개발 단계에서 사용자가 업로드한 파일 제공하기
+
+```python
+#project/urls.py
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns=[
+    path('admin/', admin.site.urls),
+    path('appname/', include('appname.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+'''
+사용자가 업로드 한 파일이 프로젝트에 업로드 되더라도, 실제로 사용자에게 제공하기 위해서는 업로드 된 파일의 URL이 필요
+'''
+```
+
+- settings.MEDIA_URL: 업로드된 파일의 URL
+- settings.MEDIA_ROOT: MEDIA_URL을 통해 참조하는 파일의 실제 위치
+
+```bash
+$ pip install Pillow
+$ python manage.py makemigrations
+$ python manage.py migrate
+$ pip freeze > requirements.txt
+```
