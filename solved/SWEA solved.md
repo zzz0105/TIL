@@ -1752,6 +1752,22 @@ for tc in range(1,t+1):
 
 
 
+## 12004. 구구단1
+
+```python
+t = int(input())
+for tc in range(1,1+t):
+    num = int(input())
+    ans = 'No'
+    for n in range(1,10):
+        if num%n==0 and (num/n) in range(1,10):
+            ans = 'Yes'
+            break
+    print(f'#{tc} {ans}')
+```
+
+
+
 ## 12221. 구구단2
 
 ```python
