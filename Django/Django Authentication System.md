@@ -161,7 +161,7 @@ from django.views.decorators.http import require_http_methods
 
 @require_http_methods(['GET', 'POST'])
 def login(request):	
-	if request.method =='POST':
+	if request.method == 'POST':
 		form = AuthenticationForm(request, request.POST) #사전 인증절차 진행. Form 상속. 
         #로그인은 DB에 저장되지 않으므로 ModelForm을 쓰지 않는다. 로그인은 session create.
 		if form.is_valid():	
@@ -171,7 +171,7 @@ def login(request):
 	else:
 		form = AuthenticationForm()	#사용자 이름 / 비밀번호 
 	context = {
-		'form': form
+		'form' : form
 	}
 return render(request, 'accounts/login.html', context)
 ```
@@ -199,8 +199,7 @@ return render(request, 'accounts/login.html', context)
   - 이는 다른 사람이 동일한 웹 브라우저를 사용하여 로그인하고, **이전 사용자의 세션 데이터에 엑세스하는 것을 방지하기 위함**
 
 ```python
-from django.shortcuts import render,redirect
-from django.contrib.auth.forms import AuthenticationForm
+from django.shortcuts import redirect
 from django.contrib.auth import logout as auth_logout
 from django.views.decorators.http import require_POST
 
@@ -232,7 +231,7 @@ def logout(request):
        <!-- base.html -->
        <body>
            <div class="container">
-               {% if request.use.is_quthenticated %}
+               {% if request.user.is_authenticated %}
                	<h3>hello, {{ user }}</h3>
                	<form action='{% url 'accounts:logout' %}' method="POST"> 
                    <!--action 없으면 현재 주소로 요청보냄-->
@@ -257,7 +256,7 @@ def logout(request):
        @require_http_methods(['GET', 'POST'])
        def login(request):	
            if request.user.is_authenticated:	#인증된 사용자가 다시 로그인 못하도록
-               return redirect('articles;index')
+               return redirect('articles:index')
               	if request.method =='POST':
               		form = AuthenticationForm(request, request.POST) 
               		if form.is_valid():
@@ -305,15 +304,14 @@ def logout(request):
 from django.shortcuts import render,redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_http_methods
 
 @require_http_methods(['GET', 'POST'])
 def login(request):	
     data = request.GET.get('next')	#/articles/create
     if request.user.is_authenticated:	#인증된 사용자가 다시 로그인 못하도록
         return redirect('articles;index')
-	if request.method =='POST':
+	if request.method == 'POST':
 		form = AuthenticationForm(request, request.POST) 
 		if form.is_valid():	
             auth_login(request, form.get_user()) 
@@ -321,7 +319,7 @@ def login(request):
 	else:
 		form = AuthenticationForm()	
 	context = {
-		'form': form
+		'form' : form
 	}
 return render(request, 'accounts/login.html', context)
 ```
@@ -351,27 +349,27 @@ return render(request, 'accounts/login.html', context)
 
 ```python
 #accounts/urls.py
-app_name='accounts'
-urlpatterns=[
+app_name = 'accounts'
+urlpatterns = [
     path('signup/', views.signup, name='signup'),
 ]
 
 #accounts/views.py
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import UserCreationForm
 from django.views.decorators.http import require_http_methods
 
 @require_http_methods(['GET', 'POST'])
 def signup(request):
-    if request.method=='POST':
+    if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()	#회원가입 후 자동로그인
             auth_login(request, user)
             return redirect('articles:index')
     else:
-        form=UserCreationForm()
-    context ={
-        'form':form,
+        form = UserCreationForm()
+    context = {
+        'form' : form,
     }
     return render(request, 'accounts/signup.html', context)
 ```
@@ -397,19 +395,18 @@ def signup(request):
 
 ```python
 #accounts/urls.py
-app_name='accounts'
-urlpatterns=[
+app_name = 'accounts'
+urlpatterns = [
     path('delete/', views.delete, name='delete'),
 ]
 
 #accounts/views.py
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST
 
 @require_POST
 def delete(request):
     if request.user.is_authenticated:
-        request.user,delete()	#회원 탈퇴 후 로그아웃 함수 호출
+        request.user.delete()	#회원 탈퇴 후 로그아웃 함수 호출
         auth_logout(request)
     return redirect('articles:index')
 ```
@@ -441,8 +438,8 @@ def delete(request):
 
 ```python
 #accounts/urls.py
-app_name='accounts'
-urlpatterns=[
+app_name = 'accounts'
+urlpatterns = [
     path('update/', views.update, name='update'),
 ]
 
@@ -452,15 +449,15 @@ from django.views.decorators.http import require_http_methods
 from .forms import CustomUserChangeForm
 
 def update(request):
-    if request.method=="POST":
+    if request.method == "POST":
         form = CustomUserChangeForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
             return redirect('articles:index')
     else:
         form = CustomUserChangeForm(instance=request.user)
-    context={
-        'form':form,
+    context = {
+        'form' : form,
     }
     return render(request,'accounts/update.html',context)
 
@@ -505,30 +502,32 @@ urlpatterns=[
 ]
 
 #accounts/views.py
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.views.decorators.http import require_http_methods
+from django.views.decorators import login_required
 
 @login_required
 @require_http_methods(['GET', 'POST'])
 def change_password(request):
-    if request.method=="POST":
+    if request.method == "POST":
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             form.save()
             return redirect('articles:index')
     else:
         form = PasswordChangeForm(request.user)
-    context={
-        'form':form,
+    context = {
+        'form' : form,
     }
     return render(request,'accounts/change_password.html', context)
 ```
 
 ```django
-<!--accounts/chang_password.html-->
+<!--accounts/change_password.html-->
 {% extends 'base.html' %}
 {% block content %}
 	<h1>비밀번호 변경</h1>
-	<form action="{% url 'accounts:chang_password' %}" method="POST">
+	<form action="{% url 'accounts:change_password' %}" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit">
@@ -546,12 +545,14 @@ def change_password(request):
 
 ```python
 #accounts/views.py
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm, update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm, update_session_auth_hash
+from django.views.decorators.http import require_http_methods
+from django.views.decorators import login_required
 
 @login_required
 @require_http_methods(['GET', 'POST'])
 def change_password(request):
-    if request.method=="POST":
+    if request.method == "POST":
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             form.save()
@@ -559,8 +560,11 @@ def change_password(request):
             return redirect('articles:index')
     else:
         form = PasswordChangeForm(request.user)
-    context={
-        'form':form,
+    context = {
+        'form' : form,
     }
     return render(request,'accounts/change_password.html', context)
 ```
+
+
+
