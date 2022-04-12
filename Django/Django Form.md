@@ -554,7 +554,31 @@ content = forms.CharField(
    ```
 
    - django는 다양한 HTTP 기능을 지원하기 위해 view 함수에 적용할 수 있는 여러 데코레이터를 제공
+     
      - Decorator: 원본 함수를 수정하지 않으면서 추가 기능만을 구현할 때 사용
+     
+     ```python
+     #Decoator 예시
+     def message(func):	#호출할 함수를 매개변수로 받음
+         def wrapper():	#호출할 함수를 감싸는 함수
+             print('함수 실행')
+             func()		#매개변수로 받은 함수를 호출
+             print('함수 종료')
+         return wrapper	#wrapper 함수 반환
+     
+     @message
+     def code():
+         print('코드 실행')
+         
+     code()
+     
+     '''결과
+     함수 실행
+     코드 실행
+     함수 종료
+     '''
+     ```
+     
    - Allowed HTTP methods
      - 요청 메서드에 따라 view 함수에 대한 엑세스를 제한
      - 요청이 조건을 충족시키지 못하면 HttpResponseNotAllowed을 return(405 Method Not Allowed)
