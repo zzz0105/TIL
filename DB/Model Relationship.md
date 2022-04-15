@@ -56,6 +56,8 @@
 
     ```python
     #articles/models.py
+    from django.db import models
+    
     class Comment(models.Model):
         article = models.ForeignKey(Article, on_delete=models.CASCADE)
         #1:N 관계에서 1을 참조하는 것이므로 소문자 단수형으로 쓴다.
@@ -110,6 +112,7 @@
   ```python
   #articles/admin.py
   from .models import Article, Comment
+  
   admin.site.register(Comment)
   ```
 
@@ -170,12 +173,14 @@
 
     ```python
     # articles/models.py
+    from django.db import models
+    
     class Comment(models.Model):
-        article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
+      article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
     ```
 
   - 위와 같이 변경하면 <u>article.comment_set은 더이상 사용할 수 없고</u>, **article.comments**로 대체됨
-
+  
   - **[주의]** 역참조 시 사용할 이름 수정 후, <u>migration</u> 과정 필요
 
 ​                                                                                              
@@ -186,6 +191,7 @@
 
   ```python
   #articles/forms.py
+  from django import forms
   from .models import Article, Comment
   
   class CommentForm(forms.ModelForm):
@@ -202,7 +208,7 @@
   
   def detail(request, pk):
       article = get_object_or_404(Article,pk=pk)
-      commnt_form = CommentForm()
+      comment_form = CommentForm()
       context={
           'article' : article,
           'comment_form' : comment_form
@@ -241,10 +247,14 @@
   #articles/urls.py
   app_name = 'articles'
   urlpatterns = [
-      path('<int:pk>/comments/', views..comments_create, name='comments_create')
+      path('<int:pk>/comments/', views.comments_create, name='comments_create')
   ]
   
   #articles/views.py
+  from django.shortcuts import get_object_or_404, redirect
+  from django.views.decorators.http import require_POST
+  from .forms import CommentForm
+  
   @require_POST
   def comments_create(request, pk):
       article = get_object_or_404(Article, pk=pk)
@@ -282,6 +292,7 @@
     ```python
     #articles/views.py
     from .models import Article, Comment
+    from .forms import CommentForm
     
     def detail(request, pk):
         article = get_object_or_404(Article, pk=pk)
@@ -290,13 +301,13 @@
         context = {
             'article' : article,
             'comment_form' : comment_form,
-            'commets' : comments
+            'comments' : comments
         }
         return render(request, 'articles/detail.html', context)
-    ```
-
-  - detail 페이지에서 댓글 출력
-
+  ```
+  
+- detail 페이지에서 댓글 출력
+  
     ```django
     <!-- articles/detail.html -->
     {% extends 'base.html' %}
@@ -305,13 +316,13 @@
     <hr>
     <h4>댓글 목록</h4>
     <ul>
-        {% for comment in comments %}
+        {% for comment in comments %}	<!-- comments = article.comment_set.all() -->
         	<li>{{ comment.content }}</li>
         {% endfor %}
     </ul>
     {% endfor %}
-    ```
-
+  ```
+  
     
 
 ### Comment Delete
@@ -320,12 +331,19 @@
 
   ```python
   #articles/urls.py
+  from django.urls import path
+  from . import views
+  
   app_name = 'articles'
   urlpatterns=[
       path('<int:article.pk>/comments/<int:comment_pk>/delete/', views.comments_delete, name='comments_delete')
   ]
   
   #articles/views.py
+  from django.shortcuts import get_object_or_404, redirect
+  from django.views.decorators.http import require_POST
+  from .models import Comment
+  
   @require_POST
   def comments_delete(request, article_pk, comment_pk):
       comment = get_object_or_404(Comment, pk=comment_pk)
@@ -357,6 +375,11 @@
 
   ```python
   #articles/views.py
+  from django.shortcuts import get_object_or_404, redirect
+  from django.views.decorators.http import require_POST
+  from .models import Article, Comment
+  from .forms import CommentForm
+  
   @require_POST
   def comments_create(request, pk):
       if request.user.is_authenticated:
@@ -396,7 +419,7 @@
   {% endif %}
   ```
 
-- 댓글이 없는 경우 대체 컨텐츠 출력(DTL의 for-empty 태크 활용)
+- 댓글이 없는 경우 대체 컨텐츠 출력(DTL의 for-empty 태그 활용)
 
   ```django
   <!-- articles/detail.html -->
@@ -451,7 +474,9 @@
          pass
      ```
 
-  2. 기존에 Django가 사용하는 User 모델이었던 auth 앱의 User 모델을 accounts 앱의 User 모델을 사용하도록 변경
+  2. 기존에 Django가 사용하는 User 모델이었던 auth 앱의 User 모델을 accounts 앱의 User 모델을 사용하도록 변경 
+
+     - 변경하지 않을 시 Reverse accessor for 'accounts.User.group' clashes with reverse accessor for 'auth.User.groups'  Error 발생
 
      ```python
      #settings.py
@@ -518,9 +543,10 @@
   from django.contrib.auth.forms import UserChangeForm, UserCreationForm
   
   class CustomUserCreationForm(UserCreationForm):
-      class Meta(UserCreationForm,.Meta):
+      class Meta(UserCreationForm.Meta):
           model = get_user_model()
-          fields = UserCreationForm.Meta.fields + ('email,')
+          fields = UserCreationForm.Meta.fields 
+          #fields = UserCreationForm.Meta.fields + ('email,')와 같이 필드 추가 가능
   ```
 
 - signup view 함수 코드수정
@@ -573,6 +599,7 @@
 
   ```python
   #articles/models.py
+  from django.db import models
   from django.conf import settings
   
   class Article(models.Model):
@@ -614,43 +641,58 @@
 
       ```python
       #articles/views.py
+      from django.shortcuts import redirect
+      from django.views.decorators.http import require_http_methods
+      from django.contrib.auth.decorators import login_required
+      from .forms import ArticleForm
+      
       @login_required
       @require_http_methods(['GET','POST'])
       def create(request):
           if request.method == 'POST':
               form = ArticleForm(request.POST)
               if form.is_valid():
-                  article = form.save(commit=False)
+              article = form.save(commit=False)
                   article.user = request.user
-                  article.save()
+              article.save()
                   return redirect('articles:detail', article.pk)
       ```
-
+    
     - DELETE : 자신이 작성한 게시글만 삭제 가능하도록 설정
-
+    
       ```python
       #articles/views.py
-      @require_POST
+      from django.shortcuts import get_object_or_404, redirect
+      from django.views.decorators.http import require_POST
+      from .models import Article
+      
+  @require_POST
       def delete(request, pk):
-          article = get_object_or_404(Article, pk=pk)
+      article = get_object_or_404(Article, pk=pk)
           if request.user.is_authenticated:
               if request.user == article.user:
               	article.delete()
               	return redirect('articles:index')
           return redirect('articles:index', article.pk)
       ```
-
+    
     - UPDATE: 자신이 작성한 게시글만 수정 가능하도록 설정
-
+    
       ```python
       #articles/views.py
+      from django.shortcuts import get_object_or_404, render, redirect
+      from django.views.decorators.http import require_http_methods
+      from django.contrib.auth.decorators import login_required
+      from .models import Article
+      from .forms import ArticleForm
+      
       @login_required
       @require_http_methods(['GET','POST'])
       def update(request, pk):
           article = get_object_or_404(Article, pk=pk)
-          if request.user == article.user:
+      if request.user == article.user:
               if request.method == 'POST':
-                  form = ArticleForm(request.POST, instance=article)
+              form = ArticleForm(request.POST, instance=article)
                   if form.is_valid():
                       form.save()
                       return redirect('articles:detail', article.pk)
@@ -663,10 +705,10 @@
           }
           return render(request, 'articles/update.html', context)
       ```
-
-    - READ: 게시글 작성 user가 누구인지 index.html에서 출력하기
-
-      ```django
+    
+- READ: 게시글 작성 user가 누구인지 index.html에서 출력하기
+    
+  ```django
       <!-- articles/index.html -->
       {% extends 'base.html' %}
       {% block content %}
@@ -677,11 +719,11 @@
               <p>글 내용: {{article.content}}</p>
       		<a href="{% url 'articles:detail' article.pk %}">DETAIL</a>
       	{% endfor %}
-      {% endblock %}
+  {% endblock %}
       ```
-
+    
     - READ: 해당 게시글의 작성자가 아니라면, 수정/삭제 버튼을 출력하지 않도록 처리
-
+    
       ```django
       <!-- articles/detail.html -->
       {% if user == article.user %}
@@ -692,7 +734,7 @@
       	</form>
       {% endif %}
       ```
-
+    
       
 
 ### User - Comment (1:N)
@@ -701,8 +743,11 @@
 
   ```python
   #articles/models.py
+  from django.db import models
+  from django.conf import settings
+  
   class Comment(models.Model):
-      article = models.ForeignKey(Article,on-delete=models.CASCADE)
+      article = models.ForeignKey(Article, on_delete=models.CASCADE)
       user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
   ```
 
@@ -727,92 +772,106 @@
 
     ```python
     #articles/forms.py
+    from django import forms
+    from .models import Comment
+    
     class CommentForm(forms.ModelForm):
         class Meta:
-            model = Comment
+          model = Comment
             exclude = ('article', 'user')
-    ```
-
-  - 댓글 작성 시 NOT NULL constraint failed: articles_article.user_id 에러 발생
-
-    - 댓글 작성 시 작성자 정보(comment.user)가 누락되었기 때문
-
+  ```
+  
+- 댓글 작성 시 NOT NULL constraint failed: articles_article.user_id 에러 발생
+  
+  - 댓글 작성 시 작성자 정보(comment.user)가 누락되었기 때문
+  
     - CREATE: 댓글 작성 시 작성자 정보(request.user) 추가 후 게시글 작성 재시도
-
+  
       ```python
       #articles/views.py
+      from django.shortcuts import get_object_or_404, redirect
+      from django.views.decorators.http import require_http_methods
+      from django.contrib.auth.decorators import login_required
+      from .forms import CommentForm
+      
       @login_required
       @require_http_methods(['GET','POST'])
       def comments_create(request, pk):
           if request.user.is_authenticated:
-              article = get_object_or_404(Article,pk=pk)
+            article = get_object_or_404(Article,pk=pk)
               comment_form = CommentForm(request.POST)
-              if comment_form.is_valid():
-                  comment = comment_form.save(commit=False)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
                   comment.article = article
+                comment.user = request.user
                   comment.save()
-              ...
+                  return redirect('articles:detail', article.pk)
+          return redirect('accounts:login')
       ```
-
+    
     - READ: 비로그인 유저에게는 댓글 form 출력 숨기기
-
-      ```django
+    
+    ```django
       <!-- articles/detail.html -->
-      {% if request.user.is_authenticated %}
-      	<form action="{% url 'articles:comments_create' article.pk %}" method="POST">
+    {% if request.user.is_authenticated %}
+    	<form action="{% url 'articles:comments_create' article.pk %}" method="POST">
               {% csrf_token %}
-              <input type="submit" value="submit">
+            <input type="submit" value="submit">
       {% else %}
       	<a href="{% url 'accounts:login' %}">댓글 작성하려면 로그인하세요</a>
       {% endif %}
       ```
-
+    
     - READ: 댓글 작성자 출력하기
-
+    
       ```django
       <!-- articles/detail.html -->
       {% for comment in comments %}
-          <li>
-              {{ comment.content }} - {{ comment.content }}
-              <form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method="POST" class="d-inline">
-                  {% csrf_token %}
+        <li>
+              {{ comment.user }} - {{ comment.content }} 
+            <form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method="POST" class="d-inline">
+                {% csrf_token %}
               </form>
-      	</li>
+    	</li>
       {% empty %}
       	<p>댓글 없음</p>		
       {% endfor %}
       ```
-
-      - DELETE : 자신이 작성한 댓글만 삭제 버튼을 볼 수 있도록 수정
-
-        ```django
-        <!-- articles/detail.html -->
-        {% for comment in comments %}
-            <li>
-                {{ comment.content }} - {{ comment.content }}
-                {% if user == comment.user %}
-                	<form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method="POST" class="d-inline">
-                    	{% csrf_token %}
-                        <input type="submit" value="DELETE">
-                	</form>
-                {% endif %}
-        	</li>
-        {% empty %}
-        	<p>댓글 없음</p>		
-        {% endfor %}
-        ```
-
-      - DELETE: 자신이 작성한 댓글만 삭제할 수 있도록 수정
-
-        ```python
-        #articles/views.py
-        @required_POST
-        def comments_delete(request, article_pk, comment_pk):
-                if request.user.is_authenicated:
-                    comment = get_object_or_404(Comment, pk=comment_pk)
-                    if request.user ==  comment.user:
-                        comment.delete()
-                return redirect('articles:detail', article_pk)
-        ```
-
-        
+    
+    - DELETE : 자신이 작성한 댓글만 삭제 버튼을 볼 수 있도록 수정
+    
+      ```django
+      <!-- articles/detail.html -->
+      {% for comment in comments %}
+          <li>
+              {{ comment.content }}
+              {% if user == comment.user %}
+            	<form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method="POST" class="d-inline">
+                  	{% csrf_token %}
+                    <input type="submit" value="DELETE">
+            	</form>
+              {% endif %}
+    	</li>
+      {% empty %}
+      	<p>댓글 없음</p>		
+      {% endfor %}
+      ```
+    
+    - DELETE: 자신이 작성한 댓글만 삭제할 수 있도록 수정
+    
+    ```python
+      #articles/views.py
+      from django.shortcuts import get_object_or_404, redirect
+    from django.views.decorators.http import require_POST
+      from .models import Comment
+      
+      @require_POST
+      def comments_delete(request, article_pk, comment_pk):
+              if request.user.is_authenticated:
+                  comment = get_object_or_404(Comment, pk=comment_pk)
+                if request.user ==  comment.user:
+                      comment.delete()
+              return redirect('articles:detail', article_pk)
+      ```
+      
+      

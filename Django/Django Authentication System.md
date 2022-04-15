@@ -308,9 +308,8 @@ from django.views.decorators.http import require_http_methods
 
 @require_http_methods(['GET', 'POST'])
 def login(request):	
-    data = request.GET.get('next')	#/articles/create
     if request.user.is_authenticated:	#인증된 사용자가 다시 로그인 못하도록
-        return redirect('articles;index')
+        return redirect('articles:index')
 	if request.method == 'POST':
 		form = AuthenticationForm(request, request.POST) 
 		if form.is_valid():	
@@ -412,6 +411,7 @@ def delete(request):
 ```
 
 ```django
+<!--templates/base.html-->
 <form action="{% url 'accounts:delete' %}" method="POST">
       {% csrf_token %}
       <input type="submit" value="회원탈퇴">
@@ -464,11 +464,12 @@ def update(request):
 #accounts/forms.py
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth import get_user_model
+
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = get_user_model()	#user 클래스 return
         fields = ('email','first_name','last_name')
-        #수정 시 필요한 필드만 선택해서 작성
+        #수정 시 필요한 필드만 선택해서 작성. type: 튜플
 ```
 
 ```django
@@ -504,7 +505,7 @@ urlpatterns=[
 #accounts/views.py
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views.decorators.http import require_http_methods
-from django.views.decorators import login_required
+from django.contrib.auth.decorators import login_required
 
 @login_required
 @require_http_methods(['GET', 'POST'])
@@ -547,7 +548,7 @@ def change_password(request):
 #accounts/views.py
 from django.contrib.auth.forms import PasswordChangeForm, update_session_auth_hash
 from django.views.decorators.http import require_http_methods
-from django.views.decorators import login_required
+from django.contrib.auth.decorators import login_required
 
 @login_required
 @require_http_methods(['GET', 'POST'])
