@@ -120,7 +120,7 @@
   $ python manage.py createsuperuser
   ```
 
-- 1:N 관계 related manager
+- 1:N 관계 `related manager`
 
   - 역참조('comment_set')
 
@@ -181,9 +181,9 @@
 
   - 위와 같이 변경하면 <u>article.comment_set은 더이상 사용할 수 없고</u>, **article.comments**로 대체됨
   
-  - **[주의]** 역참조 시 사용할 이름 수정 후, <u>migration</u> 과정 필요
+  - **[주의]** 역참조 시 사용할 이름 수정 후, <u>migration</u> 과정 필요                                                
 
-​                                                                                              
+
 
 ### Comment Create
 
@@ -276,7 +276,8 @@
   ```
 
 - The '**save()**' method
-  - save(commit=False)
+  
+  - save(<u>commit=False</u>)
     - Create, but don't save the new instance.
     - 아직 데이터베이스에 저장되지 않은 인스턴스를 반환
     - 저장하기 전에 객체에 대한 사용자 지정 처리를 수행할 때 유용하게 사용
@@ -305,9 +306,6 @@
         }
         return render(request, 'articles/detail.html', context)
     ```
-  ```
-  
-  ```
   
 - detail 페이지에서 댓글 출력
   
@@ -586,6 +584,8 @@
 
 ## 1:N 관계 설정
 
+> 완전한 종속 관계
+
 ### User - Article(1:N)
 
 - User 모델 참조하기
@@ -678,66 +678,66 @@
               return redirect('articles:index', article.pk)
       ```
       
-      - UPDATE: 자신이 작성한 게시글만 수정 가능하도록 설정
+    - UPDATE: 자신이 작성한 게시글만 수정 가능하도록 설정
     
-    ```python
-    #articles/views.py
-    from django.shortcuts import get_object_or_404, render, redirect
-    from django.views.decorators.http import require_http_methods
-    from django.contrib.auth.decorators import login_required
-    from .models import Article
-    from .forms import ArticleForm
-    
-    @login_required
-    @require_http_methods(['GET','POST'])
-    def update(request, pk):
-        article = get_object_or_404(Article, pk=pk)
-    if request.user == article.user:
-            if request.method == 'POST':
-            form = ArticleForm(request.POST, instance=article)
-                if form.is_valid():
-                    form.save()
-                    return redirect('articles:detail', article.pk)
-            else:
-                form = ArticleForm(instance=article)
-        else:
-            return redirect('articles:index')
-        context = {
-            'form':form,
-        }
-        return render(request, 'articles/update.html', context)
-    ```
+      ```python
+      #articles/views.py
+      from django.shortcuts import get_object_or_404, render, redirect
+      from django.views.decorators.http import require_http_methods
+      from django.contrib.auth.decorators import login_required
+      from .models import Article
+      from .forms import ArticleForm
+      
+      @login_required
+      @require_http_methods(['GET','POST'])
+      def update(request, pk):
+          article = get_object_or_404(Article, pk=pk)
+      if request.user == article.user:
+              if request.method == 'POST':
+              form = ArticleForm(request.POST, instance=article)
+                  if form.is_valid():
+                      form.save()
+                      return redirect('articles:detail', article.pk)
+              else:
+                  form = ArticleForm(instance=article)
+          else:
+              return redirect('articles:index')
+          context = {
+              'form':form,
+          }
+          return render(request, 'articles/update.html', context)
+      ```
     
     - READ: 게시글 작성 user가 누구인지 index.html에서 출력하기
-  
-  ```django
+    
+      ```django
       <!-- articles/index.html -->
       {% extends 'base.html' %}
       {% block content %}
-      	{% for article in articles %}
-      		<p><b>작성자: {{article.user}}</b></p>
-      		<p>글 번호: {{article.pk}}</p>
-              <p>글 제목: {{article.title}}</p>
-              <p>글 내용: {{article.content}}</p>
-      		<a href="{% url 'articles:detail' article.pk %}">DETAIL</a>
-      	{% endfor %}
-  {% endblock %}
-  ```
-  
-    - READ: 해당 게시글의 작성자가 아니라면, 수정/삭제 버튼을 출력하지 않도록 처리
-    
-      ```django
-      <!-- articles/detail.html -->
-      {% if user == article.user %}
-      	<a href="{% url 'articles:update' article.pk %}">UPDATE</a>
-      	<form action="{% url 'articles:delete' article.pk %}" method="POST">
-              {% csrf_token %}
-              <input type="submit" value="DELETE">
-      	</form>
-      {% endif %}
+      {% for article in articles %}
+      	<p><b>작성자: {{article.user}}</b></p>
+      	<p>글 번호: {{article.pk}}</p>
+      	<p>글 제목: {{article.title}}</p>
+      	<p>글 내용: {{article.content}}</p>
+      	<a href="{% url 'articles:detail' article.pk %}">DETAIL</a>
+      {% endfor %}
+      {% endblock %}
       ```
     
-      
+      - READ: 해당 게시글의 작성자가 아니라면, 수정/삭제 버튼을 출력하지 않도록 처리
+    
+        ```django
+        <!-- articles/detail.html -->
+        {% if user == article.user %}
+        	<a href="{% url 'articles:update' article.pk %}">UPDATE</a>
+        	<form action="{% url 'articles:delete' article.pk %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="DELETE">
+        	</form>
+        {% endif %}
+        ```
+    
+    
 
 ### User - Comment (1:N)
 
@@ -813,16 +813,17 @@
     
     - READ: 비로그인 유저에게는 댓글 form 출력 숨기기
     
-    ```django
+      ```django
       <!-- articles/detail.html -->
-    {% if request.user.is_authenticated %}
-    	<form action="{% url 'articles:comments_create' article.pk %}" method="POST">
-              {% csrf_token %}
-            <input type="submit" value="submit">
-      {% else %}
-      	<a href="{% url 'accounts:login' %}">댓글 작성하려면 로그인하세요</a>
+      {% if request.user.is_authenticated %}    
+      	<form action="{% url 'articles:comments_create' article.pk %}" method="POST">
+          	{% csrf_token %}        
+          	<input type="submit" value="submit">  
+      	</form>
+          {% else %}    
+          	<a href="{% url 'accounts:login' %}">댓글 작성하려면 로그인하세요</a>  
       {% endif %}
-    ```
+      ```
     
     - READ: 댓글 작성자 출력하기
     
@@ -861,20 +862,20 @@
     
     - DELETE: 자신이 작성한 댓글만 삭제할 수 있도록 수정
     
-    ```python
+      ```python
       #articles/views.py
       from django.shortcuts import get_object_or_404, redirect
-    from django.views.decorators.http import require_POST
+      from django.views.decorators.http import require_POST
       from .models import Comment
-      
+        
       @require_POST
       def comments_delete(request, article_pk, comment_pk):
-              if request.user.is_authenticated:
-                  comment = get_object_or_404(Comment, pk=comment_pk)
-                if request.user ==  comment.user:
-                      comment.delete()
-              return redirect('articles:detail', article_pk)
-    ```
+          if request.user.is_authenticated:
+              comment = get_object_or_404(Comment, pk=comment_pk)
+              if request.user ==  comment.user:
+              	comment.delete()
+                  return redirect('articles:detail', article_pk)
+      ```
     
       
 
@@ -882,34 +883,175 @@
 
 ### ManyToManyField
 
-- 다대다(M:N, many-to-many) 관계 설정 시 사용하는 모델 필드
+- 다대다(M : N, many-to-many) 관계 설정 시 사용하는 모델 필드
 
 - 하나의 필수 위치인자(M:N 관계로 설정할 모델 클래스)가 필요
 
 - 모델 필드의 RelatedManager를 사용하여 관련 개체를 추가, 제거 또는 만들 수 있음
 
-  - add(), remove(), ~~create(), clear()...~~
+  - Related Manager
+
+    - 1:N 또는 M:N 관련 컨텍스트에서 사용되는 매니저
+
+    - 같은 이름의 매서드여도 각 <u>관계(1:N, M:N)에 따라 다르게 사용 및 동작</u>
+
+      - **1:N**에서는 target 모델 인스턴스만 사용 가능
+      - **M:N** 관계에서는 관련된 두 객체에서 모두 사용 가능
+
+    - 메서드 종류
+
+      - add()
+
+        - 지정된 객체를 관련 객체 집합에 추가
+        - 이미 존재하는 관계에 사용하면 관계가 <u>복제되지 않음</u>
+        - 모델 인스턴스, 피드 값(PK)을 인자로 허용
+
+        ```python
+        doctor1 = Doctor.objects.create(name='justin')
+        patient1 = Patient.objects.create(name='tony')
+        
+        doctor1.patient_set.add(patient1)
+        #또는
+        patient1.doctors.add(doctor1)
+        ```
+
+      - remove()
+
+        - 관련 객체 집합에서 지정된 모델 객체를 제거
+        - <u>내부적으로 QuerySet.delete()</u>를 사용하여 관계가 삭제됨
+        - 모델 인스턴스, 필드 값(PK)을 인자로 허용
+
+        ```python
+        doctor1 = Doctor.objects.get(pk=1)
+        patient1 = Patient.objects.get(pk=1)
+        
+        doctor1.patient_set.remove(patient1)
+        #또는
+        patient1.doctors.remove(doctor1)
+        ```
+
+      - create(), clear(), set() 등
 
 - Arguments
 
   1. related_name
 
-     - target model(관계 필드를 가지지 않은 모델)이 source model(관계 필드를 가진 모델)을 참조할 때(역참조 시) 사용할 manager의 이름을 설정
+     - target model(관계 필드를 가지지 않은 모델)이 source model(관계 필드를 가진 모델)을 참조할 때(역참조 시) 사용할 manager의 이름을 설정 -> 역참조 시에 사용하는 manager의 이름을 설정
      - ForeignKey의 related_name과 동일
+
+     ```python
+     #예시
+     class Patient(models.Model):
+         doctors = models.ManyToManyField(Doctor, related_name = 'patients')
+         name = models.TextField()
+     ```
 
   2. through
 
-     - <u>중개 테이블을 직접 작성</u>하는 경우, through 옵션을 사용하여 중개 테이블을 나타내는 Django 모델을 지정할 수 있음
+     - <u>중개 테이블을 직접 작성</u>하는 경우, through 옵션을 사용하여 **중개 테이블**을 나타내는 Django 모델을 지정할 수 있음
+
      - 일반적으로 중개 테이블에 <u>추가 데이터를 사용하는 다대다 관계와 연결</u>하려는 경우(extra data with a many-to-many relationship)에 주로 사용됨
+
+     - 예시
+
+       1. 모델 관계 설정
+
+          ```python
+          class Doctor(models.Model):
+              name = models.TextField()
+              
+              def __str__(self):
+                  return f'{self.pk}번 의사 {self.name}'
+          
+          class Patient(models.Model):
+              doctors = models.ManyToManyField(Doctor, through='Reservation')
+              name = models.TextField()
+              
+              def __str__(self):
+                  return f'{self.pk}번 환자 {self.name}'
+              
+          class Reservation(models.Model):	#중개 모델. 두 모델과 1:N 관계
+              doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+              patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+              symptom = models.TextField()
+              reserved_at = models.DateTimeField(auto_now_add=True)
+              
+              def __str__(self):
+                  return f'{self.doctor.pk}번 의사의 {self.patient.pk}번 환자'
+          ```
+
+       2. 데이터베이스 초기화 / 마이그레이션 및 shell_plus 실행
+
+          ```bash
+          $ python manage.py makemigrations
+          $ python manage.py migrate
+          
+          $ python manage.py shell_plus
+          ```
+
+       3. 중개 테이블 확인
+
+          ![image-20220419172459630](Model Relationship.assets/image-20220419172459630.png)
+
+       4. SQLITE에서 의사, 환자, 예약 생성
+
+          ```sqlite
+          --의사 1명과 환자 2명 생성
+          doctor1 = Doctor.objects.create(name='justin')
+          
+          patient1 = Patient.objects.create(name='tony')
+          
+          patient2 = Patient.objects.create(name='harry')
+          
+          --예약 생성
+          reservation1 = Reservation(doctor=doctor1, patient=patient1, symptom = 'headache')
+          
+          reservation1.save()
+          
+          doctor1.patient_set.all()
+          <QuerySet [<Patient: 1번 환자 tony>]>
+          
+          patient1.doctors.all()
+          <QuerySet [<Doctor: 1번 의사 justin>]>
+          ```
+
+       5. 중개 테이블 확인
+
+          ![image-20220419173412804](Model Relationship.assets/image-20220419173412804.png)
+
+       6. SQLITE에서 예약 생성
+
+          ```sqlite
+          --through_defaults를 사용해 add(), create() 또는 set()을 사용하여 관계를 생성
+          patient2.doctors.add(doctor1, through_defaults={'symptom':'flu'})
+          
+          doctor1.patient_set.all()
+          <QuerySet [<Patient: 1번 환자 tony>, <Patient: 2번 환자 harry>]>
+          
+          patient2.doctors.all()
+          <QuerySet [<Doctor: 1번 의사 justin>]>
+          ```
+
+       7. 중개 테이블 확인
+
+          ![image-20220419173822769](Model Relationship.assets/image-20220419173822769.png)
+
+       8. 예약 삭제
+
+          ```sqlite
+          doctor1.patient_set.remove(patient1)
+          
+          patient2.doctors.remove(doctor1)
+          ```
 
   3. symmetrical
 
      - ManyToManyField가 <u>동일한 모델</u>(on self)을 가리키는 정의에서만 사용
-     - symmetrical=True(기본값)일 경우 Django는 person_set 매니저를 추가하지 않음
+     - symmetrical=True(기본값)일 경우 Django는 person_set 매니저를 추가하지 않음(한 쪽을 추가하면 같이 추가되므로 역참조 매니저 필요 없음)
      - source 모델의 인스턴스가 target 모델의 인스턴스를 참조하면, target 모델 인스턴스도 source 모델 인스턴스를 자동으로 참조하도록 함
        - 즉, <u>내가 당신의 친구라면 당신도 내 친구가 되는 것</u>
        - 대칭을 <u>원하지 않는 경우 False</u>로 설정
-       - Follow 기능 구현에서 다시 확인할 것
+       - [Follow 기능 구현](#Follow)에서 다시 확인
 
      ```python
      from django.db import models
@@ -919,74 +1061,72 @@
          #friends = models.ManyToManyField('self', symmetrical=False)
      ```
 
-- Related Manager
-
-  - 1:N 또는 M:N 관련 컨텍스트에서 사용되는 매니저
-
-  - 같은 이름의 매서드여도 각 <u>관계(1:N, M:N)에 따라 다르게 사용 및 동작</u>
-
-    - 1:N에서는 target 모델 인스턴스만 사용 가능
-    - M:N 관계에서는 관련된 두 객체에서 모두 사용 가능
-
-  - 메서드 종류
-
-    - add()
-
-      - 지정된 객체를 관련 객체 집합에 추가
-      - 이미 존재하는 관계에 사용하면 관계가 복제되지 않음
-      - 모델 인스턴스, 피드 값(PK)을 인자로 허용
-
-      ```python
-      doctor1 = Doctor.objects.create(name='justin')
-      patient1 = Patient.objects.create(name='tony')
-      
-      doctor1.patient_set.add(patient1)
-      patient1.doctors.add(doctor1)
-      ```
-
-    - remove()
-
-      - 관련 객체 집합에서 지정된 모델 객체를 제거
-      - 내부적으로 QuerySet.delete()를 사용하여 관계가 삭제됨
-      - 모델 인스턴스, 필드 값(PK)을 인자로 허용
-
-      ```python
-      doctor1 = Doctor.objects.get(pk=1)
-      patient1 = Patient.objects.get(pk=1)
-      
-      doctor1.patient_set.remove(patient1)
-      patient1.doctors.remove(doctor1)
-      ```
-
-    - create(), clear(), set() 등
-
 - 데이터베이스에서의 표현
 
-  - Django는 다대다 관계를 나타내는 중개 테이블을 만듦
+  - Django는 다대다 관계를 나타내는 중개 테이블(앱 이름_클래스이름\_클래스 변수 이름)을 만듦
   - 테이블 이름은 다대다 필드의 이름과 이를 포함하는 모델의 테이블 이름을 조합하여 생성됨
+    - 중개 테이블의 필드 생성 규칙
 
-- 중개 테이블의 필드 생성 규칙
+      - source model 및 target model 모델이 <u>다른</u> 경우
+        - id
+        - <containing_model>_id
+        - <other_model>_id
+      - ManyToManyField가 <u>동일한 모델</u>을 가리키는 경우
+        - id
+        - from\_< model >_id
+        - to\_< model >_id
 
-  - source model 및 target model 모델이 <u>다른</u> 경우
-    - id
-    - <containing_model>_id
-    - <other_model>_id
-  - ManyToManyField가 <u>동일한 모델</u>을 가리키는 경우
-    - id
-    - from\_< model >_id
-    - to\_< model >_id
+
 
 #### Like
 
+- User와 Article은 M:N 관계 
+
 1. ManyToManyField 작성 후 마이그레이션 -> 에러 발생
+
+   ```python
+   #articles/models.py
+   #accounts/models.py에 써도 되긴 함
+   
+   class Article(models.Model):
+       user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+       like_users = models.ManyToManyFiels(settings.AUTH_USER_MODEL)
+       #유저 모델 참조 -> settings.AUTH_USER_MODEL
+       ...
+   ```
+
+   ```bash
+   $ python manage.py makemigrations
+   ```
 
    - 에러 발생의 원인
 
      - like_users 필드 생성 시 자동으로 역참조는 `.article_set` 매니저를 생성. 그러나, 이전 1:N(User:Article) 관계에서 <u>이미 해당 매니저 이름을 사용 중</u>이기 떄문이다.
 
+       - User:Article(1:N 관계)
+         - 참조: article.user.all()
+         - 역참조: user.article_set.all()
+       - User:Article(M:N 관계)
+         - 참조: article.like_users.all()
+         - 역참조: user.article_set.all
+
        => User와 관계된 ForeignKey 또는 ManyToManyField 중 하나에 related_name 추가 필요
 
-2. related_name 설정 후 마이그레이션 다시 진행 -> 중개 테이블 생성(articles_article_like_users)
+2. related_name 설정 후 마이그레이션 다시 진행
+
+   ```python
+   #articles/models.py
+   
+   class Article(models.Model):
+       user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+       like_users = models.ManyToManyFields(settings.AUTH_USER_MODEL, related_name='like_articles')	#중개 테이블 생성
+       ...
+   ```
+
+   ```bash
+   $ python manage.py makemigrations
+   $ python manage.py migrate
+   ```
 
    - 현재 User-Article 간 사용 가능한 DB API
      - article.user: 게시글을 작성한 유저 - 1:N
@@ -994,16 +1134,81 @@
      - user.article_set: 유저가 작성한 게시글(역참조) - 1:N
      - user.like_articles: 유저가 좋아요한 게시글(역참조) - M:N
 
-3. url, like view 함수 작성
+3. 생성된 중개 테이블 확인
+
+   ![image-20220419210316754](Model Relationship.assets/image-20220419210316754.png)
+
+4. url, like view 함수 작성
+
+   ``` python
+   # articles/urls.py
+   
+   urlpatterns = [
+       path('<int:article_pk>/likes/', views.likes, name='likes'),
+   ]
+   
+   #articles/views.py
+   @require_POST
+   def likes(request, article_pk):
+       if request.user.is_authenticated:
+           article = get_object_or_404(Article, pk=article_pk)
+   
+           if article.like_users.filter(pk=request.user.pk).exists():
+           # if request.user in article.like_users.all():
+               article.like_users.remove(request.user)
+           else:
+               article.like_users.add(request.user)
+           return redirect('articles:index')
+       return redirect('accounts:login')
+   ```
 
    - QuerySet API - 'exists()'
      - QuerySet에 결과가 포함되어 있으면 True를 반환하고 그렇지 않으면 False를 반환
      - 특히 규모가 큰 QuerySet의 컨텍스트에서 특정 개체 존재 여부와 관련된 검색에 유용
      - 고유한 필드(ex. primary key)가 있는 모델이 QuerySet의 구성원인지 여부를 찾는 가장 효율적인 방법
 
-4. index 페이지에 like 출력 부분 작성
+5. index 페이지에 like 출력 부분 작성
 
-5. 좋아요 버튼 클릭 후 테이블 확인
+   ```django
+   <!-- articles/index.html -->
+   
+   {% extends 'base.html' %}
+   
+   {% block content %}
+     <h1>Articles</h1>
+     {% if request.user.is_authenticated %}
+       <a href="{% url 'articles:create' %}">[CREATE]</a>
+     {% else %}
+       <a href="{% url 'accounts:login' %}">[새 글을 작성하려면 로그인하세요.]</a>
+     {% endif %}
+     <hr>
+     {% for article in articles %}
+       <p><b>작성자 : {{ article.user }}</b></p>
+       <p>글 번호 : {{ article.pk }}</p>
+       <p>글 제목 : {{ article.title }}</p>
+       <p>글 내용 : {{ article.content }}</p>
+       <div>
+         <form action="{% url 'articles:likes' article.pk %}" method="POST">
+           {% csrf_token %}
+           {% if request.user in article.like_users.all %}
+             <input type="submit" value="좋아요 취소">
+           {% else %}
+             <input type="submit" value="좋아요">
+           {% endif %}
+         </form>
+       </div>
+       <p>{{ article.like_users.all|length }} 명이 이 글을 좋아합니다.</p>
+       <a href="{% url 'articles:detail' article.pk %}">[DETAIL]</a>
+       <hr>
+     {% endfor %}
+   {% endblock %}
+   ```
+
+6. 좋아요 버튼 클릭 후 테이블 확인
+
+   ![image-20220419174423531](Model Relationship.assets/image-20220419174423531.png)
+
+
 
 #### Profile Page
 
@@ -1014,13 +1219,16 @@
    
    urlpatterns = [
        path('<username>/', views.profile, name='profile'),
+       '''위에서부터 url pattern을 찾기 때문에, route가 문자열로 시작하는 path함수가 맨 위에 있을 경우 int가 나오지 않는 이상 어떤 경우에도 같은 view 함수로 갈 수 있다. 따라서 route가 문자열로 시작하는 path 함수의 경우 맨 아래에 위치시켜야 한다.'''
    ]
    
    #accounts/views.py
    from django.shortcuts import render, get_object_or_404
    from django.contrib.auth import get_user_model
-   def profile(request, username):    
-       person = get_object_or_404(get_user_model(), username=username)    
+   
+   def profile(request, username):
+       User = get_user_model()
+       person = get_object_or_404(User, username=username)   
        context = {  
            'person': person,
        }    
@@ -1057,7 +1265,8 @@
        <div class="container">
            {% if request.user.is_authenticated %}
            	<h3>Hello, {{  user  }}</h3>
-           <a href="{% url 'accounts:profile' user.username %}">내 프로필 </a>
+           <a href="{% url 'accounts:profile' request.user.username %}">내 프로필 </a>
+           <!-- request.user.username 대신 request.user 써도 무방 -->
            ...
        </div>
    </body>
@@ -1073,14 +1282,17 @@
    </p>
    ```
 
+
+
 #### Follow
 
-1. ManyToManyField 작성 후 마이그레이션 -> 생성된 중개 테이블(accounts_user_followings) 확인
+1. ManyToManyField 작성 후 마이그레이션
 
    ```python
    #accounts/models.py
    class User(AbstractUser):
        followings = models.ManyToManyField('self', symmetrical=False, related_name='followers')
+       #자기 자신을 참조한다. 역참조 시 followers 사용
    ```
 
    ```bash
@@ -1088,7 +1300,11 @@
    $ python manage.py migrate
    ```
 
-2. url, follow view 함수 작성
+2. 생성된 중개 테이블 확인
+
+   ![image-20220419174519123](Model Relationship.assets/image-20220419174519123.png)
+
+3. url, follow view 함수 작성
 
    ```python
    #accounts/urls.py
@@ -1112,37 +1328,62 @@
        return redirect('accounts:login')
    ```
 
-3. profile 페이지에 팔로우와 언팔로우 버튼 작성
+4. profile 페이지에 팔로우와 언팔로우 버튼 작성
 
-   1. 팔로잉 수/ 팔로워 수 출력
+   ```django
+   <!-- accounts/profile.html -->
+   {% extends 'base.html' %}
+   {% block content %}
+   <h1>
+       {{ person.username }}님의 프로필
+   </h1>
+   <div> 
+     <div>
+       <!-- 팔로잉 수/ 팔로워 수 출력 -->
+       팔로잉 : {{ person.followings.all|length }} / 팔로워 : {{ person.followers.all|length }}
+     </div>
+     <!-- 자기 자신을 팔로우할 수 없음 -->
+     {% if user != person %}
+       <div>
+         <form action="{% url 'accounts:follow' person.pk %}" method="POST">
+           {% csrf_token %}
+           {% if user in person.followers.all %}
+             <input type="submit" value="Unfollow">
+           {% else %}
+             <input type="submit" value="Follow">
+           {% endif %}
+         </form>
+       </div>
+     {% endif %}
+   </div>
+   {% endblock %}
+   ```
 
-   2. 자기 자신을 팔로우할 수 없음
+   - {% with %}를 사용하면 더 간결하게 표현할 수 있다.
 
-      ```django
-      <!-- accounts/profile.html -->
-      {% extends 'base.html' %}
-      {% block content %}
-      <h1>
-          {{ person.username }}님의 프로필
-      </h1>
-      <div> 
-        <div>
-          팔로잉 : {{ person.followings.all|length }} / 팔로워 : {{ person.followers.all|length }}
-        </div>
-        {% if user != person %}
-          <div>
-            <form action="{% url 'accounts:follow' person.pk %}" method="POST">
-              {% csrf_token %}
-              {% if user in person.followers.all %}
-                <input type="submit" value="Unfollow">
-              {% else %}
-                <input type="submit" value="Follow">
-              {% endif %}
-            </form>
-          </div>
-        {% endif %}
-      </div>
-      {% endblock %}
-      ```
+     - with 태그 안에서만 변수에 저장되어 있다. (최적화와는 관련 없음)
 
-4. 팔로우 버튼 클릭 후 테이블 확인
+     ```django
+     {% with followers=person.followers.all followings=person.followings.all %}
+         <div>
+             팔로워 : {{ followers|length }} / 팔로우 : {{ followings|length }}
+         </div>
+         <div>
+             {% if user != person %}
+             <form action="{% url 'accounts:follow' person.pk %}" method="POST">
+                 {% csrf_token %}
+                 {% if user in followers %}
+                 <input type="submit" value="Unfollo">
+                 {% else %}
+                 <input type="submit" value="Follow">
+                 {% endif %}
+             </form>
+             {% endif %}
+         </div>
+     {% endwith %}
+     ```
+
+5. 팔로우 버튼 클릭 후 테이블 확인
+
+   ![image-20220419174629600](Model Relationship.assets/image-20220419174629600.png)
+
