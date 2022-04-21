@@ -207,7 +207,7 @@
     
     urlpatterns = [
         path('admin/', admin.site.urls),
-        path('api/v1', include('articles.urls')),
+        path('api/v1/', include('articles.urls')),
     ]
     
     #articles/urls.py
@@ -287,13 +287,12 @@
   </html>
   ```
 
-  결과:
+  결과: html 문서 형태로 응답
 
   ![image-20220420224238336](REST API.assets/image-20220420224238336.png)
 
   ![image-20220420224439443](REST API.assets/image-20220420224439443.png)
 
-  ​							-> html 문서 형태로 응답
 
 ### Response② - Json Response
 
@@ -329,11 +328,13 @@
           )	
       return JsonResponse(articles_json, safe=False)
   ```
-  
-![image-20220420231622067](REST API.assets/image-20220420231622067.png)
-  
-​								-> JSON 형태로 응답
-  
+
+  결과: JSON 형태로 응답
+
+  ![image-20220421000808181](REST API.assets/image-20220421000808181.png)
+
+  ![image-20220420231622067](REST API.assets/image-20220420231622067.png)
+
 - **Content-Type** entity header
 
   - 데이터의 <u>media type</u>(MIME type, content type)을 나타내기 위해 사용됨
@@ -378,27 +379,33 @@
   def article_json_2(request):
       articles = Article.objects.all()
       data = serializers.serialize('json', articles)
+      #쿼리셋을 json으로 변환하기 위한, serialization된 객체
       return HttpResponse(data, content_type='application/json')
   ```
-
-  - Django의 내장 HttpResponse를 활용한 JSON 응답 객체
-  - 주어진 모델 정보를 활용하기 때문에 이전과 달리 필드를 개별적으로 직접 만들어줄 필요 없음
+    - Django의 내장 HttpResponse를 활용한 JSON 응답 객체
+    - <u>주어진 모델 정보를 활용</u>하기 때문에 이전과 달리 <u>필드를 개별적으로 직접 만들어줄 필요 없음</u>
+  
+    결과: JSON 형태로 응답
+  
+  ![image-20220421000842078](REST API.assets/image-20220421000842078.png)
+  
+  ![image-20220421000936628](REST API.assets/image-20220421000936628.png)
 
 ### Response④ - Django REST Framework
 
-- Django REST framework(DRF) 라이브러리를 사용한 JSON 응답
+- Django REST framework(**DRF**) 라이브러리를 사용한 JSON 응답
 
 - 설치 과정 확인(requirement.txt에 미리 작성되어 있음)
 
   ```bash
   $ pip install djangorestframework
   ```
-
+  
   ```python
   #settings.py
-  INSTALLED_APPS = [
-      'rest_framework',
-  ]
+    INSTALLED_APPS = [
+        'rest_framework',
+    ]
   ```
 
 - DRF 라이브러리를 사용한 JSON 응답 url 확인
@@ -421,7 +428,7 @@
   from .models import Article
   
   class ArticleSerializer(serializers.ModelSerializer):
-  
+  #게시글 쿼리셋을 Serialization해주는 도구. 모델폼과 유사한 구조
       class Meta:
           model = Article
           fields = '__all__'
@@ -442,7 +449,23 @@
       articles = Article.objects.all()
       serializer = ArticleSerializer(articles, many=True)
       return Response(serializer.data)
+  	#직렬화된 객체를 응답
   ```
+
+  - "many" parameter
+
+    - 단일 객체가 아닐 때 사용한다. 
+
+      ex. input이 쿼리셋일 때 사용. 
+      	  detail 페이지의 경우 단일 객체이므로 쓰지 않는다
+
+    - default: False
+
+  결과: html 형태로 응답. json 형태가 출력됨
+
+  ![image-20220421005739125](REST API.assets/image-20220421005739125.png)
+
+  ![image-20220421005824430](REST API.assets/image-20220421005824430.png)
 
 - Django REST Framework(DRF)
 
@@ -452,9 +475,376 @@
 
   - Web API: 웹 애플리케이션 개발에서 다른 서비스에 요청을 보내고 응답을 받기 위해 정의된 명세
 
-  - Django ModelForm vs DRF Serializer
+- Django ModelForm vs DRF Serializer
 
-    |          | Django    | DRF        |
-    | -------- | --------- | ---------- |
-    | Response | HTML      | JSON       |
-    | Model    | ModelForm | Serializer |
+  |          | Django    | DRF        |
+  | -------- | --------- | ---------- |
+  | Response | HTML      | JSON       |
+  | Model    | ModelForm | Serializer |
+
+
+
+## Single Model
+
+### DRF with Single Model
+
+- 단일 모델의 data를 직렬화(serialization)하여 JSON으로 변환하는  방법에 대한 학습
+
+- 단일 모델을 두고 CRUD 로직을 수행 가능하도록 설계
+
+- API 개발을 위한 핵심 기능을 제공하는 도구 활용
+
+  - DRF built-in form
+  - Postman
+    - API를 구축하고 사용하기 위해 여러 도구를 제공하는 API 플랫폼
+    - 설계, 테스트, 문서화 등의 도구를 제공함으로써 API를 더 빠르게 개발 및 생성할 수 있도록 도움
+
+- Init Project
+
+  - 제공된 01_drf 프로젝트로 진행
+
+  - 가상환경 설정 및 패키지 설치
+
+    ```bash
+    $ python -m venv venv
+    $ source venv/Scripts/activate
+    
+    $ pip install -r requirements.txt
+    ```
+
+  - 설치된 app 확인
+
+    ```python
+    #settings.py
+    INSTALLED_APPS =[
+        'articles',
+        'django_seed',
+        'django_extensions',
+        'rest_framework',
+    ]
+    ```
+
+  - 작성된 url 확인
+
+    ```python
+    #my_api/urls.py
+    from django.contrib import admin
+    from django.urls import path, include
+    
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+        path('api/v1/', include('articles.urls')),
+    ]
+    
+    #articles/urls.py
+    from django.urls import path
+    from . import views
+    
+    urlpatterns = [
+    
+    ]
+    ```
+
+  - 작성된 model 확인
+
+    ```python
+    #models.py
+    from django.db import models
+    
+    class Article(models.Model):
+        title = models.CharField(max_length=100)
+        content = models.TextField()
+        created_at = models.DateTimeField(auto_now_add=True)
+        updated_at = models.DateTimeField(auto_now=True)
+    ```
+
+- Create Dummy Data
+
+  - django-seed 라이브러리를 사용해 모델 구조에 맞는 데이터  생성
+
+    ```bash
+    $ python manage.py migrate
+    $ python manage.py seed articles --number=20
+    ```
+
+- ModelSerializer
+
+  - 모델 필드에 해당하는 필드가 있는 Serializer 클래스를 자동으로 만들 수 있는 shortcut
+
+  - 아래 핵심 기능을 제공
+
+    1. 모델 정보에 맞춰 <u>자동으로 필드  생성</u>
+    2. serializer에 대한 <u>유효성 검사기를 자동으로 생성</u>
+    3. .create() & .update()의 <u>간단한 기본 구현이 포함됨</u>
+
+  - Model의 필드를 어떻게 "직렬화"할지 설정하는 것이 핵심
+
+  - 이 과정은 Django에서 Model의 필드를  설정하는 것과 동일함
+
+    ```python
+    #articles/serializers.py
+    from rest_framework import serializers
+    from .models import Article, Comment
+    
+    class ArticleListSerializer(serializers.ModelSerializer):
+    #Article 내 쿼리셋 직렬화
+        class Meta:
+            model = Article
+            fields = ('id', 'title',)
+    ```
+
+- Serializer in Shell
+
+  - shell_plus에서 serializer 사용해보기
+
+    ```bash
+    #1. shell_plus 실행
+    $ python manage.py shell_plus
+    
+    #2. 작성한 Serializer import
+    >>> from articles.serializers import ArticleListSerializer
+    
+    #3. 기본 인스턴스 구조 확인
+    >>> serializer  = ArticleListSerializer()
+    >>> serializer
+    ArticleListSerializer():
+    	id = IntegerField(label='ID', read_only=True)
+    	title= CharField(max_length=100)
+    	
+    #4. Model instance 객체
+    >>> article = Article.objects.get(pk=1)
+    >>> article
+    <Article: Article object (1)>
+    
+    >>> serializer = ArticleListSerializer(article)
+    >>> serializer
+    ArticleListSerializer(<Article: Article object (1)>):
+    	id = IntegerField(label='ID', read_only=True)
+    	title= CharField(max_length=100)
+    >>> serializer.data
+    {'id': 1, 'title': 'Site econmic if two country science.'}
+    
+    #5. QuerySet 객체
+    >>> articles = Article.object.all()
+    
+    #5-1. many=True 옵션 x -> 첫번째 인자가 단일 객체가 아니므로 AttributeError 발생
+    >>> serializer = ArticleListSerializer(articles)
+    >>> serializer.data
+    AttributeError: Got AttributeError when attempting to get a value for field `title` on serializer `ArticleListSerializer`.
+    The serializer field might be named incorrectly and not match any attribute or key on the `QuerySet` instance.
+    Original exception text was: 'QuerySet' object has no attribute 'title'.
+    
+    #5-2. many=True 옵션 o
+    >>> serializer = ArticleListSerializer(articles, many=True)
+    >>> serializer.data
+    [OrderedDict([('id',1), ('title', 'Live left research.'),('content', 'Small')...
+    ```
+
+    - 'many' argument
+      - many=True
+        - "Serializing multiple objects"
+        - 단일 인스턴스 대신 QuerySet 등을 직렬화하기 위해서는 serializer를 인스턴스화 할 때 many=True를 키워드 인자로 전달해야 함
+
+### Bulid RESTful API
+
+|             | GET          | POST    | PUT         | DELETE      |
+| ----------- | ------------ | ------- | ----------- | ----------- |
+| articles/   | 전체 글 조회 | 글 작성 |             |             |
+| articles/1/ | 1번 글 조회  |         | 1번 글 수정 | 1번 글 삭제 |
+
+#### GET - Article List
+
+- url 및 view 함수 작성
+
+  ```python
+  #articles/urls.py
+  from django.urls import path
+  from . import views
+  
+  urlpatterns = [
+      path('articles/', views.article_list),
+  ]
+  
+  #articles/views.py
+  from rest_framework.response import Response
+  from rest_framework.decorators import api_view
+  from django.shortcuts import get_list_or_404
+  from .serializers import ArticleListSerializer
+  from .models import Article
+  
+  @api_view(['GET'])
+  def article_list(request):	#전체 게시글 조회
+      articles = get_list_or_404(Article)
+      serializer = ArticleListSerializer(articles, many=True)
+      return Response(serializer.data)
+  ```
+
+#### GET - Article Detail
+
+- Article List와 Article Detail을 구분하기 위해 추가 Serializer 정의
+
+- 모든 필드를 직렬화하기 위해 fields 옵션을 '\__all__'로 설정
+
+  ```python
+  #articles/serializers.py
+  from rest_framework import serializers
+  from .models import Article
+  
+  class ArticleSerializer(serializers.ModelSerializer):
+      
+      class Meta:
+          model = Article
+          fields = '__all__'
+  ```
+
+- url 및 view 함수 작성
+
+  ```python
+  #articles/urls.py
+  from django.urls import path
+  from . import views
+  
+  urlpatterns = [
+      path('articles/<int:article_pk>/', views.article_detail),
+  ]
+  
+  #articles/views.py
+  from rest_framework.response import Response
+  from rest_framework.decorators import api_view
+  from django.shortcuts import get_object_or_404
+  from .serializers import ArticleSerializer
+  from .models import Article
+  from articles import serializers
+  
+  @api_view(['GET'])
+  def article_detail(request, article_pk):
+      article = get_object_or_404(Article, pk=article_pk)
+      serializer = ArticleSerializer(article)
+      return Response(serializer.data)
+  ```
+
+#### POST -  Create Article
+
+- 201 Created 상태 코드 및  메세지 응답
+
+- RESTful 구조에 맞게 작성
+
+  1. URI는 자원을 표현
+  2. 자원을 조작하는 행위는 HTTP Method
+
+- article_list 함수로 게시글을 조회하거나 생성하는 행위를 모두 처리 가능
+
+- view 함수 수정
+
+  ```python
+  from rest_framework import status
+  from rest_framework.response import Response
+  from rest_framework.decorators import api_view
+  from django.shortcuts import get_list_or_404
+  from .serializers import ArticleListSerializer, ArticleSerializer, CommentSerializer
+  from .models import Article
+  from articles import serializers
+  
+  @api_view(['GET', 'POST'])
+  def article_list(request):
+      if request.method == 'GET':
+          articles = get_list_or_404(Article)
+          serializer = ArticleListSerializer(articles, many=True)
+          return Response(serializer.data)
+  
+      elif request.method == 'POST':	#게시글 생성
+          serializer = ArticleSerializer(data=request.data)
+          if serializer.is_valid(raise_exception=True):
+              serializer.save()
+              return Response(serializer.data, status=status.HTTP_201_CREATED)
+          #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  ```
+
+  - Status Codes in DRF
+
+    - DRF에는 status code를 보다 명확하고 읽기 쉽게 만드는 데 사용할 수 ㅣㅆ는 정의된 상수 집합을 제공
+
+    - status 모듈에 HTTP status code 집합이 모두 포함되어 있음
+
+      ```python
+      #예시
+      from rest_framework import status
+      
+      def example_list(request):
+          return Response(serializer.data, status=status.HTTP_201_CREATED)
+      	#단순히 status=201과 같은 표현으로도 사용할 수 있지만 DRF는 권장하지 않음
+      ```
+
+  - 'raise_exception' argument
+
+    - "Raising an exception on invalid data"
+    - is_valid()는 유효성 검사 오류가 있는 경우 serializers.ValidationError 예외를 발생시키는 선택적 raise_exception 인자를 사용할 수 있음
+    - DRF에서 제공하는 기본 예외 처리기에 의해 자동으로 처리되며, 기본적으로 HTTP status code 400을 응답으로 반환함 -> 400 status code를 응답하는 return 구문 삭제
+
+#### DELETE - Delete Article
+
+- 204 No Content 상태 코드 및 메세지 응답
+- article_detail 함수로 상세 게시글을 조회하거나 삭제하는 행위 모두 처리 가능
+
+```python
+#articles/views.py
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
+from .serializers import ArticleSerializer
+from .models import Article
+from articles import serializers
+
+
+@api_view(['GET', 'DELETE'])
+def article_detail(request, article_pk):
+    article = get_object_or_404(Article, pk=article_pk)
+
+    if request.method == 'GET':
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+
+    elif request.method == 'DELETE':
+        article.delete()
+        data = {
+            'delete': f'데이터 {article_pk}번이 삭제되었습니다.',
+        }
+        return Response(data, status=status.HTTP_204_NO_CONTENT)
+```
+
+#### PUT - Update Article
+
+- article_detail 함수로 상세 게시글을 조회하거나 삭제, 수정하는 행위 모두 처리 가능
+
+```python
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
+from .serializers import ArticleSerializer
+from .models import Article
+from articles import serializers
+
+@api_view(['GET', 'DELETE', 'PUT'])
+def article_detail(request, article_pk):
+    article = get_object_or_404(Article, pk=article_pk)
+
+    if request.method == 'GET':
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+
+    elif request.method == 'DELETE':
+        article.delete()
+        data = {
+            'delete': f'데이터 {article_pk}번이 삭제되었습니다.',
+        }
+        return Response(data, status=status.HTTP_204_NO_CONTENT)
+
+    elif request.method == 'PUT':
+        serializer = ArticleSerializer(article, request.data)
+        # serializer = ArticleSerializer(instance=article, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+```
