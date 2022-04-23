@@ -1160,6 +1160,7 @@ def article_detail(request, article_pk):
   ```python
   #settings.py
   INSTALLED_APPS = [
+      'django.contrib.staticfiles',
       'def_yasg',
   ]
   ```
@@ -1175,7 +1176,7 @@ def article_detail(request, article_pk):
   
   schema_view = get_schema_view(
      openapi.Info(
-          title="싸피 장고 REST API",
+          title="Django REST API",
           default_version='v1',
           # 여기 아래부터는 선택 인자
           description="Test description",
@@ -1205,8 +1206,8 @@ def article_detail(request, article_pk):
 ## Fixtures
 
 - How to provide initial data for models
-  - 앱을 처음 설정할 때 미리 준비된 데이터로 데이터베이스를 미리 채우는 것이 필요한 상황이 있음
-  - 마이그레이션 또는 `fixtures`와 함께 초기 데이터를 제공
+  - 앱을 처음 설정할 때 미리 준비된 데이터로 데이터베이스를 <u>미리 채우는 것이 필요한 상황</u>이 있음
+  - 마이그레이션 또는 **fixtures**와 함께 초기 데이터를 제공
 
 - fixtures
 
@@ -1275,7 +1276,7 @@ def article_detail(request, article_pk):
 
   - 쿼리셋을 만드는 작업에는 데이터베이스 작업이 포함되지 않음
 
-  - 하루종일 필터를 함께 쌓을 수 있으며(stack filters), Django는 쿼리셋이 '평가(evaluated)'될 때까지 실제로 쿼리를 실행하지 않음
+  - 하루종일 필터를 함께 쌓을 수 있으며(stack filters), Django는 쿼리셋이 '**평가(evaluated)**'될 때까지 실제로 쿼리를 실행하지 않음
 
   - DB에 쿼리를 전달하는 일이 웹 애플리케이션을 느려지게 하는 주범 중 하나이기 때문
 
@@ -1385,3 +1386,342 @@ def article_detail(request, article_pk):
       2. iterator() 사용하기
 
          - 객체가 많을 때 쿼리셋의 캐싱 동작으로 인해 많은 양의 메모리가 사용될 때 사용
+
+### 필요하지 않은 것을 검색하지 않기
+
+- Don't retrieve things you don't need
+
+  - .count()
+
+    - 카운트만 원하는 경우
+    - len(queryset) 대신 QuerySet.count() 사용하기
+
+  - .exists()
+
+    - 최소한 하나의 결과가 존재하는지 확인하려는 경우
+    - if queryset 대신 QuerySet.exists() 사용하기
+
+  - '좋아요' 코드 예시
+
+    - if 문 때문에 쿼리셋이 '평가'되고, 이에 따라 쿼리셋 캐시에도 전체 레코드가 저장
+
+      ```python
+      like_set = article.like_users.filter(pk=request.user.pk)
+      
+      #if문은 쿼리셋을 평가한다. -> 캐시 생김
+      if like_set:
+          #쿼리셋의 전체 결과가 필요하지 않은 상황임에도 ORM은 전체 결과를 가져옴
+          article.like_users.remove(request.user)
+      ```
+
+    - exists()는 쿼리셋 캐시를 만들지 않으면서 특정 레코드가 존재하는지 검사. 결과 전체가 필요하지 않은 경우에 유용
+
+      ```python
+      like_set = article.like_users.filter(pk=request.user.pk)
+      
+      if like_set.exists():
+          #DB에서 가져온 레코드가 하나도 없다면 트래픽과 메모리를 절약할 수 있다.
+          article.like_users.remove(request.user)
+          
+      #if문 안에서 반복문이 있다면, 순회할 때는 if문에서 캐시된 쿼리셋이 사용됨. 
+      if like_set:
+          for user in like_set:
+              print(user.username)
+      #그런데 쿼리셋이 엄청 크다면 쿼리셋 캐시 자체가 문제가 될 수 있다.
+      ```
+
+    - iterator()는 객체가 많을 때 쿼리셋의 캐싱 동작으로 인해 많은 양의 메모리가 사용될 때 사용
+
+      - 몇 천 개 단위의 레코드를 다뤄야할 경우, 이 데이터를 한 번에 가져와 메모리를 올리는 행위는 비효율적이기 때문
+
+      -> 데이터를 작은 덩어리로 쪼개어 가져오고, 이미 사용한 레코드는 메모리에서 지움
+
+      ```python
+      like_set = article.like_users.filter(pk=request.user.pk)
+      
+      if like_set:
+          for user in like_set.iterator():
+              print(user.username)
+      ```
+
+      - 그런데 쿼리셋이 엄청 큰 경우 평가되는 if 문도 문제가 될 수 있음
+
+        ```python
+        like_set = article.like_users.filter(pk=request.user.pk)
+        
+        if like_set.exists():	#쿼리셋에 레코드가 존재하는지 확인
+            for user in like_set.iterator():	#또 다른 쿼리로 레코드를 조금씩 가겨온다
+                print(user.username)
+        ```
+
+    - 안일한 최적화 주의: exists()와 iterator() 메서드를 사용하면 메모리 사용을 최적화할 수 있지만, 쿼리셋 캐시는 생성되지 않기 때문에, DB 쿼리가 중복될 수 있음
+
+#### Annotate
+
+> 단순히 SQL로 계산해 하나의 테이블의 필드로 추가하여 붙여 올 수 있는 경우 게시글 별로 댓글 수를 출력해보기
+
+- 개선 전 - 11 queries including 10 similar
+
+  ```python
+  #articles/views.py
+  from django.shortcuts import render
+  from .models import Article, Comment
+  from django.db.models import Count
+  
+  def index_1(request):
+      articles = Article.objects.order_by('-pk')
+      context = {
+          'articles': articles,
+      }
+      return render(request, 'articles/index_1.html', context)
+  ```
+
+  ```django
+  <!-- articles/index_1.html -->
+  {% extends 'base.html' %}
+  
+  {% block content %}
+    <h1>Articles</h1>
+    {% for article in articles %}
+      <p>제목 : {{ article.title }}</p>
+      <p>댓글개수 : {{ article.comment_set.count }}</p>
+      <hr>
+    {% endfor %}
+  {% endblock content %}
+  ```
+
+- 개선 후 - 1 query
+
+  ```python
+  #articles/views.py
+  from django.shortcuts import render
+  from .models import Article, Comment
+  from django.db.models import Count
+  
+  def index_1(request):
+      articles = Article.objects.annotate(Count('comment')).order_by('-pk')
+      context = {
+          'articles': articles,
+      }
+      return render(request, 'articles/index_1.html', context)
+  ```
+
+  ```django
+  <!-- articles/index_1.html -->
+  {% extends 'base.html' %}
+  
+  {% block content %}
+    <h1>Articles</h1>
+    {% for article in articles %}
+      <p>제목 : {{ article.title }}</p>
+      <p>댓글개수 : {{ article.comment__count }}</p>
+      <hr>
+    {% endfor %}
+  {% endblock content %}
+  ```
+
+[참고] 
+
+- Django Debug Toolbar
+  - 현재 요청/응답에 대한 다양한 디버그 정보를 표시하고 다양한 패녈에서 자세한 정보를 표시
+- JOIN 개요
+  - JOIN: 두 개 이상의 테이블들을 연결 또는 결합하여 데이터를 출력하는 것
+  - 관계형 데이터베이스의 가장 큰 장점이자 핵심적인 기능
+  - 일반적으로 PK나 FK 값의 연관에 의해 JOIN이 성립
+
+### 한번에 모든 것을 검색하기
+
+> Retrieve everything at once if you know you will need
+
+1. select_related()
+
+   - 1:1 또는 1:N 참조 관계에서 사용
+
+   - DB에서 INNER JOIN을 활용
+
+   - SQL의 INNER JOIN을 실행하여 테이블의 일부를 가져오고, SELECT FROM에서 관련된 필드를 가져옴
+
+   - 단, single-valued relationships 관계(foreign key and one-to-one)에서만 사용 가능
+
+   - "게시글의 사용자 이름까지 출력을 해보기"
+
+   - 개선 전 - 11 queries including 10 similar and 10 duplicates
+
+     ```python
+     #articles/views.py
+     from django.shortcuts import render
+     from .models import Article, Comment
+     from django.db.models import Count
+     
+     def index_2(request):
+         articles = Article.objects.order_by('-pk')
+         context = {
+             'articles': articles,
+         }
+         return render(request, 'articles/index_2.html', context)
+     ```
+
+     ```django
+     <!-- articles/index_2.html -->
+     {% extends 'base.html' %}
+     
+     {% block content %}
+       <h1>Articles</h1>
+       {% for article in articles %}
+         <h3>작성자 : {{ article.user.username }}</h3>
+         <p>제목 : {{ article.title }}</p>
+         <hr>
+       {% endfor %}
+     {% endblock content %}
+     ```
+
+   - 개선 후 - 1 query
+
+     ```python
+     #articles/views.py
+     from django.shortcuts import render
+     from .models import Article, Comment
+     from django.db.models import Count
+     
+     def index_2(request):
+         articles = Article.objects.select_related('user').order_by('-pk')
+         context = {
+             'articles': articles,
+         }
+         return render(request, 'articles/index_2.html', context)
+     ```
+
+2. prefetch_related()
+
+   - M:N 또는 1:N 역참조 관계에서 사용
+
+   - selected_related와 달리 SQL의 JOIN을 실행하지 않고, **python에서 joining을 실행** 
+
+   - select_related가 지원하는 single-valued relationships 관계에 더해, select_related를 사용하여 수행 할 수 없는 M:N and 1:N 역참조 관계에서 사용 가능
+
+   - 개선 전 - 11 queries including 10 similar
+
+     ```python
+     #articles/views.py
+     from django.shortcuts import render
+     from .models import Article, Comment
+     from django.db.models import Count
+     
+     def index_3(request):
+         articles = Article.objects.order_by('-pk')
+         context = {
+             'articles': articles,
+         }
+         return render(request, 'articles/index_3.html', context)
+     ```
+
+     ```django
+     <!-- articles/index_3.html -->
+     {% extends 'base.html' %}
+     
+     {% block content %}
+       <h1>Articles</h1>
+       {% for article in articles %}
+         <p>제목 : {{ article.title }}</p>
+         <p>댓글 목록</p>
+         {% for comment in article.comment_set.all %}
+           <p>{{ comment.content }}</p>
+         {% endfor %}
+         <hr>
+       {% endfor %}
+     {% endblock content %}
+     ```
+
+   - 개선 후 - 2 queries
+
+     ```python
+     #articles/views.py
+     from django.shortcuts import render
+     from .models import Article, Comment
+     from django.db.models import Count
+     
+     def index_3(request):
+         articles = Article.objects.prefetch_related('comment_set').order_by('-pk')
+         context = {
+             'articles': articles,
+         }
+         return render(request, 'articles/index_3.html', context)
+     ```
+
+#### 복합 활용
+
+- 댓글에 더해서 해당 댓글을 작성한 사용자 이름까지 출력해보기
+
+- 개선 전 - 111 queries including 110 similar and 100 duplicates
+
+  - 1개 + 10개 + 10개에 대한 10개 -> 111개
+
+  ```python
+  #articles/views.py
+  from django.shortcuts import render
+  from .models import Article, Comment
+  from django.db.models import Count
+  from django.db.models import Prefetch
+  
+  
+  def index_4(request):
+      articles = Article.objects.order_by('-pk')
+      context = {
+          'articles': articles,
+      }
+      return render(request, 'articles/index_4.html', context)
+  ```
+
+  ```django
+  <!-- articles/index_4.html -->
+  {% extends 'base.html' %}
+  
+  {% block content %}
+    <h1>Articles</h1>
+    {% for article in articles %}
+      <p>제목 : {{ article.title }}</p>
+      <p>댓글 목록</p>
+      {% for comment in article.comment_set.all %}
+        <p>{{ comment.user.username }} : {{ comment.content }}</p>
+      {% endfor %}
+      <hr>
+    {% endfor %}
+  {% endblock content %}
+  ```
+
+- 첫번째 개선 후 - 102 queries including 100 similar and 100 duplicates
+
+  ```python
+  #articles/views.py
+  from django.shortcuts import render
+  from .models import Article, Comment
+  from django.db.models import Count
+  from django.db.models import Prefetch
+  
+  def index_4(request):
+  	articles = Article.objects.prefetch_related('comment_set').order_by('-pk')
+      context = {
+          'articles': articles,
+      }
+      return render(request, 'articles/index_4.html', context)
+  ```
+
+- 두 번째 개선 후 - 2 queries
+
+  ```python
+  #articles/views.py
+  from django.shortcuts import render
+  from .models import Article, Comment
+  from django.db.models import Count
+  from django.db.models import Prefetch
+  
+  def index_4(request):
+      articles = Article.objects.prefetch_related(
+          Prefetch('comment_set', queryset=Comment.objects.select_related('user'))
+      ).order_by('-pk')
+  
+      context = {
+          'articles': articles,
+      }
+      return render(request, 'articles/index_4.html', context)
+  ```
