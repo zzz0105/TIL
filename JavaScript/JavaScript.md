@@ -330,7 +330,7 @@ console.log(c + d)	//2
 - 두 피연산자가 <u>모두 객체</u>일 경우 **메모리의 같은 객체를 바라보는지 판별**
 - 예상치 못한 결과가 발생할 수 있으므로 **특별한 경우를 제외하고 사용하지 않음**
 
-### 일치 비교 연산자
+### 일치 비교 연산자(===)
 
 ```javascript
 const a = 100
@@ -546,10 +546,411 @@ for (let fruit of fruits){
 
 ## 함수
 
-## 배열, 객체
+- 참조 타입 중 하나로써 **function 타입**에 속함
+- JavaScript에서 함수를 정의하는 방법은 주로 2가지로 구분
+  - [함수 선언식](#함수-선언식)
+  - [함수 표현식](#함수-표현식)
+- [참고] JavaScript의 함수는 **일급 객체**에 해당
+  - 일급 객체: 다음의 조건들을 만족하는 객체를 의미함
+    - 변수에 할당 가능
+    - 함수의 매개변수로 전달 가능
+    - 함수의 반환 값으로 사용 가능
 
-### 배열
+### 함수 선언식
 
-### 객체
+```javascript
+function name(args) {
+    //do something
+}
 
-## this
+function add(num1,  num2){
+    return num1+num2
+}
+add(1, 2)
+```
+
+- 함수의 이름과 함께 정의하는 방식
+- 익명함수로 
+- 3가지 부분으로 구성
+  - 함수의 이름(name)
+  - 매개변수(args)
+  - body(중괄호 내부)
+
+### 함수 표현식
+
+```javascript
+const name = function (args) {	//이름이 없다
+    //do something
+}	
+
+const add = function(num1, num2) {
+    return num1 + num2
+}
+add(1, 2)
+```
+
+- 함수를 표현식 내에서 정의하는 방식
+  - [참고] 표현식: 어떤 하나의 값으로 결정되는 코드의 단위
+- 함수의 이름을 생략하고 익명 함수로 정의  가능
+  - 익명 함수: 이름이 없는 함수. python의 lambda와 비슷
+  - 익명함수는 **함수 표현식에서만** 가능
+- 3가지 부분으로 구성
+  - 함수의 이름(<u>생략 가능</u>)
+  - **매개변수(args)**
+  - **body(중괄호 내부)**
+-   Airbnb Style Guide 권장 방식
+
+### 기본 인자
+
+- 인자 작성 시 '=' 문자 뒤 기본 인자 선언 가능
+
+  ```javascript
+  const greeting = function (name = 'Anonymous'){
+      return `Hello ${name}`
+  }
+  greeting()	//Hello Anonymous
+  ```
+
+### 매개변수와 인자의 개수 불일치 허용
+
+```javascript
+//매개변수보다 인자의 개수가 많을 경우
+const noArgs = function () {
+    return 0
+}
+noArgs(1,2,3)	//0
+
+const twoArgs = function(arg1, arg2) {
+    return [arg1, arg2]
+}
+twoArgs(1,2,3)	//[1,2]
+
+//매개변수보다 인자의 개수가 적을 경우
+const threeArgs = function(arg1, arg2, arg3) {
+    return [arg1, arg2, arg3]
+}
+threeArgs()		//[undefined, undefined, undefined]
+threeArgs(1)	//[1, undefined, undefined]
+```
+
+#### Rest Parameter
+
+```javascript
+const restOpt = function(arg1, arg2, ...restArgs) {
+    return [arg1, arg2, restArgs]
+}
+restOpt(1,2,3,4,5)	//[1,2,[3,4,5]]
+restOpt(1,2)		//[1,2,[]]
+```
+
+- **rest parmeter(...)**를 사용하면 함수가 정해지지 않은 수의 매개변수를 **배열**로 받음(python의 *args와 유사)
+  - 만약 rest operator로 처리한 매개변수가 인자로 넘어오지 않을 경우에는, 빈 배열로 처
+
+#### *Spread operator
+
+```javascript
+const spreadOpr= function(arg1, arg2, arg3) {
+    return arg1 + arg2 + arg3
+}
+
+const numbers = [1,2,3]
+spreadOpr(...numbers)	//6
+```
+
+- **spread operator(...)**를 사용하면 <u>배열 인자를 전개하여 전달 가능</u>
+
+### 함수 선언식과 표현식 비교 정리
+
+- 공통점: 데이터 타입, 함수 구성 요소(이름, 매개변수, body)
+- 차이점
+  - 함수 선언식: 익명 함수 불가능	/	호이스팅 O
+  - 함수 표현식: 익명 함수 가능       /     호이스팅 X
+
+#### 함수의 타입
+
+- 선언식 함수와 표현식 함수 모두 타입은 **function**으로 동일
+
+#### 호이스팅 
+
+##### 함수 선언식
+
+```javascript
+add(2, 7)	//9
+
+function add (num1, num2) {
+    return num1+num2
+}	//코드는 위에서 아래로 실행. var에서는 호이스팅으로 선언부가 모두 위로 올라감. NameError 발생하지 않는다.
+```
+
+- 함수  선언식으로 선언한 함수는 var로 정의한 변수처럼 hoisting 발생
+- 함수 호출이후에 선언해도 동작
+
+##### 함수 표현식
+
+```javascript
+sub(7, 2)	//Uncaught ReferenceError: Cannot access 'sub' before initialization
+
+const sub = function (num1, num2) {
+    return num1  -  num2
+}
+```
+
+- 함수 표현식으로 선언한 함수는 **함수 정의 전에 호출 시 에러 발생**
+- 함수 표현식으로 정의된 함수는 변수로 평가되어 **변수의 scope 규칙**을 따름
+
+```javascript
+console.log(sub)	//undefined
+sub(7, 2)			//Uncaught TypeError : sub is not a function
+var sub = function (num1, num2) {
+    return num1  -  num2
+}
+```
+
+- 함수 표현식을 var 키워드로 작성한 경우, 변수가 선언 전 **undefined로 초기화되어 다른 에러가 발생**
+- var 대신 **const** 쓰는 것을 권장
+
+### Arrow Function
+
+- 함수를 **비교적 간결하게 정의**할 수 있는 문법
+- **function 키워드 생략 가능**
+- 함수의 매개변수가 단 하나 뿐이라면, '( )'도 생략 가능
+- 함수 몸통이 표현식 하나라면 '{ }'과 return도 생략 가능
+- 기존 function 키워드 사용 방식과의 차이점은 [this 키워드](#this)까지 본 후 정리
+
+```javascript
+const arrow1  = function (name) {
+    return `hello, ${name}`
+}
+//function 키워드 삭제
+const arrow2 = (name) => {return `hello, ${name}`}
+
+//매개변수가 한 개인 경우에만 ( )생략 가능
+const arrow3 = name => {return `hello, ${name}`}
+
+//함수의 body가 return을 포함하여 1개일 경우, { }와 return 삭제 가능
+const arrow4 = name => `hello, ${name}`
+
+//예시
+const add = (a, b) => a+b
+```
+
+[참고] IIFE(즉시 실행 함수 표현, Immediately Invoked Function Expression)
+
+```javascript
+(function () {
+    //do something
+    })()
+```
+
+- 전역 스코프(Global scope)를 오염시키지 않기 위해 사용
+
+
+
+## 문자열
+
+### 문자열 관련 주요 메서드 목록
+
+| 메서드   | 설명                                      | 비고                                         |
+| -------- | ----------------------------------------- | -------------------------------------------- |
+| includes | 특정 문자열의 존재여부를 참/거짓으로 반환 |                                              |
+| split    | 문자열을 토큰 기준으로 나눈 배열 반환     | 인자가 없으면 기존 문자열을 배열에 담아 반환 |
+| replace  | 해당 문자열을 대상 문자열로 교체하여 반환 | replaceAll                                   |
+| trim     | 문자열의 좌우 공백 제거하여 반환          | trimStart, trimEnd                           |
+
+#### includes
+
+```javascript
+const str = 'a santa'
+str,includes('santa')	//true
+str.includes('asan')	//false
+```
+
+- string.includes(value)
+  - 문자열에 value가 존재하는지 판별 후 참 또는 거짓 반환
+
+#### split
+
+```javascript
+const str = 'a santa'
+
+str.split()		//['a santa']
+str.split('')	//['a', ' ', 's','a','n','t','a']
+str.split(' ')	//['a', 'santa']
+```
+
+- string.split(value)
+  - value가 없을 경우, 기존 문자열을 배열에 담아 반환
+  - value가 빈 문자열일 경우, 각 문자로 나눈 배열을 반환
+  - value가 기타 문자열일 경우, 해당 문자열로 나눈 배열을 반환
+
+#### replace
+
+```javascript
+const str = 'a santa'
+
+str.replace(' ', '-')		//'a-santa'
+str,replaceAll('a', 'q')	//'q-sqntq'
+```
+
+- string.replace(from,to)
+  - 문자열에 from 값이 존재할 경우, **1개만** to 값으로 교체하여 반환
+
+- string.replaceAll(from, to)
+  - 무자열에 from 값이 존재할 경우, **모두** to 값으로 교체하여 반환
+
+#### trim
+
+```javascript
+const str = '  a santa  '
+
+str.trim()		//'a santa'
+str,trimStart()	//'a santa  '
+str.trimEnd()	//'  a santa'
+```
+
+- string.trim()
+  - 문자열 시작과 끝의 모든 공백문자(스페이스, 탭, 엔터 등)를 제거한 문자열 반환
+
+- string.trimStart()
+  - 문자열 시작의 공백문자(스페이스, 탭, 엔터 등)를 제거한 문자열 반환
+
+- string.trimEnd()
+  - 문자열 끝의 공백문자(스페이스, 탭, 엔터 등)를 제거한 문자열 반환
+
+
+
+## 배열
+
+### 배열의 정의와 특징
+
+- 키와 속성들을 담고 있는 참조 타입의  **객체(object)**
+- 순서를 보장하는 특징이 있음
+- 주로 대괄호를 이용하여 생성하고, 0을 포함한 양의 정수 인덱스로 특정 값에 접근 가능
+  - 파이썬과 달리 -1을 사용하여 마지막 요소에 접근할 수 없다
+- 배열의 길이는 array.length 형태로 접근 가능
+
+### 배열 관련 주요 메서드 목록 - 기본
+
+| 메서드          | 설명                                                 | 비고                     |
+| --------------- | ---------------------------------------------------- | ------------------------ |
+| reverse         | **원본 배열**의 요소들의 순서를 반대로 정렬          |                          |
+| push & pop      | 배열의 **가장 뒤**에 요소를 **추가 또는 제거**       |                          |
+| unshift & shift | 배열의 **가장 앞**에 요소를 **추가 또는 제거**       |                          |
+| includes        | 배열에 특정 값이 존재하는지 판별 후 **참/거짓 반환** |                          |
+| indexOf         | 배열에 특정 값이 존재하는지 판별 후 **인덱스 반환**  | 요소가 없을 경우 -1 반환 |
+| join            | 배열의 **모든 요소를 구분자를 이용하여 연결**        | 구분자 생략 시 쉼표 기준 |
+
+#### reverse
+
+```javascript
+const numbers = [1, 2, 3, 4, 5]
+numbers.reverse()
+console.log(numbers)	//[5, 4, 3, 2, 1]
+```
+
+- array.reverse() 
+  - 원본 배열의 요소들의 순서를 반대로 정렬
+
+#### push & pop
+
+```javascript
+const numbers = [1, 2, 3, 4, 5]
+
+numbers.push(6)
+console.log(numbers)	//[1, 2, 3, 4, 5, 6]
+
+numbers.pop()
+console.log(numbers)	//[1, 2, 3, 4, 5]
+```
+
+- array.push()
+  - 배열의 가장 뒤에 요소 추가
+
+- array.pop ()
+  - 배열의 마지막 요소 제거
+
+#### unshift & shift
+
+```javascript
+const numbers = [1, 2, 3, 4, 5]
+
+numbers.unshift(0)
+console.log(numbers)	//[0, 1, 2, 3, 4, 5]
+
+numbers.shift()
+console.log(numbers)	//[1, 2, 3, 4, 5]
+```
+
+- array.unshift() 
+  - 배열의 가장 앞에 요소 추가
+
+- array.shift() 
+  - 배열의 첫번째 요소 제거
+
+#### includes
+
+```javascript
+const numbers = [1, 2, 3, 4, 5]
+console.log(numbers.includes(1))	//true
+console.log(numbers.includes(7))	//false
+```
+
+- array.includes(value) 
+  - 배열에 특정 값이 존재하는지 판별 후 참 또는 거짓 반환
+
+#### indexOf
+
+``````javascript
+const numbers = [1, 2, 3, 4, 5]
+
+console.log(numbers.indexOf(3))	//2
+console.log(numbers.indexOf(7))	//-1
+``````
+
+- array.indexOf(value) 
+  - 배열의 특정 값이 존재하는지 확인 후 가장 첫번째로 찾은 요소의 인덱스 반환
+  - 만약 해당 값이 없을 경우 **-1** 반환
+
+#### join
+
+```javascript
+const numbers = [1, 2, 3, 4, 5]
+
+    console.log(numbers.join())	//1,2,3,4,5
+console.log(numbers.join(''))	//12345
+console.log(numbers.join(' '))	//1 2 3 4 5
+console.log(numbers.join('-'))	//1-2-3-4-5
+```
+
+- array.join([separator])
+  - 배열의 모든 요소를 문자열로 연결하여 반환. 구분자는 선택적으로 지정 가능하며 생략 시 **쉼표를 기본값**으로 사용
+
+### spread operator
+
+```javascript
+const array = [1, 2, 3, 4, 5]
+const newArray = [0, ...array, 6]
+
+console.log(newArray)	//[0, 1, 2, 3, 4, 5, 6]
+```
+
+- **spread operator(...)**를 사용하면 배열 내부에서 배열 전개 가능
+- S5까지는 Array.concat() 메서드를 사용
+- 얕은 복사에 활용 가능
+
+### *배열 관련 주요 메서드 목록 - 심화
+
+- 메서드 호출 시 인자로 **callback함수**를 받는 것이 특징
+  - **callback함수**: 어떤 함수의 내부에서 실행될 목적으로 인자로 넘겨받는 함수
+  - ex) django views,py에 정의한 <함수이름>이 urls.py의 path함수에 전달되는 callback 함수
+
+| 메서드  | 설명                                                         | 비고             |
+| ------- | ------------------------------------------------------------ | ---------------- |
+| forEach | 배열의 각 요소에 대해 콜백 함수를 한 번씩 실행               | **반환 값 없음** |
+| map     | 콜백함수의 **반환 값을 요소**로 하는 **새로운 배열 반환**    |                  |
+| filter  | 콜백 함수의 반환 값이 **참인 요소들만** 모아서 **새로운 배열을 반환** |                  |
+| reduce  | 콜백 함수의 반환 값들을 **하나의 값(acc)에 누적 후 반환**    |                  |
+| find    | 콜백 함수의 **반환 값이 참이면 해당 요소를 반환**            |                  |
+| some    | 배열의 **요소 중 하나라도 판별 함수를 통과**하면 참을 반환   |                  |
+| every   | 배열의 **모든 요소가 판별 함수를 통과**하면 참을 반환        |                  |
+
