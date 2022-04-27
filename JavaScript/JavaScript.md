@@ -824,6 +824,7 @@ str.trimEnd()	//'  a santa'
 ### 배열의 정의와 특징
 
 - 키와 속성들을 담고 있는 참조 타입의  **객체(object)**
+  - 배열은 인덱스를 키로 가지며 length 프로퍼티를 갖는 특수항 객체
 - 순서를 보장하는 특징이 있음
 - 주로 대괄호를 이용하여 생성하고, 0을 포함한 양의 정수 인덱스로 특정 값에 접근 가능
   - 파이썬과 달리 -1을 사용하여 마지막 요소에 접근할 수 없다
@@ -954,3 +955,624 @@ console.log(newArray)	//[0, 1, 2, 3, 4, 5, 6]
 | some    | 배열의 **요소 중 하나라도 판별 함수를 통과**하면 참을 반환   |                  |
 | every   | 배열의 **모든 요소가 판별 함수를 통과**하면 참을 반환        |                  |
 
+#### forEach
+
+```javascript
+array.forEach((element, index, array) =>{
+    //do something
+})
+
+const fruits = ['딸기', '수박', '참외', '메론']
+fruits.forEach((fruit, index) => {
+    console.log(fruit, index)
+})
+/*
+딸기 0
+수박 1
+참외 2
+메론 3
+*/
+```
+
+- array.forEach(callback(element[, index[,array]]))
+  - 배열의 각 요소에 대해 콜백 함수를 한 번씩 실행
+  - 콜백 함수는 3가지 매개변수로 구성
+    - element: 배열의 요소
+    - index: 배열 요소의 인덱스
+    - array: 배열 자체
+  - **반환 값이 없는 메서드**
+
+#### map
+
+```javascript
+array.map((element, index, array) =>{
+    //do something
+})
+
+const numbers = [1, 2, 3, 4, 5]
+const doubleNums = numbers.map((num) => {
+    return num * 2
+})
+console.log(numbers.map(number => number * 2))	// [2, 4, 6, 8, 10]
+
+const rectangles = [
+    {'width': 30, 'height': 20}, 
+    {'width': 10, 'height': 20}
+]	//결과 [600, 200]
+const area = rectangles.map((wh) => wh.width*wh.height)
+console.log(area)
+```
+
+- array.map(callback(element[, index[, array]]))
+  - 배열의 각 요소에 대해 콜백 함수를 한 번씩 실행
+  - 콜백 **함수의 반환 값을 요소로 하는** 새로운 배열 반환
+  - 기존 배열 전체를 다른 형태로 바꿀 때 유용
+
+#### filter
+
+```javascript
+array.filter(element, index, array) => {
+    //do something
+}
+
+const numbers = [1,2,3,4,5]
+const oddNums = numbers.filter((num, index) =>{
+    return num % 2
+})
+console.log(oddNums)	//1, 3, 5
+
+console.log(students.map((x) => x.python + x.js))
+
+students.map(function (element) {return element.python + element.js})
+```
+
+- array.filter(callback(element[, index[, array]]))
+  - 배열의 각 요소에 대해 **콜백 함수를 한 번씩 실행**
+  - 콜백 **함수의 반환 값이 참인 요소들만** 모아서 새로운 배열을 반환
+  - 기존 배열의 요소들을 필터링할 때 유용
+
+#### reduce
+
+```javascript
+array.reduce((acc, element, index, array) => {
+    //do something
+}, initialValue)
+
+const numbers = [1, 2, 3]
+const result = numbers.reduce((acc, num) => {
+    return acc + num
+}, 0)
+console.log(result)	//6
+```
+
+- array.reduce(callback(acc, element, [index[, array]])[, initialValue])
+  - 배열의 각 요소에 대해 콜백 함수를 한번씩 실행
+  - 콜백 함수의 반환 값들을 **하나의 값에 누적 후 반환**
+  - reduce 메서드의 주요 매개변수
+    - acc
+      - 이전 callback 함수의 반환 값이 누적되는 변수
+    - initialValue(optional)
+      - 최초 callback 함수 호출 시 acc에 할당되는 값, default 같은 배열의 첫 번째 값
+  - [참고] 빈 배열의 경우 initialValue를 제공하지 않으면 에러 발생
+
+#### find
+
+```javascript
+array.find((element, index, array)) {
+    //do something
+}
+
+const users = [
+    {name:'길동', age: 30},
+    {name '철수',age: 18}
+]
+const result = users.find((user)) => {
+   return avenger.name==='철수'
+}
+console.log(result)	//{name '철수',age: 18}
+```
+
+- array.find(callback(element[, index[, array]]))
+  - 배열의 각 요소에 대해 콜백 함수를 한 번씩 실행
+  - 콜백 함수의 반환 값이 참이면, 조건을 만족하는 첫번째 요소를 반환
+  - 찾는 값이 배열에 없으면 undefined
+
+#### some
+
+```javascript
+array.some((element, index, array)) => {
+    //do something
+})
+const numbers = [1, 2, 3]
+const hasEvenNumber = numbers.some((num) => {
+    return num%2===0
+}, 0)
+console.log(hasEvenNumber)	//true
+```
+
+- array.some(callback(element[, index[, array]]))
+  - 배열의 **요소 중 하나라도** 주어진 판별 함수를 통과하면 참.
+  - 모든 요소가 통과하지 못하면 거짓 반환
+  - [참고] 빈 배열은 항상 **거짓** 반환
+
+#### every
+
+```javascript
+array.every((element, index, array)) => {
+    //do something
+})
+const numbers = [1, 2, 3]
+const isEveryNumberEven = numbers.some((num) => {
+    return num%2===0
+}, 0)
+console.log(isEveryNumberEven)	//false
+```
+
+- array.every(callback(element[, index[, array]]))
+  - 배열의 **모든 요소가** 주어진 판별 함수를 통과하면 참.
+  - 하나의 요소라도 통과하지 못하면 거짓 반환
+  - [참고] 빈 배열은 항상 **참** 반환
+
+### [참고] 배열 순회 방법 비교
+
+| 방식     | 특징                                                         | 비고                         |
+| -------- | ------------------------------------------------------------ | ---------------------------- |
+| for loop | 모든 브라우저 환경에서 지원<br />인덱스를 활용하여 배열의 요소에 접근<br />break, continue 사용 가능 |                              |
+| for...of | 일부 오래된 브라우저 환경에서 지원x<br />인덱스 없이 배열의 요소에 바로 접근 가능<br />break, continue 사용 가능 |                              |
+| forEach  | 대부분의 부라우저 환경에서 지원<br />break, continue 사용 불가능 | Airbnb style Guide 권장 방식 |
+
+
+
+## 객체
+
+### 객체의 정의와 특징
+
+- 객체는 속성의 집합이며 중괄호 내부에 key와 vlue의 쌍으로 표현
+- **key**는 **문자열 타입**만 가능
+  - key이름에 띄어쓰기 등의  구분자가 있으면 따옴표로 묶어서 표현
+- **value**는 **모든 타입(함수 포함)** 가능
+- 객체 요소 접근은 점 또는 대괄호로 가능
+  - key이름에 띄어쓰기 같은 구분자가 있으면 따옴표로 묶어서 표현
+
+### 객체와 메서드
+
+```javascript
+const me = {
+    firstName: '길동',
+    lastName:  '홍',
+    
+    fullName: this.firstName + this.lastName
+    
+    getFullName: function(){
+        return this.firstName + this.lastName
+    }
+}
+```
+
+- 메서드는 객체의 속성이 참조하는 함수
+- 객체.메소드명()으로  호출 가능
+- **메서드** 내부에서는 <u>this 키워드가 **객체**를 의미</u>함
+  - fullName은 메서드가 아니까 때문에 정상출력 되지 않음(NaN)
+  - getFullName은 메서드이기 때문에 해당 객체의 firstName과 lastName을 정상적으로 이어서 반환
+
+### 객체 관련 ES6 문법 익히기
+
+#### 속성명 축약
+
+```javascript
+const fruits = ['딸기', '수박', '참외', '메론']
+const drinks = ['콜라', '사이다']
+
+const shop = {
+    fruits,
+    drinks,
+}
+console.log(shop)
+/*
+fruits: ['딸기', '수박', '참외', '메론'],
+drinks: ['콜라', '사이다']
+*/
+```
+
+- 객체를 정의할 때 key와 할당하는 변수의 이름이 같으면 예시와 같이 축약 가능
+
+#### 메서드명 축약
+
+```javascript
+const obj = {
+    greeting() {
+        console.log('안녕')
+    }
+}
+obj,greeting()	//안녕
+```
+
+- 메서드 선언 시 function 키워드 생략 가능
+
+#### 계산된 속성명 사용하기
+
+```javascript
+const key = 'fruits'
+const value = ['딸기', '수박', '참외', '메론']
+
+const likes = {
+    [key]: value
+}
+console.log(likes)			//{fruits: Array(4)}
+console.log(likes.fruits)	//["딸기", "수박", "참외", "메론"]
+```
+
+- 객체를 정의할 때 key의 이름을 표현식을 이용하여 동적으로 생성 가능
+
+#### 구조 분해 할당
+
+```javascript
+const userInfo = {
+    name: '길동',
+    birthday: '04-26',
+    phoneNumber: '012-3456-7890'
+}
+
+const name = userInfo.name
+const birthday = userInfo.birthday
+const phoneNumber = userInfo.phoneNumber
+
+const {name} = userInfo
+const {birthday} = userInfo
+const {phoneNumber} = userInfo
+
+const {name, birthday, phoneNumber} = userInfo
+```
+
+- 배열 또는 객체를 분해하여 속성을 변수에 쉽게 할당할 수 있는 문법
+
+#### 객체 전개 구분(Spread Operator)
+
+```javascript
+const obj  = {b:1, c:2}
+const newObj = {a:0, ...obj,  d:3}
+
+console.log(newObj)	//{a:0, b:1, c:2,  d:3}
+```
+
+- spread operator(...)를 사용하면 객체 내부에서 객체 전개 가능
+- ES5까지는 Object.assign() 메서드를 사용
+
+### JSON
+
+> JavaScript Object Noation
+
+- key-value 쌍의 형태로 데이터를 표기하는 언어 독립적 표준 포맷
+- 자바스크립트의 객체와 유사하게 생겼으나 실제로는 문자열 타입
+  - 따라서 JS의 객체로써 조작하기 위해서는 구문 분석(parsing)이 필수
+
+- 자바스크립트에서는 JSON을 조작하기 위한 두 가지 내장 메서드를 제공
+
+  ```javascript
+  const jsonData =  JSON.stringify({
+      drink: 'soda',
+      fruit: 'apple',
+  })
+  
+  console.log(jsonData)			//"{"drink": "soda", "fruit": "apple"}"
+  console.log(typeof jsonData)	//string
+  
+  const parsedData = JsoN.parse(jsonData)
+  console.log(parsedData)			//{drink: "soda", fruit: "apple"}
+  console.log(typeof parsedData)	//object
+  ```
+
+  - JSON.parse
+    - JSON => 자바스크립트 객체
+  - JSON.stringify()
+    - 자바스크립트 객체 => JSON 
+
+
+
+## this
+
+```javascript
+function getFullName(){
+    return this.lastName + this.firstName
+}
+const me = {
+    firstName = '길동',
+    lastName = '홍',
+    getFullName: getFullname,    
+}
+const you = {
+    firstName = '짱구',
+    lastName = '신',
+    getFullName: getFullname,
+}
+me.getFullName()	//홍길동	this===me
+you.getFullName()	//신짱구	this===you
+getFullName()		//NaN		this===window
+```
+
+- 실행 문맥에 따라 다른 대상을 가리킨다
+  - class 내부의 생성자 함수
+    - this는 생성되는 객체를 가리킴(Python의 self와 같음)
+  - 메서드(객체.메서드명()으로 호출 가능한 함수)
+    - this는 해당 메서드가 소속된 객체를 가리킴
+  - 위의 두가지 경우를 제외하면 모두 최상위 객체(window)를 가리킴
+
+### function 키워드와 화살표 함수 차이
+
+```javascript
+//function 키워드
+const obj = {
+    PI: 3.14,
+    radiuses: [1, 3, 5],
+    printArea: function () {
+        this.radiuses.forEach(function(r){
+            console.log(this.PI * r * r)
+        }.bind(this))
+    },
+}
+
+//화살표 함수
+const obj ={
+    PI:3.14,
+    radiuses = [1, 3, 5],
+    printArea: function() {
+        this.radiuses.forEach((r)->{
+            console.log(this.PI * r * r)
+        })
+    },
+}
+```
+
+- this.radiuses는 메서드(객체.메서드명()으로 호출 가능) 소속이기 때문에 정상적으로 접근 가능
+
+- forEach의 콜백함수의 경우 메서드가 아님(객체.메서드명()으로 호출 불가능)
+
+  - 때문에 콜백함수의 내부의 this는 window가 되어 this.PI는 정상적으로 접근 불가능
+
+    -> 이 콜백함수 내부에서 this.pi에 접근하기 위해서 <u>함수객체.bind(this) 메서드를 사용</u>
+
+- 이 번거로운 과정을 없앤 것이 화살표 함수
+
+
+
+- 함수  내부에 this 키워드가 존재할 경우
+
+  - 화살표 함수와 function 키워드로 선언한 함수가 다르게 동작
+
+- 함수 내부에 this  키워드가 존재하지 않을 경우
+
+  - 완전 동일하게 동작
+
+  
+
+## lodash
+
+> A modern JavaScript utility library
+
+- 모듈성, 성능 및 추가 기능을 제공하는 JavaScript 유틸리티 라이브러리
+- array, object 등 자료구조를 다룰 때 사용하는 유용하고 간편한 유틸리티 함수들을 제공
+  - ex) reverse, soryBy, range, random, cloneDeep ...
+
+```javascript
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+//위의 CDN import를 통해 _ 식별자 사용 가능
+<script>
+    _.sample([1,2,3,4])
+	_.sampleS]ize(_.range(1, 46), 6)
+	_.reverse([1,2,3,4])
+	_.range(1,5,2)
+	
+	//깊은 복사 - lodash를 사용하지 않을 경우, 직접 함수를 만들어서 구현해야 함
+	const original = {a : {b : 1}}
+    const ref = original
+    const copy = _.cloneDeep(original)
+    console.log(original.a.b, ref.a.b, copy.a.b)	//1,1,1
+	ref.a.b = 10
+	console.log(original.a.b, ref.a.b, copy.a.b)	//10,10,1
+	copy.a.b = 20
+	console.log(original.a.b, ref.a.b, copy.a.b)	//10,10,20
+</script>
+```
+
+
+
+## History of JavaScript
+
+- History of JavaSctipt & Browser
+
+  - 브라우저 전쟁
+  - 파편화와 표준화의 투쟁
+
+- 브라우저 전쟁의 여파
+
+  - Cross Browsing Issue
+  - 표준화(통합)을 위한 노력
+  - Vanilla JavaScript
+
+  
+
+## DOM 조작
+
+- [브라우저에서 할 수 있는 일, DOM과 BOM](#브라우저에서-할-수-있는-일)
+
+- 개념
+  - Document는 문서 한 장(HTML)에 해당하고 이를 조작
+  - **DOM 조작 순서**
+    1. 선택(Select)
+    2. 변경(Manipulation)
+- **DOM 관련 객체의 상속 구조**
+  - EventTarget
+    - Event Listener를 가질 수있는 객체가 구현하는 DOM 인터페이스
+  - Node
+    - 여러가지 DOM 타입들이 상속하는 인터페이스
+  - Element
+    - Document 안의 모든 객체가 상속하는 가장 범용적인 인터페이스
+    - 부모인 Node와 그 부모인 EventTarget의 속성을 상속
+  - Document
+    - 브라우저가 불러온 웹 페이지를 나타냄
+    - DOM 트리의 진입점(Entry point) 역할을 수행
+  - HTMLElement
+    - 모든 종류의 HTML 요소
+    - 부모 element의 속성 상속
+
+### DOM 선택
+
+- DOM  선택 관련 메서드
+  - document.**querySelector(selector)**
+    - 제공한 선택자와 일치하는 element 하나 선택
+    - 제공한 CSS selector를 만족한느 첫번째 element 객체를 반환(없다면 null)
+  - document.**querySelectorAll(selector)**
+    - 제공한 선택자와 일치하는 여러 element를 선택
+    - 매칭할 하나 이상의 셀렉터를 포함하는 유효한 CSS selector를 인자(문자열)로 받음
+    - 지정된 셀렉터에 일치하는 NodeList를 반환
+  - getElementById(id)
+  - getElementByTagName(name)
+  - getElementByClassName(names)
+  - querySelector(), querySelectorAll()을 사용하는 이유
+    - id, class 그리고 tag 선택자 등을 모두 사용 가능하므로, 더 구체적이고 유연하게 선택 가능
+    - 예시
+      - document.querySelector('#id')
+      - document.querySelectorAll('.class')
+- 선택 메서드별  반환 타입
+  - 단일 element
+    - getElementById()
+    - querySelector()
+  - HTMLCollection
+    - getElementByTagName()
+    - getElementByClassName()
+  - NodeList
+    - querySelectAll()
+- HTMLColloction과 NodeList
+  - 둘 다 배열과 같이 각 항목에 접근하기 위한 index를 제공(유사 배열)
+  - HTMLCollction: name, id, index 속성으로 각 항목에 접근 가능
+  - NodeList
+    - index로만 각 항목에 접근 가능
+    - 단, HTMLCollction과 달리 배열에서 사용하는 forEach 메서드 및 다양한 메서드 사용 가능
+  - 둘 다 Live Collection으로 DOM의 변경사항을 실시간으로 반영하지만, querySelectAll()에 의해 반환되는 NodeList는 Static Collection으로 실시간으로 반영되지 않음
+- **Collection**
+  - Live Collection
+    - 문서가 바뀔 때 실시간으로 업데이트 됨
+    - DOM의 변경사항을 실시간으로 collection에 반영
+    - ex) HTMLCollection, NodeList
+  - Static Collection(non-live)
+    - DOM이 변경되어도 collection 내용에는 영향을 주지 않음
+    - querySelectorAll()의 반환 NodeList만 static collection
+
+### DOM 변경
+
+- DOM 변경 관련 메서드
+
+  - document.createElement()
+
+    - 작성한 태그 명의 HTML 요소를 생성하여 반환
+
+  - Element.append()
+
+    - 특정 부모 Node의 자식 NodeList 중 마지막 자식 다음에 Noe 객체나 DOMString을 삽입
+    - 여러 개의 Node 객체, DOMString을 추가할 수 있음
+    - 반환 값이 없음
+
+  - Node.appendChild()
+
+    - 한 Node를 특정 부모 Node의 자식 NodeList 중 마지막 자식으로 삽입(Node만 추가 가능)
+    - 한번에 오직 하나의 Node만 추가할 수 있음
+    - 만약 주어진 Node가 이미 문서에 존재하는 다을ㄴ Node를 참조한다면 새로운 위치로 이동
+
+  - ParentNode.append() vs Node.appendChild()
+
+    | ParentNode.append()               | Node.appendChild()           |
+    | --------------------------------- | ---------------------------- |
+    | DOM String 객체 추가 가능         | Node 객체만 허용             |
+    | 반환 값 없음                      | 추가된 Node 객체 반환        |
+    | 여러 Node 객체와 문자열 추가 가능 | 하나의 Node 객체만 추가 가능 |
+
+- 변경 관련 속성(property)
+
+  - Node.innerText
+    - Node 객체와 그 자손의 텍스트 컨텐츠(DOMString)를 표현(해당 요소 내부의 raw text)(사람이 읽을 수 있는 요소만 남김)
+    - 즉, 줄 바꿈을 인식하고 숨겨진 내용을 무시하는 등 최종적으로 스타일링이 적용된 모습으로 표현
+  - Element.innerHTML
+    - 요소(element) 내에 포함된 HTML 마크업을 반환
+    - [참고] XSS 공격에 취약하므로 사용 시 주의
+      - XSS(Cros-site Scripting)
+        - 공격자가 입력요소를 사용하여(\<input>) 웹 사이트 클라이언트 측 코드에 악성 스크립트를 삽입해 공격하는 방법
+        - 피해자(사용자)의 브라우저가 악성 스크립트를 실행하며 공격자가 엑세스 제어를 우회하고 사용자를 가장할 수 있도록 함
+
+### DOM 삭제
+
+- 삭제 관련 메서드
+  - ChildNode.remove()
+    - Node가 속한 트리에서 해당 Node를 제거
+  - Node.removeChild()
+    - DOM에서 자식 Node를 제거하고 제거된 Node를 반환
+    - Node는 인자로 들어가는 자식 Node의 부모 Node
+
+### DOM 속성
+
+-  속성 관련 메서드
+
+  - Element.setAttribute(name, value)
+
+    - 지정된 요소의 값을 설정
+    - 속성이 이미 존재하면 값을 갱신,  존재하지 않으면 지정된 이름과 값으로 새 속성을 추가
+
+  - Element.getAttribute(attributeName)
+
+    - 해당 요소의 지정된 값(문자열)을 반환
+    - 인자(attributeName)는 값을 얻고자 하는 속성의 이름
+
+    
+
+## Event Listener
+
+### Event
+
+- 개념
+
+  - <u>네트워크 활동이나 사용자와의 상호작용</u> 같은 **사건의 발생**을 알리기 위한 객체
+  - 이벤트 발생
+    - 마우스를 클릭하거나 키보드를 누르는 등 사용자 행동으로 발생할 수 있음
+    - 특정 메서드를 호출(Element.click())하여 프로그래밍적으로도 만들어낼 수 있음
+
+- Event 기반 인터페이스
+
+  - AnimationEvent, ClipboardEvent, DragEvent 등
+  - UIEvent
+    - 간단한 사용자 인터페이스 이벤트
+    - Event의 상속을 받음
+    - MouseEvent, KeyboardEvent, InputEvent, FocusEvent 등의 부모 객체 역할을 함
+
+- Event의 역할
+
+  - ~하면 ~한다	ex) 클릭하면 경고창을 띄운다
+
+    -> 특정 이벤트가 발생하면 할 일을 **등록**한다
+
+- Event handler
+
+  - EventTarget**.addEventListener()**
+
+    - 지정한 이벤트가 대상에 전달될 **때마다** 호출할 **함수를 설정**	(함수===일(동작)의 명세)
+    - 이벤트를 지원하는 모든 객체(Element, Document, Window 등)를 대상으로 지정 가능
+    - DOM 관력 객체의 상속 구조에서, EventTarget이 가장 최상단에 위치 => 모든 요소에 이벤트를 달아줄 수 있다
+
+  - target**.addEventListener(type, listener**[, options]**)**
+
+    > 대상(EventTarget)에 특정 이벤트(type)가 발생하면, 할 일을 등록하자(listener)
+
+    - type: 반응할 이벤트 유형(대소문자 구분 문자열)
+    - listener: 지정된 타입의 이벤트가 발생했을 때 알림을 받는 객체
+      EventListener 인터페이스 혹은 JS function 객체(<u>콜백 함수</u>)여야 함
+
+- Event 취소: enent.preventDefault()
+
+  - 현재 이벤트의 기본 동작을 중단
+  - HTML 요소의 기본 동작을 작동하지 않게 막음
+    - ex) a 태그의 기본 동작은 클릭 시 링크로 이동 / form 태그의 기본 동작은 form 데이터  전송
+  - 이벤트를 취소할 수 잇는 경우, 이벤트의 전파를 막지 않고 그 이벤트를 취소
+  - 취소할 수 없는 이벤트도 존재
+    - 이벤트의 취소 가능 여부는 event.cancelable을 사용해 확인할 수 있음
+
+  
+
+  
