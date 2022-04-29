@@ -129,6 +129,19 @@ let num = 70		//재선언 -> 불가
 - 할당: **선언된 변수에 값을 저장**하는 행위 또는 시점
 - 초기화: **선언된 변수에 <u>처음으로</u> 값을 저장**하는 행위 또는 시점
 
+[참고] 출력
+
+```javascript
+//대화상자 -> 사용하기 편하나 스크립트 일시 정지 됨, 스타일링 불가
+alert()			//알려준다.(경고창을 띄운다)
+prompt()		//입력받음. 입력하지 않고 취소 시 null 값 반환. 
+prompt('today', '04-')	//2번째 인자로 default 값 설정 가능. 입력 칸에 디폴트 값 쓰여있다.
+confirm()		//확인받음. 취소 선택 시 false, 확인 선택 시 true 반환
+
+//console
+console.log()	//log를 찍는다. ,로 연결하여 여러개를 한 번에 출력할 수 있다
+```
+
 #### var
 
 ```javascript
@@ -207,6 +220,7 @@ console.log(number)	//50
 - [참고] NaN(Not-A-Number)
   - **계산 불가능**한 경우 **반환**되는 값
     - ex. 'Angel'/1004 => NaN
+- [참고] console.log(1/0) 결과: Infinity
 
 ##### 문자열 타입
 
@@ -225,6 +239,9 @@ console.log(fullName)	//Gildong Hong
   - ES6부터 지원
   - 따옴표 대신 backtick(``)으로 표현
   - ${ expression } 형태로 표현식 삽입 가능
+- [참고]
+  - 문자열 + 문자열의 결과: 문자열
+  - 문자열 + 숫자의 결과: 문자열 
 
 ##### undefined
 
@@ -258,19 +275,33 @@ console.log(fullName)	//Gildong Hong
 
     - 자동 형변환 규칙
 
-      | 데이터 타입 | 거짓       | 참               |
-      | ----------- | ---------- | ---------------- |
-      | Undefined   | 항상 거짓  | X                |
-      | Null        | 항상 거짓  | X                |
-      | Number      | 0, -0, NaN | 나머지 모든 경우 |
-      | String      | 빈 문자열  | 나머지 모든 경우 |
-      | Object      | X          | 항상 참          |
+      | 데이터 타입 | 거짓        | 참               |
+      | ----------- | ----------- | ---------------- |
+      | Undefined   | 항상 거짓   | X                |
+      | Null        | 항상 거짓   | X                |
+      | Number      | 0, -0, NaN  | 나머지 모든 경우 |
+      | String      | 빈 문자열'' | 나머지 모든 경우 |
+      | Object      | X           | 항상 참          |
 
       조건문 또는 반복문에서 표현식의 결과가 참/거짓으로 판별되는 경우 발생
 
 #### 참조 타입(Reference type)
 
 - [함수](#함수), [배열](#배열), [객체](#객체)
+
+### 명시적 형 변환
+
+- String(): 문자형으로 형 변환
+- Number(): 숫자형으로 형 변환
+  - ex)
+    - Number('12ab') -> NaN
+    - Number('a') -> NaN
+    - **Number(null) -> 0**
+    - Number(undefined) -> NaN
+- Boolean(): 불린형으로 형 변환
+  - ex)
+    - Boolean('0') -> true
+    - Boolean(' ') -> true
 
 
 
@@ -289,11 +320,24 @@ console.log(x)	//2
 ```
 
 - 오른쪽에 있는 피연산자의 평가 결과를 왼쪽 피연산자에 할당하는 연산자
+
 - 다양한 연산에 대한 단축 연산자 지원
+
 - [참고] Increment 및 Decrement 연산자
+  
   - Increment(++): 피연산자의 값을 1 증가시키는 연산자
   - Decrement(--): 연산자의 값을 1 감소시키는 연산자
   - ++, -- 보다 += 또는 -=와 같이 더 분명한 표현으로 적을 것을 권장
+  
+  ```javascript
+  let num1 = 10
+  let result1 = num1++
+  console.log(result1)	//10
+  
+  let num2 = 10
+  let result2 = ++num2
+  console.log(result2)	//11
+  ```
 
 ### 비교 연산자
 
@@ -344,7 +388,7 @@ console.log(c==d)	//false
 
 - 두 피연산자가 같은 값으로 평가되는지 비교 후 boolean 값을 반환
 - **엄격한 비교**가 이뤄지며 <u>암묵적 타입 변환이 발생하지 않음</u>
-  - 엄격한 비교: 두 비교 대상의 **타입과 값 모두 같은지 비교**하는 방식
+  - 엄격한 비교: 두 비교 대상의 **<u>타입</u>과 값 모두 같은지 비교**하는 방식
 - 두 피연산자가 <u>모두 객체</u>일 경우 **메모리의 같은 객체를 바라보는지 판별**
 
 ### 논리 연산자
@@ -360,8 +404,14 @@ console.log(!'hi')		//false
 
 - 세 가지 논리 연산자로 구성
   - **and** 연산은 '**&&**' 연산자를 이용
+    - 모두 true일 때 true
+    - 첫번째 false를 발견하는 즉시 평가 멈춤
   - **or** 연산은 '**||**' 연산자를 이용
+    - 모두 false일 때 false
+    - 첫번째 true를 발견하는 즉시 평가 멈춤
   - **not** 연산은 '**!**' 연산자를 이용
+  
+  **and, or은 사용 불가!**
 - 단축 평가 지원
   - 예시
     - false && true => false
@@ -442,6 +492,16 @@ while (condition){
 - 조건은 소괄호 안에 작성
 - 실행할 코드는 중괄호 안에 작성
 - 블록 스코프 생성
+
+#### do ... while
+
+```javascript
+do {
+    //do something
+} while (condition)
+```
+
+- 적어도 한 번은 실행한다.
 
 #### for
 
@@ -542,6 +602,9 @@ for (let fruit of fruits){
 | for ... in | 반복문 | 객체 순회             | 블록 스코프 |
 | for ... of | 반복문 | 배열 등 iterable 순회 | 블록 스코프 |
 
+- break: 멈추고 빠져나옴
+- continue: 멈추고 다음 반복으로 진행
+
 
 
 ## 함수
@@ -565,12 +628,11 @@ function name(args) {
 
 function add(num1,  num2){
     return num1+num2
-}
+}	//return 값 없다면 undefined 반환
 add(1, 2)
 ```
 
 - 함수의 이름과 함께 정의하는 방식
-- 익명함수로 
 - 3가지 부분으로 구성
   - 함수의 이름(name)
   - 매개변수(args)
@@ -683,7 +745,7 @@ function add (num1, num2) {
 ```
 
 - 함수  선언식으로 선언한 함수는 var로 정의한 변수처럼 hoisting 발생
-- 함수 호출이후에 선언해도 동작
+- 함수 호출 이후에 선언해도 동작(선언한 함수들은 맨 처음에 실행되기 때문이다)
 
 ##### 함수 표현식
 
@@ -1128,11 +1190,36 @@ console.log(isEveryNumberEven)	//false
 ### 객체의 정의와 특징
 
 - 객체는 속성의 집합이며 중괄호 내부에 key와 vlue의 쌍으로 표현
+
 - **key**는 **문자열 타입**만 가능
+  
   - key이름에 띄어쓰기 등의  구분자가 있으면 따옴표로 묶어서 표현
+  
 - **value**는 **모든 타입(함수 포함)** 가능
+
 - 객체 요소 접근은 점 또는 대괄호로 가능
+  
   - key이름에 띄어쓰기 같은 구분자가 있으면 따옴표로 묶어서 표현
+  
+- 객체에 접근, 추가, 삭제
+
+  ```javascript
+  const me = {
+      firstName: '길동',
+      lastName:  '홍',
+  }
+  
+  console.log(me.firstName) //접근
+  console.log(me['firstName'])
+  me.gender = 'male'		 //추가
+  me['hair'] = 'black'
+  delete me.hair			 //삭제
+  
+  for (let key in me){
+      console.log(key)
+      console.log(superman[key])	//console.log(superman.key)는 안됨.
+  }
+  ```
 
 ### 객체와 메서드
 
@@ -1147,6 +1234,12 @@ const me = {
         return this.firstName + this.lastName
     }
 }
+
+console.log(me.firstName) //접근
+console.log(me['firstName'])
+me.gender = 'male'		 //추가
+me['hair'] = 'black'
+delete me.hair			 //삭제
 ```
 
 - 메서드는 객체의 속성이 참조하는 함수
