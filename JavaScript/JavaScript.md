@@ -21,15 +21,32 @@
 
 - DOM(Document Object Model) 조작: 문서(HTML) 조작
   - HTML, XML과 같은 문서를 다루기 위한 프로그래밍 인터페이스
+
   - 문서를 구조화하고, 구조화된 구성 요소를 하나의 객체로 취급하여 다루는 논리적 트리 모델
+
+    ![image-20220430161347025](JavaScript.assets/image-20220430161347025.png)
+
   - 문서가 객체(object)로 구조화되어 있으며 key로 접근 가능
+
   - 단순한 속성 접근, 메서드 활용뿐만 아니라 프로그래밍 언어적 특성을 활용한 조작 가능
+
   - 주요 객체
     - window: DOM을 표현하는 창(브라우저 탭). 최상위 객체(작성 시 생략 가능)
-    - document: 페이지 컨텐츠의 Entry Point 역할을 하며, \<head>, \<body> 등과 같은 수많은 다른 요소들을 포함
+
+    - document: 페이지 컨텐츠의 Entry Point 역할을 하며, \<head>, \<body> 등과 같은 수많은 다른 요소들을 포함. 
+
+      ```javascript
+      document.documentElement	//html에 접근
+      document.body				//body에 접근
+      document.body.style			//CSSStyleDeclaration 객체 나옴. body의 style을 바꿀 수 있다.
+      ```
+
     - navigator, location, history, screen
+
   - DOM - 조작
+    
     - ex) JavaScript로 document의 title을 바꿀 수 있다 
+    
   - DOM - 해석
     - 파싱(Parsing)
       - 구문 분석, 해석
@@ -106,6 +123,7 @@ console.log(x)		//1
 
 - if, for, 함수 등의 **중괄호 내부**를 가리킴
 - 블록 스코프를 가지는 변수는 **블록 바깥에서 접근 불가능**
+  - 코드 블록: 함수, if 문, for 문, while문, try/catch 문 등
 
 [참고] 선언, 할당, 초기화
 
@@ -162,7 +180,7 @@ console.log(number)	//50
   - **호이스팅**
 
     ```javascript
-    console.log(username)	//undefined
+    console.log(username)	//undefined -> 선언은 호이스팅되지만, 할당은 호이스팅되지 않기 떄문
     var username = '홍길동'
     
     console.log(email)		//Uncaught ReferenceError
@@ -173,6 +191,8 @@ console.log(number)	//50
     ```
 
     - 변수를 **선언 이전에 참조할 수 있는 현상**
+    - 스코프 내부 어디서든 변수 선언은 최상위에 선언된 것처럼 행동
+      - let과 const는 TDZ(Temporal Dead Zone)의 영향을 받는다. 할당 전에는 사용할 수 없다. 호이스팅은 스코프 단위로 일어난다.
     - **변수 선언 이전의 위치에서 접근 시 undefined를 반환**
 
 - 함수 스코프
@@ -184,8 +204,16 @@ console.log(number)	//50
   }
   
   console.log(x)	//ReferenceError: x is not defined
+  
   ```
 
+const value = 20
+  if (value>=13){
+      var txt = 'good'
+  }
+  console.log(txt)	//good
+  ```
+  
   - **함수의 중괄호 내부**를 가리킴
   - 함수 스코프를 가지는 변수는 **함수 바깥에서 접근 불가능**
 
@@ -224,13 +252,13 @@ console.log(number)	//50
 
 ##### 문자열 타입
 
-```javascript
+​```javascript
 const firstName = 'Gildong'
 const lastName  = 'Hong'
 const fullName = `${firstName} ${lastName}`
 
 console.log(fullName)	//Gildong Hong
-```
+  ```
 
 - **텍스트 데이터**를 나타내는 타입
 - 16비트 유니코드 문자의 집합
@@ -1391,6 +1419,39 @@ getFullName()		//NaN		this===window
     - this는 해당 메서드가 소속된 객체를 가리킴
   - 위의 두가지 경우를 제외하면 모두 최상위 객체(window)를 가리킴
 
+```javascript
+//user.name을 지양해야 하는 이유 
+const user = {
+    name: 'Mike',
+    sayHello(){
+        console.log(`Hello, ${user.name}`)
+    }
+}
+
+let man = user	//객체를 man, user로 접근할 수 있다
+user = null		//이제는 man으로만 객체에 접근 가능
+man.sayHello()	//user가 없어졌기 때문에 user.name에 접근 불가
+```
+
+[참고] 생성자 함수: 유사한 객체를 여러개 만들어야 할 때 사용 
+
+```javascript
+function User(name, age){ 	//new를 사용해 호출하면 다음과 같이 동작
+    //this = {}
+    this.name = name			//this에 property 추가
+    this.age = age		
+   	this.sayName = function(){
+        console.log(this.name)
+    }
+    //return this
+}
+let user1 = new User('Mike', 30)
+let user2 = new User('Jake', 46)
+//new 연산자를 사용해서 호출
+console.log(user1)	//User {name:'Mike', age: 30}
+user1.sayName()		
+```
+
 ### function 키워드와 화살표 함수 차이
 
 ```javascript
@@ -1425,8 +1486,9 @@ const obj ={
 
   -> 이 콜백함수 내부에서 this.pi에 접근하기 위해서 <u>함수객체.bind(this) 메서드를 사용</u>
 
-  => 이 <u>번거로운 과정을 없앤 것</u>이 **화살표 함수**
+  ​		(bind: this가 내가 정한 object로 고정됨 ex. A.bind(B): A에서 this는 B로 고정)
 
+  => 이 <u>번거로운 과정을 없앤 것</u>이 **화살표 함수**
 
 - 함수  내부에 this 키워드가 존재할 경우
 
@@ -1537,12 +1599,13 @@ const obj ={
     - Event Listener를 가질 수있는 객체가 구현하는 DOM 인터페이스
   - Node
     - 여러가지 DOM 타입들이 상속하는 인터페이스
-  - Element
-    - Document 안의 모든 객체가 상속하는 가장 범용적인 인터페이스
-    - 부모인 Node와 그 부모인 EventTarget의 속성을 상속
-  - Document
-    - 브라우저가 불러온 웹 페이지를 나타냄
-    - DOM 트리의 진입점(Entry point) 역할을 수행
+  - Element / Document
+    - Element
+      - Document 안의 모든 객체가 상속하는 가장 범용적인 인터페이스
+      - 부모인 Node와 그 부모인 EventTarget의 속성을 상속
+    - Document
+      - 브라우저가 불러온 웹 페이지를 나타냄
+      - DOM 트리의 진입점(Entry point) 역할을 수행
   - HTMLElement
     - 모든 종류의 HTML 요소
     - 부모 element의 속성 상속
@@ -1550,38 +1613,100 @@ const obj ={
 ### DOM 선택
 
 - DOM  선택 관련 메서드
+
+  ```javascript
+  document.querySelectorAll('.link')	//클라스명이 link인 요소들 모두 선택
+  document.querySelector('#first')	//아이디가 first인 요소 선택
+  document.querySelector('h3: nth-of-type(2)')	//2번째 h3만 선택
+  const pList = document.querySelector('p:nth-of-type(2n)')		//짝수번째 p 태그만 선택
+  for (p of pList){
+      p.style.backgroundColor = '#000'	//배경 검정색
+      p.style.color = '#fff'				//글씨 흰색
+  }
+  
+  const el = document.getElementById('first')
+  el	//<p id="first">...</p>
+  
+  const pList = document.getElementsByTagname('p')	//모든 p태그에 접근
+  
+  for (p of pList){	//모든 p태그의 폰트 크기를 30px로 바꾸기
+      p.style.fontSize = '30px'
+  }
+  ```
+
   - document.**querySelector(selector)**
     - 제공한 선택자와 일치하는 element 하나 선택
-    - 제공한 CSS selector를 만족한느 첫번째 element 객체를 반환(없다면 null)
+    - 제공한 CSS selector를 만족하는 <u>첫번째 element 객체</u>를 반환(없다면 null)
+
   - document.**querySelectorAll(selector)**
     - 제공한 선택자와 일치하는 여러 element를 선택
     - 매칭할 하나 이상의 셀렉터를 포함하는 유효한 CSS selector를 인자(문자열)로 받음
     - 지정된 셀렉터에 일치하는 NodeList를 반환
+
   - getElementById(id)
-  - getElementByTagName(name)
-  - getElementByClassName(names)
+
+  - getElement<u>s</u>ByTagName(name)
+
+  - getElement<u>s</u>ByClassName(names)
+
   - querySelector(), querySelectorAll()을 사용하는 이유
     - id, class 그리고 tag 선택자 등을 모두 사용 가능하므로, 더 구체적이고 유연하게 선택 가능
     - 예시
       - document.querySelector('#id')
       - document.querySelectorAll('.class')
+
+  - [참고] 부모, 자식, 형제 노드 접근
+
+    ```javascript
+    const red = document.getElementById('red')
+    red.parentNode				//부모노드 반환(NodeList)
+    red.parentElement			//부모노드 중 요소노드 반환(HTMLCollection)
+    red.previousSibling			//이전 형제 노드
+    red.nextSibling				//다음 형제 노드
+    
+    const ul = document.getElementById('color')
+    ul.ChildNodes				//자식노드 반환(NodeList)-예외적으로 실시간 반영됨- 
+    //space나 줄바꿈은 text 노드로, 주석은 comment 노드로 잡힘.
+    ul.firstChild				//첫번째 노드 가져옴
+    ul.lastChild				//마지막 노드 가져옴
+    
+    ul.children					//자식노드 중 요소노드 반환(HTMLCollection)
+    ul.firstElementChild		//첫번째 요소노드 가져옴
+    ul.lastElementChild			//마지막 요소노드 가져옴
+    red.previousElementSibling	//이전 형제 요소 노드
+    red.nextElementSibling		//다음 형제 요소 노드
+    ```
+
+    |      | 모든 노드                                 | 요소 노드만                                           |
+    | ---- | ----------------------------------------- | ----------------------------------------------------- |
+    | 부모 | parentNode                                | parentElement                                         |
+    | 자식 | childNodes<br />firstChild<br />lastChild | children<br />firstElementChild<br />lastElementChild |
+    | 형제 | previousSibling<br />nextSibling          | previousElementSibling<br />nextElementSibling        |
+
 - 선택 메서드별  반환 타입
+
   - 단일 element
     - getElementById()
     - querySelector()
   - HTMLCollection
-    - getElementByTagName()
-    - getElementByClassName()
+    - getElementsByTagName()
+    - getElementsByClassName()
   - NodeList
     - querySelectAll()
+
 - HTMLColloction과 NodeList
   - 둘 다 배열과 같이 각 항목에 접근하기 위한 index를 제공(유사 배열)
-  - HTMLCollction: name, id, index 속성으로 각 항목에 접근 가능
+  - HTMLCollection
+    - name, id, index 속성으로 각 항목에 접근 가능
   - NodeList
+    - 배열이 아닌 iterable한 collection. for...of 사용 가능
     - index로만 각 항목에 접근 가능
     - 단, HTMLCollction과 달리 배열에서 사용하는 forEach 메서드 및 다양한 메서드 사용 가능
-  - 둘 다 Live Collection으로 DOM의 변경사항을 실시간으로 반영하지만, querySelectAll()에 의해 반환되는 NodeList는 Static Collection으로 실시간으로 반영되지 않음
+      - length 사용 가능. 그러나 push, pop, filter, join 등은 사용 불가.(Uncaught TypeError 발생)
+  - 둘 다 Live Collection으로 DOM의 변경사항을 실시간으로 반영하지만, <u>querySelectAll()에 의해 반환되는 NodeList는 Static Collection으로 **실시간으로 반영되지 않음**</u>
+
 - **Collection**
+
   - Live Collection
     - 문서가 바뀔 때 실시간으로 업데이트 됨
     - DOM의 변경사항을 실시간으로 collection에 반영
@@ -1592,6 +1717,18 @@ const obj ={
 
 ### DOM 변경
 
+```javascript
+const newLi = document.createElement('li')
+newLi.innerHTML = 'green'
+const ul = document.getElementById('color')
+ul.appendChild(newLi)
+
+const newLi2 = document.createElement('li')
+const newText = document.createTextNode('pink')
+newLi2.appendChild(newText)	//li태그에 텍스트 'pink'를 넣어준다
+ul.appendChild(newLi2)		//ul에 li태그를 집어넣어준다
+```
+
 - DOM 변경 관련 메서드
 
   - document.createElement()
@@ -1600,7 +1737,8 @@ const obj ={
 
   - Element.append()
 
-    - 특정 부모 Node의 자식 NodeList 중 마지막 자식 다음에 Node 객체나 DOMString을 삽입
+    - 특정 부모 Node의 자식 NodeList 중 <u>마지막 자식 다음</u>에 Node 객체나 DOMString을 삽입
+      - 특정 위치에 삽입하고 싶다면 insertBefore 메서드를 사용한다
     - 여러 개의 Node 객체, DOMString을 추가할 수 있음
     - 반환 값이 없음
 
@@ -1608,7 +1746,7 @@ const obj ={
 
     - 한 Node를 특정 부모 Node의 자식 NodeList 중 마지막 자식으로 삽입(Node만 추가 가능)
     - 한번에 오직 하나의 Node만 추가할 수 있음
-    - 만약 주어진 Node가 이미 문서에 존재하는 다을ㄴ Node를 참조한다면 새로운 위치로 이동
+    - 만약 주어진 Node가 이미 문서에 존재하는 다른 Node를 참조한다면 새로운 위치로 이동
 
   - ParentNode.append() vs Node.appendChild()
 
@@ -1626,7 +1764,7 @@ const obj ={
   - Element.innerHTML
     - 요소(element) 내에 포함된 HTML 마크업을 반환
     - [참고] XSS 공격에 취약하므로 사용 시 주의
-      - XSS(Cros-site Scripting)
+      - XSS(Cross-site Scripting)
         - 공격자가 입력요소를 사용하여(\<input>) 웹 사이트 클라이언트 측 코드에 악성 스크립트를 삽입해 공격하는 방법
         - 피해자(사용자)의 브라우저가 악성 스크립트를 실행하며 공격자가 엑세스 제어를 우회하고 사용자를 가장할 수 있도록 함
 
@@ -1696,7 +1834,7 @@ const obj ={
     - listener: 지정된 타입의 이벤트가 발생했을 때 알림을 받는 객체
       EventListener 인터페이스 혹은 JS function 객체(<u>콜백 함수</u>)여야 함
 
-- Event 취소: enent.preventDefault()
+- Event 취소: event.preventDefault()
 
   - 현재 이벤트의 기본 동작을 중단
   - HTML 요소의 기본 동작을 작동하지 않게 막음
@@ -1704,3 +1842,46 @@ const obj ={
   - 이벤트를 취소할 수 잇는 경우, 이벤트의 전파를 막지 않고 그 이벤트를 취소
   - 취소할 수 없는 이벤트도 존재
     - 이벤트의 취소 가능 여부는 event.cancelable을 사용해 확인할 수 있음
+
+```html
+<!-- Event handler 할당 예시 -->
+<button onclick="alert('click')">클릭</button>
+
+<button onclick="sayHello()">클릭</button>
+
+<button id="bin">클릭</button>
+<script>
+	function sayHello(){
+        alert("Hello")
+    }
+    
+    const el = document.getElementById('bin')
+    el.onclick = sayHello	//sayHello: 함수 값 넘김. sayHello(): 함수의 반환값(undefined) 넘김
+    
+    el.addEventListener("click", sayHello)
+    
+    el.addEventListener("click", () => {
+        alert("hi")
+    })
+</script>
+
+<!--addEventListener-->
+<input id = 'txt' type = 'text'>
+<script>
+const input = document.getElementById("txt")
+input.addEventListener("keyup", event => {
+	console.log(event)	//여러 정보를 받을 수 있다
+})
+</script>
+
+<!--event 취소-->
+<input type="checkbox" id="my-checkbox">
+<script>
+const checkBox = document.querySelector('#my-checkbox')
+    
+    checkBox.addEventListener('click', function (event) {
+      event.preventDefault()
+      console.log(event)
+    })
+</script>
+```
