@@ -205,17 +205,16 @@ console.log(number)	//50
   
   console.log(x)	//ReferenceError: x is not defined
   
+  const value = 20
+    if (value>=13){
+        var txt = 'good'
+    }
+    console.log(txt)	//good
   ```
-
-const value = 20
-  if (value>=13){
-      var txt = 'good'
-  }
-  console.log(txt)	//good
-  ```
+    - **함수의 중괄호 내부**를 가리킴
+    - 함수 스코프를 가지는 변수는 **함수 바깥에서 접근 불가능**
   
-  - **함수의 중괄호 내부**를 가리킴
-  - 함수 스코프를 가지는 변수는 **함수 바깥에서 접근 불가능**
+- 키워드 별 비교
 
 | 키워드 | 재선언 | 재할당 | 스코프          | 비고         |
 | ------ | ------ | ------ | --------------- | ------------ |
@@ -252,7 +251,7 @@ const value = 20
 
 ##### 문자열 타입
 
-​```javascript
+  ```javascript
 const firstName = 'Gildong'
 const lastName  = 'Hong'
 const fullName = `${firstName} ${lastName}`
@@ -492,9 +491,9 @@ switch(expression){
         //do something
         break
     }
-    [default:{
+    default:{
      	//do something
-     }]
+    }
 }
 ```
 
@@ -914,7 +913,7 @@ str.trimEnd()	//'  a santa'
 ### 배열의 정의와 특징
 
 - 키와 속성들을 담고 있는 참조 타입의  **객체(object)**
-  - 배열은 인덱스를 키로 가지며 length 프로퍼티를 갖는 특수항 객체
+  - 배열은 인덱스를 키로 가지며 length 프로퍼티를 갖는 특수한 객체
 - 순서를 보장하는 특징이 있음
 - 주로 대괄호를 이용하여 생성하고, 0을 포함한 양의 정수 인덱스로 특정 값에 접근 가능
   - 파이썬과 달리 -1을 사용하여 마지막 요소에 접근할 수 없다
