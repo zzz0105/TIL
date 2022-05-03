@@ -64,14 +64,14 @@
   ```html
   <button>버튼</button>
   <script>
-  	const btn = document.querySelector('button')
+    const btn = document.querySelector('button')
       
-      btn.addEventListener('click', function(){
-          alert('You clicked me!')
-          const pElem = document.createElement('p')
-          pElem.innerText = 'sample text'
-          document.body.appendChild(pElem)
-      })
+    btn.addEventListener('click', function(){
+      alert('You clicked me!')
+      const pElem = document.createElement('p')
+      pElem.innerText = 'sample text'
+  	document.body.appendChild(pElem)
+    })
   </script>
   <!--
   <-btn 클릭->
@@ -93,14 +93,14 @@
   ```html
   <button>버튼</button>
   <script>
-  	const request = new XMLHttpRequest()
-      const URL = 'https://jsonplaceholder.typicode.com/todos/1/'
+    const request = new XMLHttpRequest()
+    const URL = 'https://jsonplaceholder.typicode.com/todos/1/'
   
-      request.open('GET', URL)
-      request.send()					//XMLHttpRequest 요청
+    request.open('GET', URL)
+    request.send()					//XMLHttpRequest 요청
   
-      const todo = request.response	//빈 응답 값을 todo에 할당
-      console.log(`data: ${todo}`)	//console log 실행
+    const todo = request.response	//빈 응답 값을 todo에 할당
+    console.log(`data: ${todo}`)	//console log 실행
   </script>
   <!--
   <-XMLHttpRequest 요청(언제 응답을 받는지 알 수 없음)->
@@ -114,7 +114,7 @@
   - 그렇다면 JS는 왜 기다려주지 않는 방식으로 동작하는가?
     - => "JavaScript는 single threaded"
   - 왜 비동기(Asynchronous)를 사용하는가?
-    - "사용자 경험"
+    - "인간 중심으로 설계된 사용자 경험(human-centered design with UX)"
       - 매우 큰 데이터를 동반하는 앱이 있다고 가정
       - 동기식 코드라면 데이터를 모두 불러온 뒤 앱이 실행됨
         - 즉, 데이터를 모두 불러올 때까지는 앱이 모두 멈춘 것처럼 보임
@@ -215,7 +215,10 @@
     - 인자로 넘길 수 있어야 함
     - 함수의 반환 값으로 사용할 수 있어야 함
     - 변수에 할당할 수 있어야 함
-- Async callbacks
+
+### Async callbacks
+
+- Async callbacks란?
   - 백그라운드에서 코드 실행을 시작할 함수를 호출할 때 인자로 지정된 함수
   - 백그라운드 코드 실행이 끝나면 callback 함수를 호출하여 작업이 완료되었음을 알리거나, 다음 작업을 실행하게 할 수 있음
     - ex) addEventListener()의 두 번째 매개변수
@@ -236,3 +239,183 @@
     3. Handle every single error(모든 단일 오류 처리)
     4. **Promise callbacks(Promise 콜백 방식 사용)**
 
+### Promise
+
+- Promise object
+
+  ```javascript
+  const myPromise = axios.get(URL)
+  
+  myPromise
+    .then(response => {
+  	return response.data
+    })
+  
+  //chaining
+  axios.get(URL)
+    .then(response => {		//성공에 대한 약속
+      return response.data
+    })
+    .then(response => {		//실패에 대한 약속
+      return response.title
+    })
+    .catch(error => {
+      console.log(error)
+    })
+    .finally(function() {
+      console.log('무조건 실행')
+    })
+  ```
+
+  - 비동기 작업의 최종 완료 또는 실패를 나타내는 객체
+    - 미래의 완료 또는 실패와 그 결과 값을 나타냄
+    - 미래의 어떤 상황에 대한 약속
+  - 성공(이행)에 대한 약속: **.then()**
+  - 실패(거절)에 대한 약속: **.catch()**
+
+- Promise methods
+
+  - **.then(callback)**
+    - 이전 작업(promise)이 성공했을 때(이행했을 때) 수행할 작업을 나타내는 callback 함수
+    - 그리고 각 callback 함수는 이전 작업의 성공 결과를 인자로 전달받음
+    - 따라서 성공했을 때의 코드를 callback 함수 안에 작성
+  - **.catch(callback)**
+    - .then이 하나라도 실패하면(거부 되면) 동작(동기식의 'try-except' 구문과 유사)
+    - 이전 작업의 실패로 인해 생성된 error 객체는 catch 블록 안에서 사용할 수 있음
+    - 각각의 .then()블록은 서로 다른 promise를 반환
+      - 즉, .then()을 여러 개 사용(chaining)하여 연쇄적인 작업을 수행할 수 있음
+      - 결국 여러 비동기 작업을 차례대로 수행할 수 있다는 뜻
+    - .then()과 .catch() 메서드는 모두 promise를 반환하기 때문에 chaining이 가능
+    - [주의]
+      - **반환 값이 반드시 있어야 함**
+      - 없다면 callback 함수가 이전의 promise 결과를 받을 수 없음
+  - **.finally(callback)**
+    - Promise 객체를 반환
+    - 결과와 상관없이 무조건 지정된 callback 함수가 실행
+    - 어떠한 인자도 전달받지 않음
+      - Promise가 성공되었는지 거절되었는지 판단할 수 없기 때문
+    - 무조건 실행되어야 하는 절에서 활용
+      - .then()과 .catch() 블록에서의 코드 중복을 방지
+
+- Promise가 보장하는 것
+
+  >  Async callback 작성 스타일과 달리 Promise가 보장하는 특징
+
+  1. callback 함수는 JavaScript의 Event Loop가 현재 실행 중인 Call Stack을 완료하기 이전에는 절대 호출되지 않음
+     - Promise callback 함수는 Event Queue에 배치되는 엄격한 순서로 호출됨
+  2. 비동기 작업이 성공하거나 실패한 뒤에 .then() 메서드를 이용하여 추가한 경우에도 1번과 똑같이 동작
+  3. .then()을 여러 번 사용하여 여러 개의 callback 함수를 추가할 수 있음(Cahining)
+     - 각각의 callback은 주어진 순서대로 하나하나 실행하게 됨
+     - Chaining은 Promise의 가장 뛰어난 장점
+
+## Axios
+
+> Promise based HTTP client for the browser and Node.js
+
+- Axios란?
+
+  ```html
+  <!-- Axios CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  ```
+
+  ```javascript
+  //사용법
+  axios.get('https://jsonplaceholder.typicode.com/todos/1/')	//Promise return
+    .then(...)
+    .catch(...)
+  ```
+
+  - 브라우저를 위한 Promise 기반의 클라이언트
+  - 원래는 "XHR" 이라는 브라우저 내장 객체를 활용해 AJAX 요청을 처리하는데, 이보다 편리한 AJAX 요청이 가능하도록 도움을 줌
+    - 확장 가능한 인터페이스와 함께 패키지로 사용이 간편한 라이브러리를 제공
+
+- GET
+
+  ```javascript
+  const URL = 'https://jsonplaceholder.typicode.com/todos/1/'
+  
+  axios.get(URL)
+    .then(function (response) {		
+      return response.data
+    })
+    .then(function (data) {		
+      return data.title
+    })
+    .catch(function (title) {
+      console.log(title)
+    })
+    .finally(function() {
+      console.log('무조건 실행')
+    })
+  ```
+
+- POST
+
+  ```javascript
+  //방법1
+  const URL = '<URL 주소>'
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+  axios({
+  	method: 'post',
+      url: URL, 
+  	headers: {'X-CSRFToken': csrftoken}
+    })
+    .then(response => {
+  	//성공 시 수행할 코드
+    })
+    .catch(error => {
+  	//실패 시 수행할 코드
+    })
+  
+  //방법2
+  axios.post("URL", {
+  	//data
+    })
+    .then(function (response) {
+  	//성공 시 수행할 코드
+    })
+    .catch(function (response) {
+  	//실패 시 수행할 코드
+    })
+  ```
+
+- DELETE
+
+  ```javascript
+  axios.delete(URL)	//'/user?ID=12345'
+    .then(function (response) {
+      //성공 시 수행할 코드
+    })
+    .catch(function (response) {
+      //실패 시 수행할 코드
+    })
+  ```
+
+- PUT
+
+  ```javascript
+  axios.PUT(URL, {	//'/user'
+      //data
+    })
+    .then(function (response) {
+      //성공 시 수행할 코드
+    })
+    .catch(function (response) {
+      //실패 시 수행할 코드
+    })
+  ```
+
+  
+
+## [참고] async & await
+
+- 비동기 코드를 작성하는 새로운 방법
+  - ECMAScript 2017(ES8)에서 등장
+- 기존 Promise 시스템 위에 구축된 syntactic sugar
+  - Promise 구조의 then chaining을 제거
+  - 비동기 코드를 조금 더 동기 코드처럼 표현
+  - Syntactic sugar
+    - 더 쉽게 읽고 표현할 수 있도록 설계된 프로그래밍 언어 내의 구문
+    - 즉, 문법적 기능은 그대로 유지하되 사용자가 직관적으로 코드를 읽을 수 있게 만듦
