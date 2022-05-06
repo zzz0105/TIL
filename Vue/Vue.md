@@ -380,25 +380,26 @@
 
    - 종류
 
-      - v-text
+     - v-text
 
-        ```html
-        <div id="app">
-          <p>{{ message }}</p>
-          <p v-text="message"></p>
-        </div>
+       ```html
+       <div id="app">
+         <p>{{ message }}</p>
+         <p v-text="message"></p>
+       </div>
 
-        <script>
-          const app = new Vue({
-        	el: '#app',
-        	data: {
-        	  message: 'Hello'
-        	}
-          })
-        </script>
-        ```
-        
+       <script>
+         const app = new Vue({
+       	el: '#app',
+       	data: {
+       	  message: 'Hello'
+       	}
+         })
+       </script>
+       ```
+       
      - 엘리먼트의 textContent를 업데이트
+        
         - 내부적으로 interpolation 문법이 v-text로 컴파일 됨
         
       - v-html
@@ -443,7 +444,7 @@
 
         - 조건부 렌더링 중 하나. true일 때 보인다
         - 요소는 항상 렌더링되고 <u>DOM에 남아있음</u>
-        - 단순히 엘리먼트에 display CSS 속성을 <u>토글</u>하는 것
+        - 단순히 엘리먼트에 display CSS 속성을 **토글**하는 것
 
       - v-if, v-else-if, v-else
 
@@ -501,7 +502,8 @@
           <div v-for="(fruit, idx) in fruits" :key="idx">
             {{ idx }} => {{ fruit }} 
           </div>
-        
+          <!--key에 bind 안걸어주고 key="idx"라고 하면 Duplicated keys detected 오류 발생-->	
+            
           <div v-for="todo in todos" :key="`todo-${todo.id}`">
             <p>{{ todo.title }} => {{ todo.completed }}</p>
           </div>
@@ -536,33 +538,163 @@
         ```
 
         - 원본 데이터를 기반으로 엘리먼트 또는 템플릿 블록을 여러 번 렌더링
-        - item in items 구문 사용
+        - **item in items** 구문 사용
         - item 위치의 변수를 각 요소에서 사용할 수 있음
           - 객체의 경우는 key
-        - v-for 사용 시 반드시 <u>key 속성을 각 요소에 작성</u>
+        - v-for 사용 시 반드시 <u>**key 속성**을 각 요소에 작성</u>
         - v-if와 함께 사용하는 경우 v-for가 우선순위가 더 높음
-          - 단, 가능하면 v-if와 v-for를 동시에 사용하지 말 것
+          - <u>단, 가능하면 v-if와 v-for를 동시에 사용하지 말 것</u>
 
       - v-on
+
+        ```html
+        <div id="app">
+            <!-- 메서드 핸들러 -->
+            <button v-on:click="alertHello">Button</button>
+            <button @click="alertHello">Button</button>
+            <!-- 기본 동작 방지 -->
+            <form action="" @submit.prevent="alertHello">
+              <button>GoGo</button>
+            </form>
+        
+            <!-- 키 별칭을 이용한 키 입력 수식어 -->
+            <input type="text" @keyup.enter="log"> <!--첫번째 인자가 event-->
+            <!-- cb 함수에서 특수문법 () -->
+            <input type="text" @keyup.enter="log('s')"> <!--첫번째 인자로 's' 넘김-->
+            
+            <p>{{ message }}</p>
+            <button @click="changeMessage">change message</button>
+          </div>
+          
+          <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+          <script>
+            const app = new Vue({
+              el: '#app',
+              // 값
+              data: {
+                message: 'Hello Vue',
+              },
+              // 행동(함수)
+              methods: {
+                alertHello: function () {
+                  alert('hello')
+                },
+                log: function (something) {
+                  console.log(something)
+                },
+                changeMessage() {
+                  this.message = 'New message!!!'
+                },
+              }
+        
+            })
+          </script>
+        ```
 
         - 엘리먼트에 이벤트 리스너를 연결
         - 이벤트 유형은 전달인자로 표시함
         - 특정 이벤트가 발생했을 때, 주어진 코드가 실행됨
         - 약어(Shorthand)
-          - @
-          - v-on: click -> @click
+          - **@**
+            - v-on: click -> @click
 
       - v-bind
 
-        - HTML 요소의 속성에 Vue의 상태 데이터를 값으로 할당
+        ```html
+        <head>
+          <style>
+            .active {
+              color: red;
+            }
+        
+            .my-background-color {
+              background-color: yellow;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="app">
+            <!-- 속성 바인딩 -->
+            <img v-bind:src="imageSrc" :alt="altMsg">	<!--실제 data의 텍스트와 연결-->
+            <img :src="imageSrc" alt="altMsg">
+            <hr>	<!-- v-bind: === : -->
+        
+            <!-- 클래스 바인딩 -->
+            <div :class="{ active: isRed }"> <!--{ active: if isRed } 느낌. 종속되어 있음-->
+              클래스 바인딩
+            </div>
+        
+            <h3 :class="[activeRed, myBackground]">	<!--key값으로 bind-->
+              hello vue
+            </h3>
+            <hr>
+        
+            <!-- 스타일 바인딩 -->
+            <p :style="{ fontSize: fontSize + 'px' }">
+              this is paragraph
+            </p>
+          </div>
+          
+          <script>
+            const app = new Vue({
+              el: '#app',
+              data: {
+                fontSize: 16,
+                altMsg: 'this is image',
+                imageSrc: 'https://picsum.photos/200/300/',
+                isRed: true,
+                activeRed: 'active',
+                myBackground: 'my-background-color',
+              }
+            })
+            const myName = 'asdf'
+          </script>
+        </body>
+        ```
+
+        - <u>HTML 요소의 속성에 Vue의 상태 데이터를 값으로 할당</u>
         - Object 형태로 사용하면 value가 true인 key가 class 바인딩 값으로 할당
         - 약어(Shorthand)
-          - :(콜론)
-          - v-bind: href -> :href
+          - **:**(콜론)
+            - v-bind: href -> :href
 
       - v-model
 
-        - HTML form 요소의 값과 data를 양방향 바인딩
+        ```html
+        <body>
+          <div id="app">
+            <h2>Input -> Data 단방향</h2>
+            <p>{{ msg1 }}</p>
+            <input type="text" @input="onInputChange">	<!--input tag에 변화가 있으면 동작-->
+            <hr>
+            <h2>Input <-> Data 양방향</h2>
+            <p>{{ msg2 }}</p>
+            <input type="text" v-model="msg2">
+            <hr>
+            check! <input id="box" type="checkbox" v-model="checked">
+            <label for="box">{{ checked }}</label>
+          </div>
+        
+          <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+          <script>
+            const app = new Vue({
+              el: '#app',
+              data: {
+                msg1: '111',
+                msg2: '222',
+                checked: true,
+              },
+              methods: {
+                onInputChange (event) {
+                  this.msg1 = event.target.value
+                }
+              },
+            })
+          </script>
+        </body>
+        ```
+
+        - HTML form 요소(<u>input</u>)의 값과 <u>data</u>를 **양방향 바인딩**
         - 수식어
           - .lazy
             - input 대신 change 이벤트 이후에 동기화
@@ -573,22 +705,75 @@
 
 - Options/Data - 'computed'
 
+  ```html
+  <body>
+    <div id="app">
+      <input v-model="r" type="text">
+      <p>{{ r }}</p>
+      <p>{{ area }}</p>
+      <p>{{ perim }}</p>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+      const app = new Vue({
+        el: '#app',
+        data: {
+          r: 2,
+        },
+        computed: {	//data에 의존하는 계산된 값
+          area: function () {
+            return this.r ** 2 * 3.14
+          },
+          perim: function () {
+            return this.r * 2 * 3.14
+          }
+        }
+      })
+    </script>
+  </body>
+  ```
+
   - 데이터를 기반으로 하는 계산된 속성
-  - 함수의 형태로 정의하지만 함수가 아닌 함수의 반환 값이 바인딩 됨
+  - 함수의 형태로 정의하지만 함수가 아닌 <u>함수의 반환 **값**이 바인딩</u> 됨
   - 종속된 데이터에 따라 저장(캐싱)됨
   - **종속된 데이터가 변경될 때만 함수를 실행**
-  - 즉, 어떤 데이터에도 의존하지 않는 computed 속성의 경우 절대로 업데이트되지 않음
-  - 반드시 반환 값이 있어야 함
+  - 즉, 어떤 데이터에도 의존하지 않는 computed 속성의 경우 <u>절대로 업데이트되지 않음</u>
+  - 반드시 **반환 값**이 있어야 함
 
 - computed & methods
 
   - computed 속성 대신 methods에 함수를 정의할 수도 있음
     - 최종 결과에 대해 두 가지 접근 방식은 서로 동일
   - 차이점은 computed 속성은 종속 대상을 따라 저장(캐싱)됨
-  - 즉, computed는 종속된 대상이 변경되지 않는 한 computed에 작성된 함수를 여러 번 호출해도 계산을 다시 하지 않고 계산되어 있던 결과를 반환
-  - 이에 비해 methods를 호출하면 렌더링을 다시 할 때마다 항상 함수를 실행
+  - 즉, computed는 종속된 대상이 변경되지 않는 한 computed에 작성된 함수를 여러 번 호출해도 계산을 다시 하지 않고 <u>계산되어 있던 결과를 반환</u>. data를 통한 값을 **얻음**.(setter 함수들)
+  - 이에 비해 methods를 호출하면 렌더링을 다시 할 때마다 항상 함수를 실행. 주로 data를 **바꾸**는 로직(getter 함수들).
 
 - Options/Data - 'watch'
+
+  ```html
+  <body>
+    <div id="app">
+      <p>{{ num }}</p>
+      <button @click="num += 1">add 1</button>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+      const app = new Vue({
+        el: '#app',
+        data: {
+          num: 2,
+        },
+        watch: {
+          num: function () {
+            console.log(`${this.num}이 변경되었습니다.`)
+          }
+        },
+      })
+    </script>
+  </body>
+  ```
 
   - 데이터를 감시
   - 데이터에 변화가 일어났을 때 실행되는 함수
@@ -597,18 +782,21 @@
 
   - computed
 
-    > 특정 값이 변동하면 해당 값을 다시 계산해서 보여준다
+    > 특정 값이 변동하면 해당 값을 다시 계산해서 보여준다(<u>능동적</u>)
+    >
+    > 주로 사용됨
 
-    - 특정 데이터를 직접적으로 사용/가공하여 다른 값으로 만들 때 사용
-    - 속성은 계산해야 하는 목표 데이터를 정의하는 방식으로 소프트웨어 공학에서 이야기하는 '선언형 프로그래밍' 방식
+    - 특정 데이터를 <u>직접적으로 사용/가공하여</u> 다른 값으로 만들 때 사용
+    - 속성은 계산해야 하는 목표 데이터를 정의하는 방식으로 소프트웨어 공학에서 이야기하는 '**선언형** 프로그래밍' 방식
 
   - watch
 
     > 특정 값이 변동하면 다른 작업을 한다.
 
     - 특정 데이터의 변화 상황에 맞춰 다른 data 등이 바뀌어야 할 때 주로 사용
-    - 감시할 데이터를 지정하고 그 데이터가 바뀌면 특정 함수를 실행하는 방식
-    - 소프트웨어 공학에서 이야기하는 '명령형 프로그래밍' 방식
+    - <u>감시할 데이터를 지정</u>하고 그 데이터가 바뀌면 특정 함수를 실행하는 방식
+    - 안에 들어있는 함수의 계산된 결과를 변수처럼 쓴다. <u>각각 직접</u> 정의.
+    - 소프트웨어 공학에서 이야기하는 '**명령형** 프로그래밍' 방식
     - 특정 대상이 변경되었을 때 콜백 함수를 실행시키기 위한 트리거
 
   - computed와 watch는 어떤 것이 더 우수한 것이 아닌 사용하는 목적과 상황이 다름
@@ -620,7 +808,40 @@
 
 - Options/Assets - 'filter'
 
-  - 텍스트 형식화를 적용할 수 있는 필터
+  ```html
+  <body>
+    <div id="app">
+      {{ numbers | getOddNumbers | getUnderTen }}
+      {{ getOddAndUnderTen }}
+    </div>
+  
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+      const app = new Vue({
+        el: '#app',
+        data: {
+          numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        },
+        filters: {
+          getOddNumbers(array) {
+            return array.filter(num => num % 2)
+          },
+          getUnderTen(array) {
+            return array.filter(num => num < 10)
+          }
+        },
+        // w/ computed
+        computed: {
+          getOddAndUnderTen() {
+            return this.numbers.filter(num => num % 2 && num < 10)
+          }
+        }
+      })
+    </script>
+  </body>
+  ```
+
+  - **텍스트 형식화**를 적용할 수 있는 필터
   - interpolation 혹은 v-bind를 이용할 때 사용 가능
   - 필터는 자파스크립트 표현식 마지막에 '|'(파이프)와 함께 추가되어야 함
   - 이어서 사용(chaining) 가능
@@ -632,6 +853,49 @@
     - 예를 들어 데이터 관찰 설정이 필요한 경우, 인스턴스를 DOM에 마운트하는 경우, 데이터가 변경되어 DOM을 업데이트하는 경우 등
   - 그 과정에서 사용자 정의 로직을 실행할 수 있는 Lifecycle Hooks도 호출됨
   - 공식문서를 통해 각 라이프사이클 훅의 상세 동작을 참고
+  
 - 예시
+
+  ```html
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <img v-if="imgSrc" :src="imgSrc" alt="sample img">	<!-- imgSrc에 값이 들어올 때 보인다 -->
+      <button @click="getImg">GetDog</button>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+      const API_URL = 'https://dog.ceo/api/breeds/image/random'
+      const app = new Vue({
+        el: '#app',
+        data: {
+          imgSrc: '',
+        },
+        methods: {
+          getImg: function () {
+            axios.get(API_URL)
+              .then(response => {	//성공했을 때
+                this.imgSrc = response.data.message	//data 변경
+              })
+          }
+        },
+        created: function () {	//view instance가 생성될 때 실행
+          this.getImg()			// 외부 API에서 초기 데이터 받아오기
+        }
+      })
+    </script>
+  </body>
+  </html>
+  ```
+
   - 예를 들어 created hook은 vue 인스턴스가 생성된 후에 호출됨
   - created를 사용해 애플리케이션의 초기데이터를 API 요청을 통해 불러올 수 있음
