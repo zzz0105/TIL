@@ -904,11 +904,11 @@
 
 ## SFC(Single File Component)
 
-- Component
+- Component 
 
-  - 기본 HTML 엘리먼트를 확장하여 재사용 가능한 코드를 캡슐화하는데 도움을 줌
+  - 기본 HTML 엘리먼트를 확장하여 재사용 가능한 코드를 캡슐화하는데 도움을 줌(부품)
   - CS에서는 다시 사용할 수 있는 범용성을 위해 개발된 소프트웨어 구성 요소를 의미
-  - 즉, 컴포넌트는 유지보수를 쉽게 만들어 줄 뿐만 아니라, 재사용성의 측면에서도 매우 강력한 기능을 제공
+  - 즉, 컴포넌트는 유지보수를 쉽게 만들어 줄 뿐만 아니라, <u>재사용성</u>의 측면에서도 매우 강력한 기능을 제공
 
   **Vue 컴포넌트 === Vue 인스턴스**
 
@@ -916,7 +916,7 @@
 
   - Vue의 컴포넌트 기반 개발의 핵심 특징
   - 하나의 컴포넌트는 .vue 확장자를 가진 하나의 파일 안에서 작성되는 코드의 결과물
-  - 화면의 특정 영역에 대한 HTMl, CSS, JavaScript 코드를 하나의 파일(.vue)에서 관리
+  - 화면의 특정 영역에 대한 <u>HTMl, CSS, JavaScript 코드를 하나의 파일(.vue)에서 관리</u>
   - 즉, .vue 확장자를 가진 싱글 파일 컴포넌트를 통해 개발하는 방식
 
   **Vue 컴포넌트 === Vue 인스턴스 === .vue 파일**
@@ -959,7 +959,7 @@
 
 - Node.js
 
-  - 자바스크립트를 브라우저가 아닌 환경에서도 구동할 수 있도록 하는 자바스크립트 런타임 환경
+  - 자바스크립트를 브라우저가 아닌 환경에서도 구동할 수 있도록 하는 자바스크립트 런타임 <u>환경</u>
     - 브라우저 밖을 벗어날 수 없던 자바스크립트 언어의 태생적 한계를 해결
   - Chrome VS 엔진을 제공하여 여러 OS 환경에서 실행할 수 이쓴 환경을 제공
   - 즉, 단순히 브라우저만 조작할 수 있던 자바스크립트를 SSR 아키텍처에서도 사용할 수 있도록 함
@@ -968,7 +968,7 @@
 - NPM(Node Package Manage)
 
   - 자바스크립트 언어를 위한 패키지 관리자
-    - Python에 pip가 있다면 Node.js에는 NPM
+    - Python에 pip가 있다면 <u>Node.js에는 NPM</u>
     - pip와 마찬가지로 다양한 의존성 패키지를 관리
   - Node.js의 기본 패키지 관리자
   - Node.js 설치 시 함께 설치됨
@@ -976,85 +976,82 @@
 - Vue CLI Quick Start
 
   ```bash
-  $ npm install -g @vue/cli	#설치
+  $ npm install -g @vue/cli	#1. 설치(global)
+  $ vue --version				#2. 버전 확인
   
-  $ vue --version				#버전 설치
+  #vscode terminal로 진행 - 대화형으로 진행 시 편리함
+  $ vue create my-first-app	#3. 프로젝트 생성
+  #3-1. npm 레지스트리 변경(환경에 따라 나오지 않을 수 있음)
   
-  $ vue create my-first-app	#프로젝트 생성
-  
-  #npm 레지스트리 변경(환경에 따라 나오지 않을 수 있음)
-  $ cd my-first-app	#프로젝트 디렉토리 이동
-  $ npm run serve 	#서버 실행
+  #4. Vue 버전 선택 (Vue2)
+  #5. 프로젝트 생성 성공
+  $ cd my-first-app/	#6. 프로젝트 디렉토리 이동
+  $ npm run serve 	#7. 서버 실행	(ctrl+c로 서버 종료)
   ```
 
 
 
 ### Babel & Webpack
 
-- Babel: JavaScript compiler
-  - 자바스크립트의 ECMAScript 2015+ 코드를 이전 버전으로 번역/변환해주는 도구
+- Babel: JavaScript <u>compiler</u>
+  - 자바스크립트의 ECMAScript 2015+ 코드를 <u>이전 버전으로 번역/변환</u>해주는 도구
   - 과거 자바스크립트의 파편화와 표준화의 영향으로 코드의 스펙트럼이 매우 다양
     - 이때문에 최신 문법을 사용해도 이전 브라라우저 혹은 환경에서 동작하지 않는 상황이 발생
   - 원시 코드(최신 버전)을 목적 코드(구 버전)로 옮기는 번역가가 등장하면서 개발자는 더 이상 내 코드가 특정 브라우저에서 동작하지 않는 상황에 대해 크게 고민하지 않을 수 있게 됨
 - Webpack: static module bundler
-  - 모듈 간의 의존성 문제를 해결하기 위한 도구
+  - 모듈 간의 <u>의존성 문제를 해결</u>하기 위한 도구
   - 프로젝트에 필요한 모든 모듈을 매핑하고 내부적으로 종속성 그래프를 빌드함
-- Static **Module** bundler
-  - 모듈은 단지 파일 하나를 의미(ex. js 파일 하나 === 모듈 하나)
+- Static **Module** Bundler
+  - 모듈은 단지 파일 하나를 의미 (ex. js 파일 하나 === 모듈 하나)
   - 배경
-    - 브라우저만 조작할 수 있었던 시기의 자바스크립트는 모듈 관련 문접ㅂ이 없이 사용됨
+    - 브라우저만 조작할 수 있었던 시기의 자바스크립트는 모듈 관련 문법이 없이 사용됨
     - 하지만 JS와 애플리케이션이 복잡해지고 크기가 커지자 전역 scope를 공유하는 형태의 기존 개발 방식의 한계점이 드러남
-    - 그래서 라이브러리를 만들어 필요한 모듈을 언제든지 불러오거나 코드를 모듈 단위로 작성하는 등의 다양한  시도가 이루어짐
+    - 그래서 **라이브러리**를 만들어 필요한 모듈을 언제든지 불러오거나 코드를 **모듈 단위**로 작성하는 등의 다양한  시도가 이루어짐
   - 에러 모듈 시스템 
-    - ESM(ECMA Script Module)
+    - ESM(ECMA Script Module)_사실상 표준
     - AMD(Asynchronous Module Definition)
     - CommonJS
     - UMD(Universal Module Definition)
   - 모듈 의존성 문제
-    - 모듈의 수가 많아지고 라이브러리 혹은 모듈 간의 의존성(연결성)이 깊어지면서 특정한 곳에서 발생한 문제가 어떤 모듈 간의 문제인지 파악하기 어려움
-    - 즉, Webpack은 이 모듈 간의 의존성 문제를 해결하기 위해 등장
-- Static Module **bundler**
-  - 모듈 의존성 문제를 해결해주는 작업을 Bundling이라 함
-  - 이러한 일을 해주는 도구가 Bundler이고, Webpack은 다양한 Bundler 중 하나
-  - 여러 모듈을 하나로 묶어주고 묶인 파일은 하나(혹은 여러 개)로 합쳐짐
+    - 모듈의 수가 많아지고 라이브러리 혹은 모듈 간의 **의존성(연결성)이 깊어지면서** 특정한 곳에서 발생한 문제가 <u>어떤 모듈 간의 문제인지 파악하기 어려움</u>
+    - 즉, <u>Webpack</u>은 이 모듈 간의 <u>의존성 문제를 해결</u>하기 위해 등장
+- Static Module **Bundler**
+  - **<u>모듈 의존성 문제를 해결</u>**해주는 작업을 **Bundling**이라 함
+  - 이러한 일을 해주는 도구가 Bundler이고, <u>Webpack은 다양한 Bundler 중 하나</u>
+  - <u>여러 모듈을 하나로 묶어주고 묶인 파일은 하나(혹은 여러 개)로 합쳐짐</u>
   - Bundling된 결과물은 더 이상 순서에 영향을 받지 않고 동작하게 됨
   - snowpack, parcel, rollup.js 등의 webpack 이외에도 다양한 모듈 번들러 존재
-  - Vue CLI는 이러한 Babel, Webpack에 대한 초기 설정이 자동으로 되어 있음
-- [정리]
-  - Node.js
-    - JavaScript Runtime Environment
-    - JavaScript를 브라우저 밖에서 실행할 수 있는 새로운 환경
-  - Babel
-    - Compiler
-    - ES2015+ JavaScript 코드를 구 버전의 JavaScript로 바꿔주는 도구
-  - Webpack
-    - Module Bundler
-    - 모듈 간의 의존성 문제를 해결하기 위한 도구
+  - **Vue CLI는 이러한 Babel, Webpack에 대한 초기 설정이 자동으로 되어 있음**
 - Vue 프로젝트 구조
   - node_modules
-    - node.js 환경의 여러 의존성 모듈
+    - node.js 환경의 여러 의존성 모듈. (용량이 크다)
+    - django의 venv. 
   - public/index.html
     - Vue 앱의 뼈대가 되는 파일
     - 실제 제공되는 단일 html 파일
-  - src/assets
-    - webpack에 의해 빌드된 정적 파일
-  - src/components
-    - 하위 컴포넌트들이 위치
-  - src/App.vue
-    - 최상위 컴포넌트
-  - src/main.js
-    - webpack이 빌드를 시작할 때 가장 먼저 불러오는 entry point
-    - 실제 단일 파일에서 DOM과 data를 연결했던 것과 동일한 작업이 이루어지는 곳
-    - Vue 전역에서 활용할 모듈을 등록할 수 있는 파일
+  - src/  (작업공간)
+    - assets/
+      - webpack에 의해 빌드된 정적 파일
+    - components/
+      - 하위 컴포넌트들이 위치
+    - App.vue
+      - 최상위(루트) 컴포넌트. 캔버스
+    - main.js
+      - webpack이 빌드를 시작할 때 가장 먼저 불러오는 entry point
+      - 실제 단일 파일에서 DOM과 data를 <u>연결</u>했던 것과 동일한 작업이 이루어지는 곳
+      - Vue 전역에서 활용할 모듈을 등록할 수 있는 파일
   - babel.config.js
     - babel 관련 설정이 작성된 파일
   - package.json
-    - 프로젝트의 종속성 목록과 지원되는 브라우저에 대한 구성 옵션이 포함
+    - 프로젝트의 종속성 목록과 지원되는 브라우저에 대한 구성 옵션이 포함 (알아서 써준다)
+    - django의 requirements.txt
   - package-lock.json
     - node_modules에 설치되는 모듈과 관련된 모든 의존성을 설정 및 관리
     - 팀원 및 배포 환경에서 정확히 동일한 종속성을 설치하도록 보장하는 표현
     - 사용할 패키지의 버전을 고정
     - 개발 과정 간의 의존성 패키지 충돌 방지
+
+
 
 ## Pass props & Emit event
 
@@ -1127,3 +1124,172 @@
   - HTML의 대소문자 구분을 위해 DOM 템플릿의 v-on 이벤트 리스너는 항상 자동으로 소문자 변환되기 때문에 v-on:myEvent는 자동으로 v-on:myevent로 변환
   - 이러한 이유로 이름에는 **항상 kebab-case를 사용하는 것을 권장**
 
+
+
+## Vue Router
+
+- What is Vue Router?
+
+  - "Vue.js 공식 라우터"
+- 라우트(route)에 <u>컴포넌트를 매핑</u>한 후, <u>어떤 주소에서 렌더링할 지</u> 알려줌
+    - URL을 통한 하이퍼링크 이동하지 않는다. 마치 URL로 인해 화면이 바뀐 것처럼 행동
+- SPA 상에서 라우팅을 쉽게 개발할 수 있는 기능을 제공
+  - [참고] router
+- 위치에 대한 최적의 경로를 지정하며, 이 경로를 따라 데이터를 다음 장치로 전향시키는 장치
+  
+- Vue Router 시작하기
+
+  ```bash
+  $ vue create my-router-app #1. 프로젝트 생성 및 이동(앱 안에서 앱 만들지 않기)
+  $ vue add router	#2. Vue Router plugin설치(Vue CLI 환경)
+  '''[주의]기존 프로젝트를 진행하고 있던 도중에 추가하게 되면 App Vue를 덮어쓰므로, 프로젝트 내에서 다음 명령을 실행하기 전에 필요한 경우 파일을 백업(커밋)해야 함'''
+  #3. commit 여부 -> Yes
+  #4. History mode 사용 여부 -> Yes
+  ```
+
+- Vue Router로 인한 변화
+
+  - App.vue 코드 (router 관련 코드 자동으로 작성해줌)
+  - router/index.js 생성
+  - views 디렉토리 생성
+
+- Vue Router 요소
+
+  - index.js
+    
+    - 라우트에 관련된 정보 및 설정이 작성되는 곳
+      - url 패턴, 별칭, 렌더링할 컴포넌트. 
+      - django의 urlpatterns와 비슷하다
+    
+  - App.vue의 \<router-link>
+
+    ```vue
+    <router-link to="/">Home</router-link>
+    <router-link :to="{ name: 'home' }">Home</router-link>
+    ```
+
+    - 사용자 네비게이션을 가능하게 하는 <u>컴포넌트</u>
+    - 목표 경로는 'to' prop으로 지정됨
+    - HTML5 히스토리 모드에서 router-link는 클릭 이벤트를 차단하여 브라우저가 페이지를 <u>다시 로드하지 않도록 함</u>
+    - a 태그지만 우리가 알고 있는 GET 요청을 보내는 a 태그와 조금 다르게, 기본 GET 요청을 보내는 <u>이벤트를 제거한 형태</u>로 구성됨
+
+  - App.vue의 \<router-view>
+    
+    - 주어진 라우트에 대해 <u>일치하는 컴포넌트를 렌더링</u>하는 컴포넌트
+    - 실제 component가 DOM에 부착되어 보이는 자리를 의미
+    - router-link를 클릭하면 해당 경로와 연결되어 있는 index.js에 정의한 컴포넌트가 위치
+
+- History mode
+
+  - HTML History API를 사용해서 router를 구현한 것
+  - <u>브라우저의 히스토리는 남기지만 실제 페이지는 이동하지 않는 기능을 지원</u>
+  - 즉, 페이지를 다시 로드하지 않고 URL을 탐색할 수 있음
+    - SPA의 단점 중 하나인 "URL이 변경되지 않는다"를 해결
+  - [참고] History API
+    - DOM의 Window 객체는 history 객체를 통해 브라우저의 세션 기록에 접근할 수 있는 방법을 제공
+    - history 객체는 사용자를 자신의 방문 기록 앞과 뒤로 보내거나, 기록의 특정 지점으로 이동하는 등 유용한 메서드와 속성을 가짐
+
+- Vue Router
+
+  1. Named Routes
+     - 이름을 가지는 라우트
+     - 명명된 경로로 이동하려면 객체를 vue-router 컴포넌트 요소의 prop에 전달
+  2. 프로그래밍 방식 네비게이션
+     - \<router-link>를 사용하여 선언적 탐색을 위한 a 태그를 만드는 것 외에도, router의 인스턴스 메서드를 사용하여 프로그래밍 방식으로 같은 작업을 수행할 수 있음
+       - 선언적 방식: \<router-link to="...">
+       - 프로그래밍 방식: $router.push(...)
+       
+     - Vue 인스턴스 내부에서 라우터 인스턴스에 <u>$router</u>로 접근할 수 있음
+
+     - 따라서 다른 URL로 이동하려면 <u>this.**$router**.push</u>를 호출할 수 있음
+       
+       - 이 메서드는 새로운 항목을 히스토리 스택에 넣기 때문에 사용자가 브라우저의 뒤로 가기 버튼을 클릭하면 이전 URL로 이동하게 됨
+       
+     - \<router-link>를 클릭할 때 내부적으로 호출되는 메서드이므로 \<router-link :to="...">를 클릭하면, <u>router.push(...)</u>를 호출하는 것과 같음
+
+     - 작성할 수 있는 인자 예시
+
+       ```vue
+       <script>
+       	router.push('home')	//literal string path. url에 string(home)을 붙임
+           router.push({path:'home'})	//object
+           router.push({name:'user', params: {userId:'123'}})	//named route
+           router.push({path:'register', query:{plan:'private'}})	
+           //with query, resulting in /reguster?plan=private
+       </script>
+       ```
+  3. Dynamic Route Matching
+     - 동적 인자 전달
+
+     - 주어진 패턴을 가진 라우트를 동일한 컴보넌트에 매핑해야 하는 경우
+
+     - 예를 들어 모든 User에 대해 동일한 레이아웃을 가지지만, 다른 User ID로 렌더링 되어야 하는 User 컴포넌트 예시
+
+       ```vue
+       <!--UserProfile.vue-->
+       <template>
+       	<p>
+               당신의 id는 {{user.userId}}
+           </p>
+       </template>
+       <script>
+       export default {
+           name:'UserProfile',
+           data: function () {
+               return {
+                   user: this.$route.params,
+               }
+           }
+       }
+       </script>
+       
+       <!--router/index.js-->
+       <script>
+       	const routes = [
+               {
+                   path: '/user/:userId',
+                   name: 'User',
+                   component: User
+               }
+           ]
+       </script>
+       ```
+
+     - 동적 인자는 :(콜론)으로 시작
+
+     - 컴포넌트에서 this.$route.params로 사용가능
+
+       | pattern                            | matched path       | $route.params                 |
+       | ---------------------------------- | ------------------ | ----------------------------- |
+       | /user/:userName                    | /user/jo           | {username: 'jo'}              |
+       | /user/:userName/article/:articleId | /user/jo/article/2 | {username:'jo', articleId: 2} |
+
+- components와 views
+
+  - 기본적으로 작성된 구조에서 components 폴더와  views 폴더 내부에 각기 다른 컴포넌트가 존재하게 됨
+  - 컴포넌트를 작성해 갈 때 정해진 구조가 있는 것은 아니며, 주로 아래와 같이 구조화하여 활용함
+    - App.vue
+      - 최상위 컴포넌트
+    - views/
+      - router(index.js)에 매핑되는 컴포넌트를 모아두는 폴더
+      - ex) App 컴포넌트 내부에 AboutView & HomeView 컴포넌트 등록
+    - components/
+      - route에 매핑된 컴포넌트 내부에 작성하는 컴포넌트를 모아두는 폴더
+      - ex) Home 컴포넌트 내부에 HelloWorld 컴포넌트 등록
+
+- Vue Router가 필요한 이유
+
+  1. SPA 등장 이전
+     - 서버가 모든 라우팅을 통제
+     - 요청 경로에 맞는 HTML를 제공
+  2. SPA 등장 이후
+     - 서버는 <u>index.html 하나</u>만 제공
+     - 이후 모든 처리는 HTML 위에서 JS 코드를 활용해 진행
+     - 즉, 요청에 대한 처리를 더 이상 <u>서버가 하지 않음</u>(할 필요가 없어짐)
+  3. 라우팅 처리 차이
+     - SSR
+       - 라우팅에 대한 결정권을 서버가 가짐
+     - CSR
+       - 클라이언트는 더 이상 서버로 요청을 보내지 않고 응답받은 HTML 문서 안에서 주소가 변경되면 특정 주소에 맞는 컴포넌트를 렌더링
+       - 라우팅에 대한 결정권을 클라이언트가 가짐
+     - 결국 Vue Router는 라우팅의 결정권을 가진 Vue.js에서 라우팅을 편리하게 할 수 있는 Tool을 제공해주는 라이브러리
