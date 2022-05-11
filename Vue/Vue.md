@@ -1058,11 +1058,12 @@
 - 컴포넌트 작성
   - Vue app은 자연스럽게 중첩된 컴포넌트 트리로 구성됨
   - 컴포넌트 간 부모-자식 관계가 구성되며 이들 사이에 필연적으로 의사 소통이 필요함
-  - 부모는 자식에게 데이터를 전달(pass props)하며, 자식은 자신에게 일어난 일을 부모에게 알림(emit event)
+  - 부모는 자식에게 데이터를 전달(pass **props**)하며, 자식은 자신에게 일어난 일을 부모에게 알림(**emit** event)
     - 부모와 자식이 명확하게 정의된 인터페이스를 통해 격리된 상태를 유지할 수 있음
   - **props는 아래로, event는 위로**
   - 부모는 props를 통해 자식에게 데이터를 전달하고, 자식은 events를 통해 부모에게 메세지를 보냄
-- 컴포넌트 구조
+  
+- 컴포넌트 구조 (vetur 설치하고 vue 쓰고 엔터치면 기본 구조 나옴)
   1. 템플릿(HTML)
      - HTML의 body 부분
      - 각 컴포넌트를 작성
@@ -1071,37 +1072,142 @@
      - 컴포넌트 정보, 데이터, 메서드 등 vue 인스턴스를 구성하는 대부분이 작성 됨
   3. 스타일(CSS)
      - CSS가 작성되며 컴포넌트의 스타일을 담당
+  
 - 컴포넌트 등록 3단계
+
+  ```vue
+  <template>
+    <div id="app">
+      <!-- 3. 보여주기 (print) -->
+      <TheAbout/ my-message="CammelCase">					<!-- 카멜 케이스 -->
+      <the-about my-message="kebab-case"></the-about>		<!-- *케밥 케이스 -->
+      <!-- key-value형태로 넘김 -->
+    </div>
+  </template>
+  
+  <script>
+  // 1. 불러오기 (import)
+  import TheAbout from './components/TheAbout.vue'
+  
+  export default {
+    name: 'App',	//구분할 때 사용
+    // 2. 등록하기 (register)
+    components: {
+      TheAbout,
+    },
+  }
+  </script>
+  
+  <style>
+  #app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 60px;
+  }
+  </style>
+  ```
+
   1. 불러오기(import)
-  2. 등록하기(register)
+     - \<scirpt>부분에 import 이름 from '경로'
+       - 경로
+         - 상대경로: './components/About.vue'
+           - . = 내가 있는 위치
+         - 절대경로: '@/components/About.vue'
+           - @: src의 위치
+  2. 등록하기(register) 
+     - App.vue의 export default의 components 안에 이름을 써준다
+     - 예시
   3. 보여주기(print)
+     - \<template> 부분에 <이름></이름>을 써준다.
 
 ### Props
 
 - props는 부모(상위) 컴포넌트의 정보를 전달하기 위한 사용자 지정 특성
+
 - 자식(하위) 컴포넌트는 props 옵션을 사용하여 수신하는 props를 명시적으로 선언해야 함
+
 - 즉, 데이터는 props 옵션을 사용하여 자식 컴포넌트로 전달됨
+
 - **[주의]**
-  - 모든 컴포넌트 인스턴스에는 자체 격리된 범위가 있음
-  - 즉, 자식 컴포넌트의 템플릿에서 상위 데이터를 직접 참조할 수 없음
+  - 모든 컴포넌트 인스턴스에는 <u>자체 격리된 범위</u>가 있음
+  - 즉, 자식 컴포넌트의 템플릿에서 상위 데이터를 직접 참조할 수 없음 
 
 - Static Props 작성
+
+  ```vue
+  <template> <!-- 구역 설정. 템플릿 안에는 하나의 요소만 써야한다. -->
+  	<h1>{{ myMessage }}</h1>
+  </template>
+  <script>
+  export default {
+      name: 'TheAbout',
+      props:{myMessage: String}	//받는 내용
+  }
+  </script>
+  <style></style>
+  ```
+
   - 자식 컴포넌트(About.vue)에서 보낼 prop 데이터 선언
   - 작성법: prop-data-name="value"
   - 수신할 prop 데이터를 명시적으로 선언 후 사용
 
 - Dynamic Props 작성
+
+  ```vue
+  <template>
+  	<div>
+  	<about my-message="This is prop data" :parent-data="parentData1"></about>
+      <p>{{parentData}}</p>
+      </div>
+  </template>
+  <script>
+  import About from './component/About.vue'
+  export default {
+      name:'App',
+      components: {
+          About
+      },
+      data: function() {
+          return  {
+              parentData1: 'Ths is parent data'
+      },
+      props:{
+          parentData:String
+      }
+  }
+  </script>
+  <style></style>
+  ```
+
   - v-bind directive를 사용해 부모의 데이터의 props를 동적으로 바인딩
   - 부모에서 데이터가 업데이트될 때마다 자식 데이터로도 전달됨
   - 마찬가지로 수신할 prop 데이터를 명시적으로 선언 후 사용
+
 - Props 이름 컨벤션
   - during declaration(선언 시): camelCase
   - in template(HTML): kebab-case
+  
 - **컴포넌트의 data는 반드시 함수여야 함**
+
+  ```vue
+  <script>
+  data: funcction(){
+      return {
+          myData: null,
+      }
+  }
+  </script>
+  ```
+
   - 기본적으로 각 인스턴스는 모두 같은 data 객체를 공유하므로 새로운 data 객체를 반환(return)하여야 함
+
 - Props 시 자주하는 실수
   - Static 구문을 사용하여 숫자를 전달하려고 시도하는 것
   - 실제 JavaScript 숫자를 전달하려면 값이 JavaScript 표현식으로 평가되도록 v-bind를 사용해야함
+  
 - 단방향 데이터 흐름
   - 모든 props는 하위 속성과 상위 속성 사이의 **단방향** 바인딩을 형성
   - 부모의 속성이 변경되면 자식 속성에게 전달되지만, 반대 방향으로는 안됨
@@ -1111,6 +1217,64 @@
 ### Emit event
 
 > Listening to Child Components Events
+
+```vue
+<!-- App.vue -->
+<template>
+	<div>
+	<about :my-message="parentData" @send="onsend"></about>
+    <p>{{parentData}}</p>
+    </div>
+</template>
+<script>
+import About from './component/About.vue'
+export default {
+    name:'App',
+    components: {
+        About
+    },
+    data: function() {
+        return  {
+            parentData1: 'Ths is parent data'
+    },
+    props:{
+        parentData:String
+    },
+    methods: {
+        onSend: function(inputData){
+            console.log('들린다', inputData)
+        }
+    }
+}
+</script>
+<style></style>
+<!-- TheAbout.vue -->
+<template>
+<input type='text' v-model="childInputData" @keyup.enter=childInputEnter>
+</template>
+<script>
+    export default {
+        name:'TheAbout',
+        props:{
+            myMessage:String,
+        },
+        data: function () {
+            return {
+                childInputData: ''
+            }
+        },
+        methods: {
+          childInputEnter: function(){
+              console.log('Enter', this.childInputData)
+              this.$emit('send',this.childInputData)	
+              //부모 컴포넌트에게 'send'라는 이벤트 발생. data를 보낸다.
+              //(여러 개의 data 보내는 것 가능하지만 많을 때에는 묶어서 보내는 것이 좋다)
+          }  
+        },
+    }
+</script>
+<style></style>
+```
 
 - $emit(eventName)
   - 현재 인스턴스에서 이벤트를 트리거
@@ -1132,8 +1296,10 @@
 
   - "Vue.js 공식 라우터"
 - 라우트(route)에 <u>컴포넌트를 매핑</u>한 후, <u>어떤 주소에서 렌더링할 지</u> 알려줌
+    
     - URL을 통한 하이퍼링크 이동하지 않는다. 마치 URL로 인해 화면이 바뀐 것처럼 행동
 - SPA 상에서 라우팅을 쉽게 개발할 수 있는 기능을 제공
+  
   - [참고] router
 - 위치에 대한 최적의 경로를 지정하며, 이 경로를 따라 데이터를 다음 장치로 전향시키는 장치
   
