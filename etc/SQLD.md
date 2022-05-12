@@ -1,6 +1,6 @@
 # SQLD
 
-## SQL 명령문
+## [최종 정리강의](https://www.youtube.com/channel/UCosmeBx3OuKP1YwGmT6ar2Q)
 
 - SQL 연산 순서
 
@@ -226,7 +226,7 @@
 
   - natural join using
     - 중복된 컬럼이 사라진다. 제일 앞에 등장하는 것 하나만 출력됨.  
-    - using의 경우 alias 사용 안됨
+    - using의 경우 alias 사용 가능
   - left outer join
     - 'A left outer join B' = 'A col1 = B col1 (+)'
       - 이 때 col1이 조인키이다.
@@ -236,7 +236,107 @@
 
   - 조인 순서
     - from A, B, C: A, B 조인한 후 하나의 테이블이 되었을 때 C와 조인한다.
+  
+- 서브 쿼리
 
+  - select: scalar(단일 행 서브쿼리)
+  - from: inline view(메인쿼리에 컬럼 사용 가능하다)
+  - where: 거의 모든 서브쿼리(중첩서브쿼리)
+  - group by: 서브쿼리가 들어가지 않는다
+  - having: 거의 모든 서브쿼리(중첩서브쿼리)
+  - order by: scalar
+  - 상호연관 서브쿼리가 있을 때 select from A where (select from B...)
+    - A 테이블 row를 하나 볼 때 전체 테이블 B를 본다. 
+  - 함수
+    - in
+    - any/some
+    - all
+    - exist: 모든 문자 사용 가능. 존재하면 True, 0 rows인 경우 False
 
+- 집합 연산자
 
+  - union: 중복을 제거한 합집합
+  - intersect: 교집합
+  - minus
+    - 차집합
+    - sql 서버에서는 except라고 한다
+  - unionall
+    - 중복 데이터 존재. 정렬 작업이 없고 빠르다(나머지 셋은 정렬 작업 존재 -> 느림)
 
+- DDL
+
+  - TCL과 연관지어서 생각하기
+  - Truncate(입주민 퇴거. 구조 남음. log data 남음) vs Drop(건물 철거. 구조 삭제)
+  - Truncate(DDL) vs Delete(DML)
+
+- DML
+
+  - TCL과 연관지어서 생각하기
+  - insert: 지정한 매개변수와 value의 개수가 다를 때 -> 오류상황
+  - update
+  - delete
+  - merge -> 37회 기출 참고
+
+- *제약조건
+
+  - pk: unique + notnull. 대표성 가지므로 하나만 있다
+  - unique
+  - notnull
+
+- DCL
+
+  - grant: 사용자(User)에게 접속권한, 오브젝트 생성권한, DBA 권한 등을 부여할 수 있는 명령어
+  - revoke: 사용자(User)에게 부여한 권한을 다시 회수하는 명령어 
+  - role 특징(role의 type은 object이다)
+    - role을 사용하면 권한 부여와 회수를 쉽게 할 수 있다
+    - 한 사용자가 여러 Role을 access할 수 있고, 여러 사용자에게 같은 Role을 부여할 수 있다
+    - 사용자는 Role에 Role을 부여할 수도 있다
+  - 37회 기출문제 on to
+
+- view
+
+  - sql 명령문 저장. 기존 테이블보다 저장 공간이 적게 필요함
+  - *장점
+    - 독립성: 기존 table 구조가 변경되어도 view의 구조는 변경되지 않는다. view를 따로 업데이트하지 않아도 된다.
+    - 편리성: 계속 테이블을 조작할 필요는 없다
+    - 보안성: 원하는 정보만 가져올 수 있다
+
+- *그룹함수
+
+  - 종류
+    - rollup: 인수가 2개가 다른 순서로 들어오면 다른 결과가 나온다.
+      - rollup(A,B) != rollup(B,A) 계층구조로 진행되기 떄문이다.
+    - cube
+      - cube(A,B) == cube(B,A)
+    - groupingsets
+    - grouping
+  - 어떤 그룹함수를 썼는지 찾는 문제가 나왔을 때
+    1. null을 모두 찾는다
+    2. 총합 행이 있는지 찾는다.
+       1. 있다면?
+          - rollup: 한 쪽만 결과가 나오며 계층형태 가진다. 행의 수 적음
+          - cube: 양 쪽으로 둘 다 결과가 나옴. 행의 수 많음
+       2. 없다면?
+          - groupingsets
+
+- TCL
+
+  - 종류
+    - commit
+    - rollback
+  - DDL의 커밋 기능 없애기
+    - auto commit off and Begin transaction
+
+- *윈도우 함수
+
+  - Rows/Range 결과값 차이점
+    - 같은 값 유무 파악. range는 같은 값이 나올 확률이 있다.
+  - rank/dense rank
+    - rank는 중복건너뛴다.(후순위 건너뜀) 1,1,3,4등
+    - dense rank는 건너뛰기 없음. 1,1,2,3등
+  - partition by/order by 의미
+
+- 계층형 질의
+
+  - prior 자식데이터 = 부모데이터
+  - 부모 데이터에서 자식으로 가는 경우: 순방향
