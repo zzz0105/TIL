@@ -1,6 +1,8 @@
-# Vue & Django
+# Django & Vue
 
-## Server & Client
+## Django
+
+### Server & Client
 
 - Server: 정보제공
 
@@ -23,7 +25,7 @@
   - ex. 브라우저, Postman 등
     - Client(Postman)가 서버에 올바른 요청을 제공하면, Server(Django rest framework)에서 Json으로 응답
 
-## Start Project Model + Serializer
+### Start Project Model + Serializer
 
 ```bash
 $ python -m venv venv
@@ -85,8 +87,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/articles/', include('articles.urls')),
     path('api/v1/accounts/', include('accounts.urls')),
-    path('api/v1/accounts/', include('dj_rest_auth.urls')),
-    path('api/v1/accounts/signup/', include('dj_rest_auth.registration.urls')),
 ]
 
 
@@ -166,6 +166,31 @@ class ArticleListSerializer(serializers.ModelSerializer):
         model = Article
         fields = ('pk', 'user', 'title', 'comment_count', 'like_count')
 
+# articles/views.py
+...
+@api_view(['GET', 'POST'])
+def article_list_or_create(request):
+	#함수화시켜서 가독성 증가
+    def article_list():
+        articles = Article.objects.annotate(	# comment 개수 추가
+            comment_count=Count('comments', distinct=True),
+            like_count=Count('like_users', distinct=True)
+        ).order_by('-pk')
+        serializer = ArticleListSerializer(articles, many=True)
+        return Response(serializer.data)
+    
+    def create_article():
+        serializer = ArticleSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    if request.method == 'GET':
+        return article_list()
+    elif request.method == 'POST':
+        return create_article()
+...
+       
 #articles/serializers/comment.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
@@ -191,7 +216,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 
-## CORS
+### CORS
 
 - SOP(: Same-Origin Policy)
 
@@ -308,7 +333,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
   
 
-## Authentication & Authorization
+### Authentication & Authorization
 
 - Authentication
 
@@ -343,3 +368,347 @@ class CommentSerializer(serializers.ModelSerializer):
   - 단, 모든 인증을 거쳐도 권한이 동일하게 부여되는 것은 아님
     - Django에서 로그인을 했더라도(인증) 다른 사람의 글까지 수정/삭제가 가능하진 않음(권한)
   - 세션, 토큰, 제 3자를 활용하는 등의 다양한 인증 방식이 존재
+
+
+
+### DRF Authentication
+
+- 다양한 인증 방식
+  1. Session Based
+  2. Token Based
+     - Basic Token
+     - JWT
+  3. Oauth
+     - google
+     - facebook
+     - github
+     - ...
+
+- Basic Token Authentication(session cookie 방식과 비슷)
+  1. client에서 로그인 시도. Server에 username과 password가 담긴 JSON data를 올바르게 보낸다.
+  2. table에서 username과 password를 같은지 대조한다. 같다면 새로운 테이블에 user의 id와 token값을 저장한다. 응답으로 token 값을 준다.
+  3. client는 받은 token 값을 저장한다. 앞으로 요청을 보낼 때마다 요청 헤더의 Authorization에 'Token <토큰값>'을 보내준다.
+  4. server에서는 받은 token 값을 token 테이블에서 확인 후 응답을 보낸다.
+
+- JWT
+
+  > JSON Web Token. JWT.IO allows you to decode, verify and generate JWT.
+
+  - JSON 포맷을 활용하여 요소 간 안전하게 정보를 교환하기 위한 표준 포맷
+
+  - 암호화 알고리즘에 의한 <u>디지털 서명</u>이 되어 있기 떄문에 JWT 자체로 검증 가능
+
+  - JWT 자체가 <u>필요한 정보를 모두 갖기</u> 때문에(self-contained) 이를 검증하기 위한 다른 검증 수단(ex. table)이 필요 없음
+
+  - 사용처: Authentication, Information Exchange
+
+  - 기본 토큰 인증 체계와 달리 JWT 인증 확인은 데이터베이스를 사용하여 토큰의 유효성을 검사할 필요가 없음
+
+    - 즉,  JWT는 데이터베이스에서 유효성 검사가 필요 없음. (JWT 자체가 인증에 필요한 정보를 모두 갖기 때문(self-contained))
+
+      - 이는 세션 혹은 기본 토큰을 기반으로 한 인증과의 핵심 차이점
+
+    - 토큰 탈취(오염)시 서버 측에서 토큰 무효화가 불가능(블랙리스팅 테이블 활용)
+
+      - 매우 짧은 유효기간(5min)과 Refresh 토큰을 활용하여 구현. (복잡도 증가)
+      - MSA(Micrio Server Architecture) 구조에서 서버간 인증에 활용
+
+      cf. Basic Token Authentication에서는 테이블에서 탈취된 토큰만 지우면 된다. 의미가 없어짐
+
+    - One Source(JWT) Multi Use 가능
+
+      - 하나의 인증으로 여러 API Server에서 알아볼 수 있다.
+
+- dj-rest-auth & django-allauth 라이브러리
+
+  ```bash
+  $ pip install django-allauth	#로그인/로그아웃/검증
+  $ pip install dj-rest-auth		#회원가입 기능
+  ```
+
+  ```python
+  #settings.py
+  INSTALLED_APPS = [
+      ...
+      'rest_framework.authtoken',	#token 기반 auth
+      
+      #DRF auth
+      'dj_rest_auth',	#signup 제외 auth 관련 담당
+      'dj_rest_auth.registration',  #signup 담당
+  	
+      #signup 담당을 위해 필요 
+      'allauth', 	#확장하면 소셜 로그인까지 확장 가능
+      'allauth.account',
+      'allauth.socialaccount',
+      ...
+      'django.contrib.sites',  # dj-rest-auth signup 필요
+      ...
+  ]
+  
+  SITE_ID = 1
+  ...
+  REST_FRAMEWORK = {	#DRF 인증 관련 설정
+      'DEFAULT_AUTHENTICATION_CLASSES': [
+          'rest_framework.authentication.TokenAuthentication',
+      ],
+      'DEFAULT_PERMISSION_CLASSES': [
+          #'rest_framework.permissions.AllowAny', 	#모두에게 허용
+  
+          #인증된 사용자만 모든일이 가능 / 비인증 사용자는 모두 401 Unauthorized
+          #view함수에 @login_required 일괄처리. (signup, login은 제외)
+          'rest_framework.permissions.IsAuthenticated'
+      ]
+  }
+  #migrate 필요
+  
+  #pjt/urls.py
+  from django.contrib import admin
+  from django.urls import path, include
+  
+  urlpatterns = [
+      path('admin/', admin.site.urls),
+      path('api/v1/articles/', include('articles.urls')),
+      path('api/v1/accounts/', include('accounts.urls')),
+      path('api/v1/accounts/', include('dj_rest_auth.urls')),	#위에서 찾는 것이 없으면 여기로 옴
+      path('api/v1/accounts/signup/', include('dj_rest_auth.registration.urls')),
+  ]
+  ```
+
+  - 토큰 값이 오지 않으면 로그인/로그아웃 상태로 전환이 불가능하다
+    - 로그인 = 토큰 발생 = authtoken 테이블에 create하는 작업
+    - 로그아웃 =  토큰 삭제 = authtoken 테이블에 delete하는 작업
+    - authentication = 토큰 검증 = authtoken 테이블에 read하는(비교하는) 작업
+
+  ```python
+  #accounts/serializers.py
+  from rest_framework import serializers
+  from django.contrib.auth import get_user_model
+  from articles.models import Article
+  
+  class ProfileSerializer(serializers.ModelSerializer):
+  
+      class ArticleSerializer(serializers.ModelSerializer):
+          #아래에서 pk값만 받지 않고 한번에 다른 자세한 내용(fields)도 받을 수 있게 한다
+          class Meta:
+              model = Article
+              fields = ('pk', 'title', 'content')	
+  
+      like_articles = ArticleSerializer(many=True)
+      articles = ArticleSerializer(many=True)
+  
+      class Meta:
+          model = get_user_model()
+          fields = ('pk', 'username', 'email', 'like_articles', 'articles',)
+  
+  #accounts/urls.py
+  from django.urls import path
+  from . import views
+  
+  app_name = 'accounts'
+  
+  urlpatterns = [
+      path('profile/<username>/', views.profile),
+  ]
+  
+  #accounts/views.py
+  from django.shortcuts import get_object_or_404
+  from django.contrib.auth import get_user_model
+  
+  from rest_framework.decorators import api_view
+  from rest_framework.response import Response
+  
+  from .serializers import ProfileSerializer
+  
+  User = get_user_model()
+  
+  @api_view(['GET'])
+  def profile(request, username):
+      user = get_object_or_404(User, username=username)
+      serializer = ProfileSerializer(user)
+      return Response(serializer.data)
+  ```
+
+  
+
+## Vue
+
+```js
+//@/api/drf.js
+const HOST = 'http://localhost:8000/api/v1/'
+
+const ACCOUNTS = 'accounts/'
+const ARTICLES = 'articles/'
+const COMMENTS = 'comments/'
+
+export default {
+  accounts: {
+    login: () => HOST + ACCOUNTS + 'login/',	
+    //http://localhost:8000/api/v1//accounts/login/
+    logout: () => HOST + ACCOUNTS + 'logout/',
+    signup: () => HOST + ACCOUNTS + 'signup/',
+    // Token 으로 현재 user 판단
+    currentUserInfo: () => HOST + ACCOUNTS + 'user/',
+    // username으로 프로필 제공
+    profile: username => HOST + ACCOUNTS + 'profile/' + username,
+  },
+  articles: {
+    articles: () => HOST + ARTICLES,
+    article: articlePk => HOST + ARTICLES + `${articlePk}/`,
+    likeArticle: articlePk => HOST + ARTICLES + `${articlePk}/` + 'like/',
+    comments: articlePk => HOST + ARTICLES + `${articlePk}/` + COMMENTS,
+    comment: (articlePk, commentPk) =>
+      HOST + ARTICLES + `${articlePk}/` + COMMENTS + `${commentPk}/`,
+  },
+}
+```
+
+### Vue router
+
+#### 404 page
+
+- 404 Not Found 시나리오
+
+  1. Vue Router에 등록되지 않은 routes인 경우 ex. /no-such-routes
+
+     ```js
+     import Vue from 'vue'
+     import VueRouter from 'vue-router'
+     // import store from '../store'
+     //components는 부품, Views는 url과 매핑
+     import LoginView from '@/views/LoginView.vue'
+     import ProfileView from '@/views/ProfileView.vue'
+     import ArticleListView from '@/views/ArticleListView.vue'
+     import NotFound404 from '../views/NotFound404.vue'
+     
+     Vue.use(VueRouter)
+     
+     const routes = [	
+       {
+         path: '/login',
+         name: 'login',
+         component: LoginView
+       },
+       	...
+       {
+         path: '/profile/:username',  //username은 변수
+         name: 'profile',
+         component: ProfileView,
+       },
+       {
+         path: '/',  	//Home
+         name: 'articles',
+         component: ArticleListView
+       },
+     	...
+       {
+         path: '/404',
+         name: 'NotFound404',
+         component: NotFound404
+       },
+       {
+         path: '*',	//위에 있는 것 제외한 나머지를 쓰면 404로 간다
+         redirect: '/404'
+       },
+     ]
+     ```
+
+     - vue router는 routes 배열에서 순차적으로 URL을 검색
+     - 등록되지 않은 모든(*) URL은 /404로 redirection
+     - 브라우저에서 NotFound404 컴포넌트 확인
+
+  2. Vue Router에는 등록되어 있지만, 서버에서 해당 리소스를 찾을 수 없는 경우 ex. /articles/455
+
+     ```js
+     //SFC(.vue)
+     ...
+     axios.get(URL)
+     	.then(res => {
+         ...
+     	})
+     	.catch(err => {
+             console.error(err.response)
+             if (err.response.status === 404) {
+                 this.$router.push({ name: 'NotFound404'})
+             }
+         })
+     
+     //Vuex
+     import router from '@/router'
+     ...
+     axios.get(URL)
+     	.then(res => {
+         ...
+     	})
+     	.catch(err => {
+             console.error(err.response)
+             if (err.response.status === 404) {
+                 router.push({ name: 'NotFound404'})
+             }
+         })
+     ```
+
+#### Navigation Guard
+
+- 전역 가드(Global Before Guards)
+
+  ```js
+  //@/router/index.js
+  const routes = [ ... ]
+                  
+  const router = new VueRouter({
+  	mode: 'history',
+      base: process.env.BASE_URL,
+      routes
+  })
+  /*
+  router.beforeEach((to, from, next) => {
+  	// '/' => '/articles/1'
+  })
+  */
+  /*
+  Navigation Guard 설정  (이전 페이지에서 있던 에러 메시지 삭제)
+    로그인(Authentication)이 필요 없는 route 이름들 저장(/login, /signup)
+    0. router 에서 이동 감지
+    1. 현재 이동하고자 하는 페이지가 로그인이 필요한지 확인  
+    2. 로그인이 필요한 페이지인데 로그인이 되어있지 않다면 로그인 페이지(/login)로 이동
+    3. 로그인이 되어 있다면 원래 이동할 곳으로 이동  
+    4. 로그인이 되어있는데 /login, /signup 페이지로 이동한다면 메인 페이지(/)로 이동
+  */
+  ```
+
+  1. URL을 이동할 때마다, 이동하기 전 모든 경우에 발생
+  2. router 객체의 메서드로, 콜백 함수를 인자로 받고 해당 콜백 함수는 3개의 인자를 받음
+     1. to: 이동하려는 route의 정보를 담은 객체
+     2. from: 직전 route의 정보를 담은 객체
+     3. next: 실제 route의 이동을 조작하는 함수
+  3. 반드시 마지막에 next()로 route 이동을 실행해야 함
+
+### Vuex
+
+#### Vuex modules
+
+- Module 분리
+  1. 단일 파일(@/store/index.js)에 모든 state, getters, mutations, actions를 작성할 경우, App이 커질수록 파일의 크기가 너무 커짐
+  2. 기능에 따라 state, getters, mutations, actions를 모듈(파일)로 분리하여 사용
+
+#### namespace
+
+- Module의 이름공간(module space)
+
+  ```js
+  //@/store/index.js
+  import Vue from 'vue'
+  import Vuex from 'vuex'
+  
+  import articles from './modules/articles'
+  import accounts from './modules/accounts'
+  
+  Vue.use(Vuex)
+  
+  export default new Vuex.Store({
+    modules: { accounts, articles },
+  })
+  ```
+
+  1. 다른 module에 작성되어 있어도, 실제로는 global namespace에 등록됨
+  2. 만약 확실하게 모듈별로 구분하고 싶다면, namespaced: true 옵션을 사용
