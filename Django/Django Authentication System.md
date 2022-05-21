@@ -297,7 +297,32 @@ def logout(request):
 ### "next" query string parameter
 
 - 로그인이 정상적으로 진행되면 <u>기존에 요청했던 주소로</u> redirect하기 위해 마치 주소를 keep해주는 것
+
   - next parameter가 있는 현재 url로 요청을 보내야하기 때문에 action을 비워둔다
+
+  - 비로그인 상태에서 글을 쓰려고 할 경우(@login_required() 설정되어있을 때) next 파라미터에 기존 view의 주소를 전달하여 로그인 완료 후 요청했던 URL로 redirect할 수 있도록 한다
+
+    ```python
+    #django github(django/django/contrib/auth/views.py )
+    from urllib.parse import urlparse, urlunparse
+    ...
+    def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
+        """
+        Redirect the user to the login page, passing the given 'next' page.
+        """
+        resolved_url = resolve_url(login_url or settings.LOGIN_URL)	#로그인 화면의 url
+    
+        login_url_parts = list(urlparse(resolved_url))
+        if redirect_field_name:	#존재한다면 로그인 url 일부 수정
+            querystring = QueryDict(login_url_parts[4], mutable=True)
+            #4는 query string을 의미. QueryDict는 url query string을 딕셔너리형태로 저장하는 자료형. 
+            #딕셔너리 수정 가능하도록 mutable=True
+            querystring[redirect_field_name] = next	#redirect_field_name에 next 값 전달
+            login_url_parts[4] = querystring.urlencode(safe='/')	
+    
+        return HttpResponseRedirect(urlunparse(login_url_parts))
+    ```
+
 - 단, 별도로 처리해주지 않으면 우리가 view에 설정한 redirect 경로로 이동하게 됨
 
 ```python
