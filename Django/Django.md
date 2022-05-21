@@ -19,6 +19,15 @@
     - 웹 페이지에 대한 요청을 받은 경우 서버는 **추가적인 처리 과정** 이후 클라이언트에게 응답을 보냄
     - 동적 웹 페이지는 **방문자와 상호작용**하기 때문에 **페이지 내용은 그때그때 다름**
     - 서버 사이드 프로그래밍 언어(<u>Python, Java, C++ 등</u>)이 사용됨. 파일을 처리하고 데이터베이스와의 상호작용(저장, 수정, 삭제, 조회)이 이루어짐
+  - 웹의 동작 원리
+    1. 사용자가 브라우저에 웹 주소를 입력하면 브라우저는 DNS 서버로 가서 웹사이트가 있는 서버의 진짜 주소를 찾는다.
+       - dns 서버: 웹 사이트를 위한 주소록. 브라우저에 입력하는 웹주소(ex. mozilla.org) 를 웹사이트의 실제 주소(IP. ex. 63.245.217.105)에 맞춰주는 특별한 서버
+    2.  브라우저는 서버에게 웹사이트의 사본을 클라이언트에게 보내달라는 HTTP 요청 메세지를 서버로 전송. 
+       - 메세지, 그리고 클라이언트와 서버 사이에 전송된 모든 데이터는 TCP/IP 연결을 통해서 전송됨.
+         - TCP/IP: 전송 제어 규약과 인터넷 규약. 인터넷으로 통신하는 데 있어 가장 기반이 되는프로토콜
+    3. 이 메세지를 받은 서버는 올바른 요청이면 승인하고, "200 OK"(코드의 동작 결과) 메세지를 클라이언트에게 전송. 
+    4. 서버는 웹사이트의 파일들을 데이터 패킷이라 불리는 작은 일련의 덩어리들로 브라우저에 전송하기 시작
+    5. 브라우저는 이 작은 덩어리들을 완전한 웹 사이트로 조립하고, 화면에 표시한다
 
 - Frame work (= Applicatiion framework)
   - 프로그래밍에서 특정 운영 체제를 위한 응용 프로그램 표준 구조를 구현하는 **클래스와 라이브러리 모임**
@@ -40,6 +49,7 @@
 
   - MVC(Model-View-controller) Design Pattern
     - 소프트웨어 공학에서 사용되는 디자인 패턴 중 하나
+      - 디자인패턴: 객체 지향 프로그래밍 설계를 할 때 자주 발생하는 문제들을 피하기 위해 사용되는 패턴. 의사소통 수단의 일종
     - 사용자 인터페이스로부터 프로그램 로직을 분리하여 애플리케이션의 시각적 요소나 이면에서 실행되는 부분을 서로 영향 없이 쉽게 고칠 수 있는 애플리케이션을 만들 수 있음
     - Django에서는 MTV(Model-Template-View) Pattern이라고 함
 
@@ -528,8 +538,8 @@ def catch(request):
            return render(request, 'articles/index.html')
        ```
 
-```django
-{# settings.py #}
+```python
+# settings.py
 ...
 TEMPLATES = [
 	{
@@ -539,32 +549,32 @@ TEMPLATES = [
 	}
 ]
 
-{# pjt/urls.py #}
+# pjt/urls.py
 urlpatterns=[
 	path('pages/', include('pages.urls'))
 ]
 
-{# articles/urls.py #}
+# articles/urls.py
 from . import views
 app_name='articles'
 urlpatterns=[
 	path('/index', views.index, name='index')
 ]
 
-{# pages/urls.py #}
+# pages/urls.py
 from django.urls import path
-from . import views	{# 명시적인 상대경로 #}
+from . import views	# 명시적인 상대경로
 app_name='pages'
 urlpatterns=[
 	path('index/', views.index, name='index')
 ]
 
-{# pages/views.py #}
+# pages/views.py
 def index(request):
 	return render(request, 'index.html')
 
-{# pages/templates/index.html #}
-{# 참조 : 어떤 앱의 url인지 붙여준다 #}
+# pages/templates/index.html
+# 참조 : 어떤 앱의 url인지 붙여준다
 {% extends 'base.html' %}
 {% block content %}
 	<a href="{% url 'pages:index' %}"></a>
