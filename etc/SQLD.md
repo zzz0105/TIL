@@ -746,3 +746,164 @@
     - 불규칙한 응답 속도
     - 통제의 어려움
     - 데이터 무결성에 대한 위협
+
+### 2과목 1장 SQL 기본 
+
+- SQL 문장 종류
+
+  - DCL: 데이터베이스 사용자에게 권한을 부여/회수하는 언어
+
+    - GRANT: 권한 부여
+      - GRANT 권한 ON 테이블 TO 유저;
+    - REVOKE: 권한 회수
+      - REVOKE 권한 ON 테이블 FROM 유저;
+    - 권한의 종류: SELECT,INSERT,UPDATE,DELETE / REFERENCES,ALTER,INDEX / ALL
+      - WHERE 조건문을 사용가능하게 하려면 SELECT 권한 부여해야 한다
+      - ROLE이란? 
+        - 다양한 권한을 다양한 유저를 대상으로 관리하기 위한 명령어. 
+        - 다양한 권한을 하나의 그룹으로 묶어서 관리할 수 있도록 하는 논리적인 권한의 그룹. 
+        - 여러 사용자에게 동일한 ROLL 부여 가능하다. 
+        - ROLE의 생성은 CREATE ROLE 권한을 가진 유저가 할 수 있다.
+    - GRANT 옵션
+      - TO 유저 WITH GRANT OPTION;
+        - 특정 사용자에게 권한 부여 가능한 권한 부여
+        - 엄마가 회수될 때 자식도 회수됨
+      - TO 유저 WITH ADMIN OPTION;
+        - 테이블에 대한 모든 권한 부여
+        - 엄마의 권한 회수는 나와 상관이 없다
+
+  - DDL: 데이터를 보관하고 관리하기 위한 객체의 구조를 정의하기 위한 언어. SQL 서버에서 자동으로 DB에 반영
+
+    - CREATE: 데이터베이스 상 테이블 구조 생성
+
+      ```sql
+      CREATE TABLE C_INFO (		 --테이블 이름 C_INFO
+          이름		varchar2(10),	--컬럼명과 컬럼의 속성 정의
+          생년		number(4) default 9999,
+          phone	 varchar2(15) not null,
+          첫방문일   date,
+          고객번호   varchar2(10) primary key
+      );	
+      ```
+
+      - 구조
+
+        - 컬럼명의 시작은 무조건 문자로. 영어, 한글, 숫자 모두 가능
+
+          +) 테이블명의 시작은 무조건 문자로. 영어, 숫자, _, #, $ 모두 가능
+          		다른 테이블명과 중복되지 않아야하고, 칼럼 뒤 데이터 유형은 꼭 지정되어야 함
+
+        - 데이터 타입
+
+          - number: 숫자형
+          - date: 날짜형
+          - varchar2: 가변길이 문자열
+            - '호호' != '호호   '
+          - char: 고정된 크기 문자열 할당된 길이만큼 문자를 채움
+            - '호호' = '호호   '
+
+      - 제약조건(CONSTRAINT)
+
+        - default: 기본값 지정
+        - not null: null 입력 불가
+          - null: 모르는 값. 값이 없음(부재)을 의미. null과의 모든 비교 및 연산은 null값을 반환하며, NULL **IS** NULL = TRUE. NULL은 숫자0이나 공백문자와 동일하지 않음.
+          - count(*): 전체 행의 수 카운트, null 포함
+          - count(컬럼명): null 제외한 행 수 카운트
+        - primary key: 기본키 지정
+          - pk는 not null. unique한 값(테이블 내 중복 없음)
+        - foreign key: 외래키 지정. 테이블 당 여러개 가능
+
+    - ALTER: 테이블과 칼럼에 대해 이름 및 속성 변경, 추가/삭제 등 구조 수정을 위해 사용
+
+      ```sql
+      -- 	테이블			명령		대상
+      ALTER TABLE MENU RENAME TO MENU;	--테이블명 변경
+      RENAME TABLE MENU TO MENU	--테이블명 변경(다수 테이블명 동시에 변경 가능)
+      ALTER TABLE MENU RENAME COLUMN phone TO 전화번호;	   --컬럼명 변경
+      ALTER TABLE MENU MODIFY (이름 varchar(20) not null);	--칼럼 속성 변경
+      ALTER TABLE MENU ADD (거주지역 varchar(10));	--칼럼 추가
+      ALTER TABLE MENU DROP COLUMN 이름;			 --칼럼 삭제
+      ALTER TABLE MENU ADD CONSTRAINT; 	--제약조건 추가
+      ALTER TABLE MENU DROP CONSTRAINT;	--제약조건 삭제
+      ```
+
+    - RENAME: 이름 변경
+
+    - DROP: 테이블 및 칼럼 삭제
+
+      ```sql
+      ALTER TABLE MENU DROP COLUMN 이름;	--칼럼 삭제
+      DROP TABLE MENU;		--테이블 삭제
+      ```
+
+      - 테이블 삭제 유의사항
+        - DROP TABLE MENU CASCADE CONSTRAINT;	
+          - 해당 테이블의 데이터를 외래키로 참조한 제약사항도 모두 삭제
+          - ORACLE에만 있는 조건. SQL SERVER에는 존재하지 않음
+          - FK제약조건과 참조테이블 먼저 삭제하고, 해당 테이블을 삭제한다
+
+    - TRUNCATE: 테이블 초기화
+
+      - DROP vs. TRUNCATE
+
+        ```sql
+        DROP TABLE MENU;		--테이블 관련해서 모두 삭제. (구조와 데이터도)
+        TRUNCATE TABLE MENU;	--테이블 데이터만 삭제되고 구조는 살아있다
+        ```
+
+        - DROP
+          - 테이블 정의를 완전 삭제
+          - 테이블이 사용했던 모든 저장공간을 Release됨
+        - TRUNCATE
+          - 테이블을 초기상태로 만듦(뼈대만 살렸다)
+          - 테이블 최초 형성 시 사용했던 저장공간만 남기고 Release
+
+  - DML: 정의된 데이터베이스에 레코드를 입력하거나, 수정, 삭제 및 조회하기 위한 명령어다.
+
+    ```sql
+    INSERT INTO MENU (NAME) VALUES ('연어스시');
+    UPDATE MENU SET discount_rate = 10 (where name = '연어스시');
+    DELETE FROM MENU (WHERE name='연어스시')
+    
+    UPDATE MENU SET 메뉴코드 =100 WHERE 메뉴명='연어스시'
+    DELETE MENU
+    INSERT INTO MENU (메뉴코드, 가격, 메뉴명) VALUES ('100', 1000, '연어스시')
+    INSERT INTO MENU VALUES ('100', '연어스시', 300, 0)	--튜플
+    ```
+
+    - INSERT: 데이터 입력
+      - 칼럼명 지정이 이뤄지지 않은 상태에서는 전체값이 들어가야함
+      - not null 값인 메뉴명에 대한 insert가 이뤄지지 않을 경우 오류 발생
+    - UPDATE: 데이터 수정
+      - COL1 컬럼에 행이 3개가 있는데 UPDATE 테이블 SET COL1=50이라고 하면 모든 행의 값이 50으로 바뀐다
+    - DELETE: 데이터 삭제
+      - DELETE에서 FROM 생략 가능. DELETE MENU 가능
+      - 숫자는 varchar2와 char에 입력 가능.
+      - 삭제된 데이터에 대해 로그를 남길 수 있는 방법. DB에 반영되기 전까지 삭제된 데이터를 다시 되돌릴 수 있다
+        -> 데이터는 삭제되지만 용량이 줄어들지 않는다.
+      - 특정행을 삭제할 수 있다
+
+    - SELECT: 조회
+
+  - TCL: 트랜잭션을 제어하기 위한 언어
+
+    - COMMIT: 데이터에 대한 변화를 DB에 반영하기 위한 명령어
+      - 영구적으로 반영이 됨 = COMMIT되어 DB에 들어감
+    - ROLLBACK: 코드를 분할하기 위한 저장 포인트 지정
+      - SAVEPOINT가 쓰여있지 않을 경우 가장 최신의 COMMIT 상태로 복원된다
+    - SAVEPOINT: 트랜잭션이 시작되기 이전의 상태로 되돌리기 위한 언어. 
+      최신 COMMIT이나 특수한 SAVEPOINT로 되돌릴 수 있는 명령어
+
+    +. COMMIT과 ROLLBACK의 효과
+
+    	1. 데이터 무결성을 보장할 수 있다
+     	2. 영구적인 변경 전 데이터에 대한 변동사항을 확인할 수 있다
+     	3. 논리적 연관성 있는 작업을 그룹화하여 처리할 수 있다
+
+    +. 트랜잭션: 데이터베이스의 상태를 변화시키기 위해 수행하는 작업의 단위
+
+    - 특징
+      - 고립성: 트랜잭션이 **실행되는 동안** 다른 트랜잭션에 영향을 받아 잘못된 결과를 만들어선 안된다
+      - 원자성: **all or nothing**. 트랜잭션에서 정의된 연산은 모두 성공적으로 실행되던지 아니면 전혀 실행되지 않은 상태로 있어야 한다
+      - 지속성: 트랜잭션이 성공적으로 완료되면 해당 트랜잭션이 갱신한 데이터베이스의 내용은 **영구적으로 저장**
+      - 일관성: 트랜잭션 발생 전 데이터베이스 내용에 잘못된 점이 없다면 트랜잭션 **수행 후**에도 데이터베이스의 내용에 잘못이 있으면 안된다
