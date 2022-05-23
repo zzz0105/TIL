@@ -874,8 +874,11 @@
     - INSERT: 데이터 입력
       - 칼럼명 지정이 이뤄지지 않은 상태에서는 전체값이 들어가야함
       - not null 값인 메뉴명에 대한 insert가 이뤄지지 않을 경우 오류 발생
+      
     - UPDATE: 데이터 수정
+      
       - COL1 컬럼에 행이 3개가 있는데 UPDATE 테이블 SET COL1=50이라고 하면 모든 행의 값이 50으로 바뀐다
+      
     - DELETE: 데이터 삭제
       - DELETE에서 FROM 생략 가능. DELETE MENU 가능
       - 숫자는 varchar2와 char에 입력 가능.
@@ -885,7 +888,91 @@
 
     - SELECT: 조회
 
-  - TCL: 트랜잭션을 제어하기 위한 언어
+      - **SELECT** 조회대상(컬럼명 등) **FROM** 테이블명 **WHERE** 조건문 **GROUP BY** 집계기준컬럼명 **HAVING** grouping된 후 상태 기반의 조건문 **ORDER BY** 컬럼명
+
+      - 예시
+
+        INFO
+
+        | 유저코드 | 성별 | 이름 |
+        | -------- | ---- | ---- |
+        | 1A       | F    | A    |
+        | 2A       | M    | B    |
+        | 3A       | M    | C    |
+        | 4A       | F    | D    |
+        | 5A       |      | E    |
+
+        ```sql
+        SELECT COUNT(*) FROM C_INFO      	   --5
+        SELECT COUNT(성별) FROM C_INFO		  --4
+        SELECT COUNT(DISTINCT 성별) FROM C_INFO --3
+        ```
+        - SELECT DISTINCT: 중복값 없이 가져오는 것. NULL도 단일 행으로 본다. 만약 DISTINCT가 두 컬럼에 대해 적용되었다면 컬럼의 조합에서 중복을 제거하고 조회한다
+
+      - SELECT문 기본 구조 - 문자형 함수
+
+        ```sql
+        LOWER('SQL')			--'sql'
+        UPPER('sql')			--'SQL'
+        CONCAT('S'+'QL') = 'S'||'QL' = 'S'+'QL'	--'SQL'
+        SUBSTR('SQL',2,2)		--'QL'
+        LEN('S QL')				--4
+        TRIM('AABBCCAA', 'A')	--'BBCC'
+        TRIM(' AABBCCAA ',)		--'AABBCCAA'	지정된 문자 없으면 공백 제거
+        LTRIM('AABBCCAA', 'A')	--'BBCCAA'
+        LTRIM(' AABBCCAA ',)	--'AABBCCAA '
+        RTRIM('AABBCCAA', 'A') 	--'AABBCC'
+        RTRIM(' AABBCCAA ',)	--' AABBCCAA'
+        
+        SELECT TRIM(유저코드, 'A'), LOWER(이름) FROM INFO	
+        --INFO 테이블에서 양쪽에서 A를 제거한 유저코드, 소문자로 나타낸 이름을 조회
+        SELECT T1.* FROM table1 T1, table2 T2 WHERE UPPER(T1.col1) LIKE T2.col1
+        /* T1(테이블1)의 col1을 대문자로 변환한 결과가 T2(테이블2)와 유사한 경우 둘을 접합시키고 T1에 있는 모든 것을 조회 */
+        ```
+
+        - LOWER(문자열): 영어 문자열 소문자로 변환
+        - UPPER(문자열): 영어 문자열 대문자로 변환
+        - CONCAT(문자열1, 문자열2): 문자열 1과 문자열2를 결합
+        - SUBSTR(문자열,m,n): 문자열에서 <u>m번째 자리값부터 n개</u>를 자른다
+        - LENGTH(문자열) = LEN(문자열): <u>공백을 포함</u>하여 문자열의 길이값
+        - TRIM(문자열, 제거대상): 왼쪽과 오른쪽에서 지정된 문자를 삭제한다
+          - LTRIM(문자열, 제거대상): 왼쪽에서 지정된 문자를 삭제한다
+          - RTRIM(문자열, 제거대상): 오른쪽에서 지정된 문자를 삭제한다
+
+      - SELECT문 기본 구조 - 숫자형 함수
+
+        ```sql
+        ROUND(25.3467, 2)	--25.35
+        TRUNC(25.3467, 2)	--25.34
+        CEIL(25.3427)		--26
+        FLOOR(25.3427)		--25
+        MOD(25, 7)			--4
+        SIGN(25.3427)		--1
+        ABS(25.3427)		--25.3427
+        ```
+
+        - ROUND(숫자, 소숫점 자릿수): 반올림
+        - TRUNC(숫자, 소숫점 자릿수): 버림
+        - CEIL(숫자): 크거나 같은 최대 정수 반환
+        - FLOOR(숫자): 작거나 같은 최대 정수 반환
+        - MOD(분자, 분모): 분자를 분모로 나눈 나머지 반환
+        - SIGN(숫자): 숫자가 양수면 1, 0이면 0, 음수면 -1 반환
+        - ABS(숫자): 절댓값
+
+      - SELECT문 기본 구조 - 날짜형 함수
+
+        ```sql
+        SELECT SYSDATE FROM DUAL	--2022/05/23 11:45:23(datetime 형태)
+        --DUAL은 오라클이 설치될 때 만들어지는 테이블. 산술, 날짜 처리 등을 하는 기본 임시 테이블
+        EXTRACT(YEAR FROM sysdate)	--2022
+        EXTRACT(YEAR FROM sysdate) TO_NUMBER(TO_CHAR(sysdate, 'YYYY')) --2022
+        ```
+
+        - SYSDATE: 쿼리를 돌리는 현재 날짜 & 시각 출력
+        - EXTRACT(정보 FROM 날짜): 날짜형 데이터에서 원하는 값을 출력함
+          - 정보: YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
+
+  - TCL: 트랜잭션을 제어하기 위한 언어 
 
     - COMMIT: 데이터에 대한 변화를 DB에 반영하기 위한 명령어
       - 영구적으로 반영이 됨 = COMMIT되어 DB에 들어감
@@ -897,8 +984,8 @@
     +. COMMIT과 ROLLBACK의 효과
 
     	1. 데이터 무결성을 보장할 수 있다
-     	2. 영구적인 변경 전 데이터에 대한 변동사항을 확인할 수 있다
-     	3. 논리적 연관성 있는 작업을 그룹화하여 처리할 수 있다
+    	2. 영구적인 변경 전 데이터에 대한 변동사항을 확인할 수 있다
+    	3. 논리적 연관성 있는 작업을 그룹화하여 처리할 수 있다
 
     +. 트랜잭션: 데이터베이스의 상태를 변화시키기 위해 수행하는 작업의 단위
 
