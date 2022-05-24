@@ -890,6 +890,8 @@
 
       - **SELECT** 조회대상(컬럼명 등) **FROM** 테이블명 **WHERE** 조건문 **GROUP BY** 집계기준컬럼명 **HAVING** grouping된 후 상태 기반의 조건문 **ORDER BY** 컬럼명
 
+        - 실행 순서: SELECT ALIAS > FROM > WHERE > GROUP BY > HAVING > SELECT > ORDER BY
+
       - 예시
 
         INFO
@@ -971,6 +973,143 @@
         - SYSDATE: 쿼리를 돌리는 현재 날짜 & 시각 출력
         - EXTRACT(정보 FROM 날짜): 날짜형 데이터에서 원하는 값을 출력함
           - 정보: YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
+
+      - SELECT문 기본 구조 - 명시적/암시적 형변환
+
+        > 명시적 형변환: 형변환 함수를 사용하여 강제로 data type을 변경하는 것
+        >
+        > 암시적 형변환: 데이터베이스가 알아서 바꿔주는 것 
+        > 	ex. where pk='12' -> 인덱스에 대해 암시적 형변환이 발생. 인덱스를 사용할 수 없다
+
+        ```sql
+        TO_NUMBER('2022')	--2022
+        TO_CHAR(date '2022-02-11', 'day')	--'금요일'
+        TO_CHAR(200)		--'200'
+        TO_DATE('20220523', 'YYYYMMDDHH24')	--2022/05/23 23:00:00
+        SELECT TO_CHAR(SYSDATE-1, 'YYYYMMDD') FROM DUAL;	--어제 날짜 조회
+        ```
+
+        - TO_NUMBER(문자열): 문자열을 숫자로 변환
+        - TO_CHAR(숫자 or 날짜, 포맷): 숫자 혹은 날짜형 데이터를 포맷에 맞게 문자로 바꿈
+        - TO_DATE(문자열, 포맷): 날짜형으로 변환
+
+      - SELECT문 기본 구조 - DECODE, CASE WHEN
+
+        ```sql
+        DECODE(B, C, '나', '너')		--'너'
+        CASE WHEN col1 < 10 THEN '한자릿수'
+             WHEN col1 BETWEEN 10 AND 99 THEN '두자릿수'
+             ELSE '세자릿수'
+        END
+        SELECT 회원코드 AS ID, 연령 AS AGE, 이름 AS NAME
+        FROM INFO
+        ORDER BY (CASE WHEN 회원코드=101 OR 회원코드=104 THEN 1 ELSE 2 END), 연령 DESC 
+        /* AS는 ALIAS의 줄임말. 컬럼명을 변경하여 출력되도록 도움
+        ORDER BY 2개 기준으로 정렬됨. 마지막으로 수행됨
+        회원코드가 101 또는 104일 때 기준1이 1, 그외에는 2. 말이 없으면 ASC정렬
+        (출력되지 않는다. 정렬할 때만 쓰는 것)
+        기준2는 AGE*/
+        ```
+
+        - DECODE(값1, 값2, 참일 때 출력값, 거짓일 때 출력값): IF문
+
+        - CASE WHEN 조건 THEN 조건이 참일 때 결과 ELSE 거짓일 때 결과 END
+
+        - CASE WHEN 조건문1 THEN 결과값1
+
+          ​		 ...
+
+          ​		 WHEN 조건문N THEN 결과값N
+
+          ​		 ELSE 결과값 N+1
+
+          END
+
+      - SELECT문 기본 구조 - WHERE 조건문
+
+        - IN (x,y,z): x, y, z 등으로 구성된 목록 내 값 중 어느 하나라도 일치하면 된다
+
+        - NOT IN (x,y,z): x, y, z 등으로 구성된 목록 내 값 중 어느 하나라도 일치하면 안된다
+
+        - IS NULL: NULL인지 판단. NULL일 경우 TRUE. 표현식 두 개의 데이터 타입이 같아야 함
+
+          - ISNULL(생일,9999) -> 생일이 NULL이면 9999 표시
+
+        - IS NOT NULL: NULL이 아닌지 판단. NULL이 아닌 경우 TRUE
+
+        - BETWEEN a AND b: a와 b 사이에 값이 있는지
+
+        - 비교연산자(=, >, >=, <, <=)
+
+        - 문자열 조건문 관련 연산자
+
+          ```sql
+          SELECT * FROM words WHERE 단어 LIKE 'li%' ORDER BY 1
+          --여기서 1은 조회된 테이블의 컬럼순서 번호
+          
+          SELECT * FROM INFO WHERE ROWNUM=1; 
+          --ROWNUM: 조회된 행이 몇번째 행인지 부여해줌
+          --ROWID: 데이터베이스에 저장되어 있는 데이터를 구분할 수 있는 유일한 값
+          --SQL SERVER에서는 TOP(1), MySQL에서는 LIMIT1
+          
+          WITH TableName AS (SELECT * FROM INFO WHERE NAME LIKE '%a%')
+          --이름에 a가 들어가는 사람들 대상으로 임시테이블 만들고 전체를 조회하기
+          
+          SELECT * FROM(SELECT * FROM INFO WHERE name LIKE '%a%')
+          --서브쿼리
+          ```
+
+          - A LIKE B: A에 대하여 B와 유사한 문자열을 찾아줌
+          - %: 문자 1개 이상이 존재한다는 의미
+          - _: 문자 한 개
+
+          +. WITH 구문
+
+           	1. 서브쿼리를 사용해서 임시테이블이나 뷰처럼 사용 가능함
+               - 서브쿼리: SELECT 문 내에 SELECT 문이 또 쓰여있는 쿼리
+               - 뷰 테이블: 일종의 가상테이블로서 실제 데이터가 하드웨어에 저장되는 것은 아니다. 실제 데이터를 가지고 있지 않다. 테이블 구조가 변경되더라도 독립적으로 존재. 사용상의 편의. 수행속도 향상. 보안성.
+           	2. 별칭 지정 가능함
+           	3. 인라인뷰나 임시테이블로 판단
+               - 인라인뷰: 서브쿼리가 FROM 절 내에 쓰여진 것
+
+      - SELECT문 기본 구조 - NULL 관련 함수
+
+        ```sql
+        NVL(col1, 100) 			-- col1이 NULL이면 100으로 바꿔줌
+        NVL2(col1, 'F', 'T')	--col1이 NULL이면 'F', 아니면 'T' 출력
+        NULLIF(1,2)				--1
+        COALESCE(NULL,2,3)		--3
+        ```
+
+        - NVL(col1, 대체값): NULL이면 다른 값으로 바꿔주는 함수. 표현식 두 개의 데이터 타입이 같아야 함
+        - NVL2(col1, 결과1, 결과2): col1이 NULL이면 결과1, 아니면 결과2
+        - NULLIF(v1, v2): v1과 v2가 같으면 NULL, 다르면 V1을 출력
+        - COALESCE(v1, v2, ... , vn): NULL이 아닌 최초의 값을 반환
+
+      - SELECT문 기본 구조 - GROUP BY: DISTINCT한 값을 기준으로 묶어준다
+
+        - GROUP BY 안에서도 함수를 먹인 상태에서 집계를 해주어야 한다
+
+        - 두 개의 컬럼으로 GROUP BY가 된다면, 각각 DISTINCT한 조합으로 함.
+
+        - SELECT문 기본 구조 - 집계함수
+
+          ```sql
+          COUNT(*), COUNT(exp)		--COUNT(*): NULL 포함, COUNT(exp): NULL 제외
+          SUM([DISTINCT|ALL] exp)		--합계
+          AVG([DISTINCT|ALL] exp)		--평균
+          MAX([DISTINCT|ALL] exp)		--최대값
+          MIN([DISTINCT|ALL] exp)		--최소값
+          STDDEV([DISTINCT|ALL] exp)	--표준편차
+          VARIAN([DISTINCT|ALL] exp)	--분산
+          -- NULL 값에 대한 연산 결과는 모두 NULL. 통계적 집계함수를 연산할 때 NULL을 제외하고 계산
+          ```
+
+      - SELECT문 기본 구조 - HAVING
+
+        ```sql
+        SELECT 성별, AVG(연령) FROM INFO GROUP BY 성별 HAVING AVG(연령)>=30 AND AVG(연령)<40	--성별의 평균 연령이 30대인 셩별의 성별과 평균 연령 출력
+        ```
 
   - TCL: 트랜잭션을 제어하기 위한 언어 
 
