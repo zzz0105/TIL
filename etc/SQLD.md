@@ -1066,11 +1066,11 @@
           +. WITH 구문
 
            	1. 서브쿼리를 사용해서 임시테이블이나 뷰처럼 사용 가능함
-               - 서브쿼리: SELECT 문 내에 SELECT 문이 또 쓰여있는 쿼리
-               - 뷰 테이블: 일종의 가상테이블로서 실제 데이터가 하드웨어에 저장되는 것은 아니다. 실제 데이터를 가지고 있지 않다. 테이블 구조가 변경되더라도 독립적으로 존재. 사용상의 편의. 수행속도 향상. 보안성.
+           	 - 서브쿼리: SELECT 문 내에 SELECT 문이 또 쓰여있는 쿼리
+           	 - 뷰 테이블: 일종의 가상테이블로서 실제 데이터가 하드웨어에 저장되는 것은 아니다. 실제 데이터를 가지고 있지 않다. 테이블 구조가 변경되더라도 독립적으로 존재. 사용상의 편의. 수행속도 향상. 보안성.
            	2. 별칭 지정 가능함
            	3. 인라인뷰나 임시테이블로 판단
-               - 인라인뷰: 서브쿼리가 FROM 절 내에 쓰여진 것
+           	 - 인라인뷰: 서브쿼리가 FROM 절 내에 쓰여진 것
 
       - SELECT문 기본 구조 - NULL 관련 함수
 
@@ -1133,3 +1133,99 @@
       - 원자성: **all or nothing**. 트랜잭션에서 정의된 연산은 모두 성공적으로 실행되던지 아니면 전혀 실행되지 않은 상태로 있어야 한다
       - 지속성: 트랜잭션이 성공적으로 완료되면 해당 트랜잭션이 갱신한 데이터베이스의 내용은 **영구적으로 저장**
       - 일관성: 트랜잭션 발생 전 데이터베이스 내용에 잘못된 점이 없다면 트랜잭션 **수행 후**에도 데이터베이스의 내용에 잘못이 있으면 안된다
+
+### 2과목 2장 SQL 활용/최적화 기본원리
+
+- 그룹함수
+
+  - SELECT 성별, 연령대, count(회원코드) FROM INFO GROUP BY 성별, 연령대
+  - ROLLUP: 부분합계와 전체 합계값을 보여준다. 인수의 순서에 영향을 받는다
+    - SELECT 성별, 연령, SUM(결제금액) FROM 결제 GROUP BY ROLLUP(성별, 연령대) ORDER BY 성별, 연령;		첫인자(성별)의 결제금액을 부분합계로 보여준다. 마지막엔 전체합
+  - CUBE: 그룹화될 수 있는 <u>모든 경우</u>에 대해 생성. 계층 구조로 집계값을 반환
+  - GROUPING SETS: 괄호 묶은 집합 별 집계 가능 -> GROUPINGSETS(성별, 연령, (성별,연령),())이면 성별별 합계, 연령별 합계, 성별X연령 별 합계, 전체 합계를 얻을 수 있다. CUBE와 결과가 같다
+  - 정리
+
+  | SQL  구문                          | 결과                                                         |
+  | ---------------------------------- | ------------------------------------------------------------ |
+  | GROUP BY 성별, 연령                | 성별 X 연령 별 합계                                          |
+  | GROUP BY ROLLUP(성별, 연령)        | 성별 X  연령 별 합계<br />성별 별 합계<br />전체 합계        |
+  | GROUP BY CUBE(성별, 연령)          | 성별 X  연령 별 합계<br />성별 별 합계<br />연령 별 합계<br />전체 합계 |
+  | GROUP BY GROUPING SETS(성별, 연령) | 성별 별 합계<br />연령 별 합계                               |
+
+  - GROUPING 함수: 소계, 합계 등이 계산되면 1을 반환하고, 아니면 0을 반환한다
+
+    - SELECT 성별, GROUPING(성별) g1, 연령대, GROUPING(연령대) g2, SUM(결제금액) FROM INFO GROUP BY ROLLUP(성별, 연령대) ORDER BY 성별, 연령;
+
+      | 성별 | g1   | 연령대 | g2   | SUM(결제금액) |
+      | ---- | ---- | ------ | ---- | ------------- |
+      | F    | 0    | 10     | 0    | 10            |
+      | F    | 0    | 20     | 0    | 30            |
+      | F    | 0    |        | 1    | 40            |
+      | M    | 0    | 30     | 0    | 15            |
+      | M    | 0    | 40     | 0    | 55            |
+      | M    | 0    |        | 1    | 70            |
+      |      | 1    |        | 1    | 110           |
+
+      ```sql
+      --전체 합계 구분하고 싶다면
+      SELECT 성별, CASE WHEN GROUPING(성별)=1 
+      				 THEN '전체합계' END
+      			AS g1
+      		,연령, GROUPING(연령) g2, SUM(결제금액)
+      FROM 결제
+      GROUP BY ROLLUP(성별, 연령대)
+      ORDER BY 성별, 연령대
+      ```
+
+    - INFO테이블과 PHONE 테이블이 있을 때 이름과 전화번호를 함께 조회하려고 한다
+
+      - SELECT A.*, B.PHONE FROM INFO A INNER JOIN PHONE B ON A.회원코드=B.회원코드
+        - A에서 다 가져오고 B에서 PHONE을 가져온다
+
+- JOIN: 테이블 간의 결합. 집합과 유사함. 관련된 두 테이블에 적어도 하나의 공통 속성이 있을 때 적용 가능한 결합 방식
+
+  1. 테이블 간 결합의 key가 되는 칼럼 찾기
+  2. JOIN 방식에 따라 결과가 달라지기 때문에 KEY 컬럼값 간의 일치도 파악하기
+
+  ![JOIN - 생활코딩](https://s3.ap-northeast-2.amazonaws.com/opentutorials-user-file/module/98/1861.png)
+
+  - 교집합
+    - INNER JOIN: 교집합이 되는 공통의 키값을 가진 값들만 출력
+      - JOIN 예시
+        - SELECT A.*, B.연령 FROM GENDER A <u>INNER JOIN</u> AGE B <u>ON</u> A.회원코드=B.회원코드;
+          - GENDER을 A, AGE는 B라고 이름을 붙여줌. 회원코드(키)가 같은 경우 테이블 같이 보여줄 것이다. A의 모든 칼럼을 가져오고, B에서는 연령을 가져온다
+            - B에서도 모든 칼럼을 들고 오게되면 칼럼이 겹치게 된다 -> 하나만 쓰기
+        - SELECT A.*, B.연령 FROM GENDER A, AGE B <u>WHERE</u> A.회원코드=B.회원코드;
+      - JOIN 후 특정 행만 호출할 때
+        - SELECT A.*, B.연령 FROM GENDER A INNER JOIN AGE B ON A.회원코드=B.회원코드 WHERE A.성별='F';
+        - SELECT A.*, B.연령 FROM GENDER A, AGE B WHERE A.회원코드=B.회원코드 AND A.회원='F'
+      - 3개 이상의 테이블을 JOIN할 때
+        - SELECT A.*, B.연령, C.생년 FROM GENDER A JOIN AGE B ON A.회원코드=B.회원코드 JOIN BIRTH C ON B.연령 = C.생년
+        - SELECT A.*, B.연령 FROM GENDER A, BIRTH B WHERE A.회원코드=B.회원코드 AND B.연령=C.생년;
+    - OUTER JOIN: 합집합
+      - SELECT A.*, B.연령 FROM GENDER A FULL OUTER JOIN AGE B ON A.회원코드=B.회원코드;
+    - LEFT JOIN: A의 값(+)들은 다 나오고 B에서는 공통된 것만 붙이겠다. 없으면 NULL로. 
+      - SELECT A.*, B.연령 FROM GENDER A LEFT JOIN AGE B ON A.회원코드=B.회원코드;
+      - SELECT A.*, B.연령 FROM GENDER A, AGE B WHERE A.회원코드**(+)**=B.회원코드;
+    - RIGHT JOIN: B의 값(+)들은 다 나오고 A에서는 공통된 것만 붙이겠다. 없으면 NULL로.
+      - SELECT B.회원코드, 성별 연령 FROM GENDER A LEFT JOIN AGE B ON A.회원코드=B.회원코드;
+      - SELECT B.회원코드, 성별 연령 FROM GENDER A, AGE B WHERE A.회원코드=B.회원코드**(+)**;
+  - 합집합: 동일한 컬럼 개수와 데이터타입을 가진 두 테이블을 합쳐줌. 테이블을 위, 아래로 합친다
+    - UNION: 중복된 레코드가 제거됨(동일 컬럼구조, DATATYPE 동일 중복 제거)
+      - SELECT * FROM T1 UNION SELECT * FROM T2
+    - UNION ALL: 중복된 레코드가 제거되지 않음
+      - SELECT * FROM T1 UNION ALL SELECT * FROM T2
+  - 차집합: MINUS(oracle) = EXCEPT(SQL SERVER)
+    - A 회사의 고객만 추린다
+      - SELECT * FROM A MINUS SELECT * FROM B
+  - 결합되는 대상 간의 일치 정도 
+    - EQUI 조인: 동일한 컬럼을 사용하여 두 릴레이션을 결합. 공통적으로 존재하는 칼럼의 값이 일치되는 행을 연결해서 결과를 생성
+      - SELECT 테이블1.칼럼명, 테이블2.칼럼명 FROM   테이블1, 테이블2 WHERE  테이블1.칼럼명1 = 테이블2.칼럼명2; 
+    - NON-EQUI 조인: 정확하게 일치하지 않는 칼럼들을 사용하여 두 릴레이션을 결합
+      - SELECT 테이블1.칼럼명, 테이블2.칼럼명 FROM   테이블1, 테이블2 WHERE  테이블1.칼럼명1 BETWEEN 테이블2.칼럼명1 AND 테이블2.칼럼명2;
+      - =을 사용하지 않음
+      - A.key <, >, <=, >= B.key
+  - CROSS JOIN: key 없이 JOIN하면 2개의 테이블에 대해 케테시안 곱 발생
+    - 5*3=15개의 행이 조회된다
+      - SELECT * FROM T1 CROSS JOIN T2
+
