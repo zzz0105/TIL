@@ -1204,12 +1204,13 @@
         - SELECT A.*, B.연령 FROM GENDER A, BIRTH B WHERE A.회원코드=B.회원코드 AND B.연령=C.생년;
     - OUTER JOIN: 합집합
       - SELECT A.*, B.연령 FROM GENDER A FULL OUTER JOIN AGE B ON A.회원코드=B.회원코드;
+      - SELECT A.*, B.연령 FROM GENDER A, AGE B WHERE A.회원코드**(+)**=B.회원코드**(+)**;
     - LEFT JOIN: A의 값(+)들은 다 나오고 B에서는 공통된 것만 붙이겠다. 없으면 NULL로. 
       - SELECT A.*, B.연령 FROM GENDER A LEFT JOIN AGE B ON A.회원코드=B.회원코드;
-      - SELECT A.*, B.연령 FROM GENDER A, AGE B WHERE A.회원코드**(+)**=B.회원코드;
+      - SELECT A.*, B.연령 FROM GENDER A, AGE B WHERE A.회원코드=B.회원코드**(+)**;
     - RIGHT JOIN: B의 값(+)들은 다 나오고 A에서는 공통된 것만 붙이겠다. 없으면 NULL로.
       - SELECT B.회원코드, 성별 연령 FROM GENDER A LEFT JOIN AGE B ON A.회원코드=B.회원코드;
-      - SELECT B.회원코드, 성별 연령 FROM GENDER A, AGE B WHERE A.회원코드=B.회원코드**(+)**;
+      - SELECT B.회원코드, 성별 연령 FROM GENDER A, AGE B WHERE A.회원코드**(+)**=B.회원코드;
   - 합집합: 동일한 컬럼 개수와 데이터타입을 가진 두 테이블을 합쳐줌. 테이블을 위, 아래로 합친다
     - UNION: 중복된 레코드가 제거됨(동일 컬럼구조, DATATYPE 동일 중복 제거)
       - SELECT * FROM T1 UNION SELECT * FROM T2
@@ -1228,4 +1229,80 @@
   - CROSS JOIN: key 없이 JOIN하면 2개의 테이블에 대해 케테시안 곱 발생
     - 5*3=15개의 행이 조회된다
       - SELECT * FROM T1 CROSS JOIN T2
+  
+- SubQuery
+
+  - 메인쿼리 vs 서브쿼리
+
+    - SELECT COUNT(*) FROM 고객목록 WHERE 고객번호 NOT IN (SELECT 고객번호 FROM 연체자목록)
+      - 전체: 메인 쿼리
+      - (SELECT 고객번호 FROM 연체자목록): 서브쿼리. SELECT 안의 SELECT(SELECT, FROM, WHERE 절에 들어갈 수 있다)
+    - 서브쿼리는 ORDER BY를 사용할 수 없다. 진짜로 보고자 하는 값이 아니기 때문에(있는지 없는지 이런게 중요함) ORDER BY는 있어도 필요가 없다.
+    - 메인쿼리에서 서브쿼리의 컬럼을 자유롭게 사용할 수 없다. 
+      서브쿼리 내부에서는 메인 쿼리의 칼럼을 쓸 수 있음. 
+      메인 쿼리에서는 SELECT되지 않은 서브쿼리의 컬럼을 사용할 수 없음
+    - EXIST가 반환하는 결과값은 True 혹은 False이다. 결과가 하나라도 존재하면 참.
+      - ex. WHERE EXISTS (SELECT 1 FROM INFO WHERE 거주지='서울')
+
+  - 이름이 있는 서브쿼리
+
+    - 인라인뷰(Inline View):FROM 구에 SELECT 문이 있다
+      - ex. FROM (SELECT * FROM 고객목록 WHERE 거주지='서울') A JOIN 연락처 B ON A.고객번호=B.고객번호
+    - 스칼라 서브쿼리: SELECT 문에 들어가고, <u>한 행과 한 컬럼만 변환</u>하는 서브쿼리
+      - ex. SELECT (SELECT(SUM(salary) FROM 급여 WHERE EXTRACT(YEAR FROM 급여지급일)=2021)...)
+
+  - 단일행/다중행 서브쿼리(출력되는 행의 개수에 따라 정의)
+
+    - SELECT COUNT(*) FROM 고객목록 WHERE 고객번호 NOT IN (SELECT 고객번호 FROM 연체자목록) → 다중행 서브쿼리(연체자목록이 여러행이 있으면)
+
+      - 메인쿼리의 결과와 서브 쿼리의 결과가 모두 동일할 때 참이 되는 다중행 연산자는?
+
+        ```sql
+        50000 > ALL(20000,30000) 	--TRUE. 전체에 대해 50000이 더 큰가
+        50000 > ANY(70000,30000)	--TRUE. 어느 것 하나라도 50000이 더 큰다
+        50000 > ALL(70000,30000)	--FALSE. 전체에 대해 50000이 더 큰가
+        ```
+
+    - SELECT (SELECT(SUM(salary) FROM 급여 WHERE EXTRACT(YEAR FROM 급여지급일)=2021)...)  → 단일행 서브쿼리
+
+- 계층형 조회: 트리 형태의 데이터에 대해 조회를 수행하는 것
+
+  - 계층 구조 시작점(START WITH로 계층형 조회의 시작점을 설정) → 부모데이터, ROOT 노드. LV1
+
+  - 자식 데이터: 부모 밑에 있는 데이터
+
+  - LEAF 노드: 자식노드가 없는 데이터
+
+  - 예시
+
+    - SELECT col3 FROM 조직구조 START WITH col2 IS NULL CONNECT BY PRIOR col1=col2 ORDER SIBILNGS BY col3 DESC
+
+      | col1 | col2 | col3 |
+      | ---- | ---- | ---- |
+      | 11   |      | 10   |
+      | 12   | 11   | 12   |
+      | 13   | 11   | 13   |
+      | 14   | 12   | 15   |
+
+      - 계층형 조회문제는 조회를 통해 어떻게 레코드가 재배치 되는지 파악하는 것이 중요! 동일한 값을 가진 칼럼끼리 연결되어 재배치된다
+
+      - START WITH: 계층 구조가 시작되는 지점을 알려줌. 여기에 적힌 조건에 맞는 레코드가 ROOT. 이 문제에서는 첫번째 레코드 행이 트리구조의 루트노드이다
+
+      - CONNECT BY: 계층구조(트리)가 연결된 방향성을 알려줌. EX. 자식노드→부모노드, 부모노드 → 자식노드
+
+        - 모든 레코드에 대하여 관계성을 파악하면 재배치된 테이블에서 전체 레코드의 순서를 알 수 있다
+        - CONNECT BY PRIOR a=b
+          1. a컬럼과 b컬럼이 동일한 레코드들 간에 계층화가 발생한다.
+          2. b→a 순으로 재배치된다(a가 부모의 키값. b가 자식의 키값)</u> 직독직해!
+
+      - ORDER SIBLINGS BY col3 DESC: col3 기준, 내림차순으로 배치 순서 결정
+
+      - | col1 | col2 | col3 |
+        | ---- | ---- | ---- |
+        | 11   |      | 10   |
+        | 13   | 11   | 13   |
+        | 12   | 11   | 12   |
+        | 14   | 12   | 15   |
+
+        
 
